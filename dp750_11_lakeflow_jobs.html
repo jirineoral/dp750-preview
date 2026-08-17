@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Lakeflow Jobs — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+[data-view="orig"]{display:none}
+html.mode-orig [data-view="orig"]{display:revert}
+html.mode-orig [data-view="custom"]{display:none}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="orig")document.documentElement.className="mode-orig"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Lakeflow Jobs</span>
+  </div>
+  <div class="nav-links">
+    <button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_12_dev_lifecycle.html" class="next">Vývojový lifecycle →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-anatomie-jobu" class="toc-item active" data-section="sec-anatomie-jobu">Anatomie Lakeflow Jobu: tasky, zdroje kódu, compute</a>
+    <a href="#sec-zavislosti-parametry" class="toc-item" data-section="sec-zavislosti-parametry">Závislosti tasků a parametry jobu</a>
+    <a href="#sec-triggery" class="toc-item" data-section="sec-triggery">Triggery: scheduled, file arrival, table update, continuous</a>
+    <a href="#sec-planovani" class="toc-item" data-section="sec-planovani">Plánování: cron, časové zóny, souběžné běhy</a>
+    <a href="#sec-alerty" class="toc-item" data-section="sec-alerty">Alerty a notifikace</a>
+    <a href="#sec-retry" class="toc-item" data-section="sec-retry">Automatické restarty a retry policy</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 11: Implement Lakeflow Jobs (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 11</div>
+      <h1>Lakeflow Jobs</h1>
+      <div class="hero-subtitle">Konfigurace jobů, triggery, plánování, alerty a automatické restarty</div>
+      <div class="hero-meta"><span>🗂 Automatizace</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Vytvořit a nakonfigurovat Lakeflow Job s tasky, závislostmi a vhodným compute</li>
+    <li>Nastavit triggery jobu — scheduled, file arrival, table update a continuous</li>
+    <li>Naplánovat job pomocí cron výrazu a správně zvolit časovou zónu i chování souběžných běhů</li>
+    <li>Nakonfigurovat alerty a notifikace bez rizika alert fatigue</li>
+    <li>Nastavit retry policy a automatické restarty pro spolehlivý provoz</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-anatomie-jobu">
+  <div class="section-header">
+    <div class="section-num">11.1</div>
+    <h2>Anatomie Lakeflow Jobu: tasky, zdroje kódu, compute</h2>
+  </div>
+
+  <p><strong>Lakeflow Jobs</strong> je orchestrátor zabudovaný přímo v Azure Databricks. Job se skládá z jednoho nebo více <strong>tasků</strong> uspořádaných do <strong>DAG</strong> (Directed Acyclic Graph) — graf určuje pořadí a paralelismus. Minimální job potřebuje tři věci: task s logikou, compute, na kterém task poběží, a unikátní název.</p>
+
+  <p>Job vytvoříte v UI přes <code class="inline">Jobs &amp; Pipelines</code> → <code class="inline">Create</code> → <code class="inline">Job</code>. Každý task má typ, který určuje, co se konfiguruje a kde to běží:</p>
+
+  <table>
+    <tr><th>Typ tasku</th><th>Klíčová konfigurace</th><th>Compute</th></tr>
+    <tr><td>Notebook</td><td>cesta k notebooku, parametry</td><td>serverless, classic jobs, all-purpose</td></tr>
+    <tr><td>Python script / wheel</td><td>cesta, CLI argumenty / entry point</td><td>serverless, classic jobs, all-purpose</td></tr>
+    <tr><td>SQL</td><td>query nebo soubor</td><td>serverless / pro SQL warehouse</td></tr>
+    <tr><td>Pipeline</td><td>výběr existující pipeline</td><td>pipeline compute</td></tr>
+    <tr><td>dbt</td><td>dbt projekt, profily</td><td>serverless / classic jobs</td></tr>
+    <tr><td>JAR</td><td>main class, parametry</td><td>serverless, classic jobs</td></tr>
+    <tr><td>Spark Submit</td><td>legacy varianta JARu</td><td>pouze classic jobs compute</td></tr>
+    <tr><td>Run Job</td><td>odkaz na jiný job</td><td>dle odkazovaného jobu</td></tr>
+  </table>
+
+  <p>Vedle toho existují řídicí tasky <code class="inline">If/else</code> a <code class="inline">For each</code> pro větvení a iteraci uvnitř jobu. Kód tasku může žít na třech místech: ve <strong>workspace</strong> (rychlý start, vývoj), v <strong>Git repozitáři</strong> (job si při spuštění vezme snapshot konkrétního commitu — všechny tasky jobu sdílejí stejnou Git referenci) nebo v <strong>volume/cloud storage</strong> (pro Python skripty přes <code class="inline">abfss://</code> URI).</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Pro produkční joby používejte zdroj Git. Job pak běží proti definovanému commitu, ne proti tomu, co má zrovna někdo rozpracované ve workspace. „Funguje to u mě v notebooku" přestane být argument.</div></div>
+
+  <p>U compute je dnes výchozí volbou <strong>serverless compute</strong> — Databricks spravuje infrastrukturu, nic nekonfigurujete a škáluje se automaticky. <strong>Classic jobs compute</strong> si vyberete, když potřebujete kontrolu nad verzí Sparku, typem instancí nebo knihovnami, které serverless nepodporuje. Když více tasků sdílí stejný cluster, cluster žije, dokud neskončí všechny — ušetříte start-up čas mezi tasky, ale platíte i za případné prostoje.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Job běží s oprávněními <strong>run identity</strong> — vlastníka jobu, nebo nakonfigurovaného <strong>service principal</strong> — nikdy s oprávněními uživatele, který běh spustil. Pokud run identity nemá potřebná Unity Catalog oprávnění, job spadne za běhu na autorizační chybě, i když je konfigurace jinak validní.</div></div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- opravneni pro service principal, pod kterym job pobezi</span>
+<span class="kw">GRANT</span> <span class="kw">SELECT</span>, <span class="kw">MODIFY</span> <span class="kw">ON TABLE</span> <span class="tbl">telconnect.silver.cdr_clean</span> <span class="kw">TO</span> <span class="str">`sp-cdr-pipeline`</span>;
+<span class="kw">GRANT</span> <span class="kw">USE SCHEMA</span> <span class="kw">ON SCHEMA</span> <span class="tbl">telconnect.silver</span> <span class="kw">TO</span> <span class="str">`sp-cdr-pipeline`</span>;</pre>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Úrovně oprávnění k jobu<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Oprávnění k jobu jsou nezávislá na oprávněních ke compute a mají čtyři úrovně: <code class="inline">CAN VIEW</code> (vidí konfiguraci a historii běhů), <code class="inline">CAN MANAGE RUN</code> (navíc spouští a ruší běhy), <code class="inline">IS OWNER</code> (výchozí identita pro Run as), <code class="inline">CAN MANAGE</code> (plná editace včetně schedulů a oprávnění). Každá úroveň zahrnuje práva těch pod sebou. Tvůrce jobu a admini mají automaticky <code class="inline">CAN MANAGE</code>. Praktický vzor: pipeline tým <code class="inline">CAN MANAGE</code>, operátoři <code class="inline">CAN MANAGE RUN</code>, stakeholdeři <code class="inline">CAN VIEW</code>.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/2-create-lakeflow-job#configure-task-sources" target="_blank" rel="noopener">Configure task sources</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/2-create-lakeflow-job#configure-run-identity-and-unity-catalog-access" target="_blank" rel="noopener">Configure run identity and Unity Catalog access</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-zavislosti-parametry">
+  <div class="section-header">
+    <div class="section-num">11.2</div>
+    <h2>Závislosti tasků a parametry jobu</h2>
+  </div>
+
+  <p>Závislosti definujete u tasku polem <code class="inline">Depends on</code> — tím vzniká DAG. Ke každé hraně navíc patří podmínka <strong>Run if</strong>, která říká, kdy se downstream task vůbec spustí:</p>
+
+  <table>
+    <tr><th>Run if podmínka</th><th>Task poběží, když…</th></tr>
+    <tr><td><strong>All succeeded</strong></td><td>všechny upstream tasky uspěly (výchozí)</td></tr>
+    <tr><td><strong>At least one succeeded</strong></td><td>uspěl aspoň jeden upstream task</td></tr>
+    <tr><td><strong>None failed</strong></td><td>žádný neselhal (některé mohly být přeskočeny)</td></tr>
+    <tr><td><strong>All done</strong></td><td>všechny doběhly — bez ohledu na výsledek</td></tr>
+    <tr><td><strong>At least one failed</strong></td><td>aspoň jeden upstream task selhal</td></tr>
+    <tr><td><strong>All failed</strong></td><td>selhaly všechny</td></tr>
+  </table>
+
+  <p>Kdo čeká, že podmínky slouží jen na „happy path", přichází o nejužitečnější vzory: <code class="inline">All done</code> pro úklidové tasky, které musí běžet vždy, a <code class="inline">At least one failed</code> pro error-handling větev (zápis do incident tabulky, kompenzační logika).</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="DAG Lakeflow Jobu pro CDR pipeline. Task ingest_cdrs navazuje na clean_cdrs, z něj paralelně běží aggregate_usage a detect_fraud, oba ústí do publish_gold s podmínkou All succeeded a do tasku cleanup_tmp s podmínkou All done.">
+      <defs>
+        <marker id="arr11a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+        <marker id="arr11ao" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <rect x="0" y="0" width="820" height="300" fill="#ffffff"/>
+      <text x="410" y="26" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Job „TelConnect CDR Pipeline" — DAG tasků</text>
+      <!-- ingest -->
+      <rect x="20" y="120" width="140" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="90" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">ingest_cdrs</text>
+      <text x="90" y="162" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Notebook · serverless</text>
+      <!-- clean -->
+      <rect x="220" y="120" width="140" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="290" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">clean_cdrs</text>
+      <text x="290" y="162" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Notebook · serverless</text>
+      <!-- parallel -->
+      <rect x="420" y="52" width="160" height="56" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="500" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">aggregate_usage</text>
+      <text x="500" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">SQL · warehouse</text>
+      <rect x="420" y="188" width="160" height="56" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="500" y="212" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">detect_fraud</text>
+      <text x="500" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Python · classic</text>
+      <!-- publish -->
+      <rect x="650" y="52" width="150" height="56" rx="8" fill="#e8f0fb" stroke="#22c55e" stroke-width="2"/>
+      <text x="725" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">publish_gold</text>
+      <text x="725" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">Run if: All succeeded</text>
+      <!-- cleanup -->
+      <rect x="650" y="188" width="150" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2" stroke-dasharray="5 3"/>
+      <text x="725" y="212" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">cleanup_tmp</text>
+      <text x="725" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">Run if: All done</text>
+      <!-- edges -->
+      <line x1="160" y1="148" x2="216" y2="148" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="360" y1="136" x2="416" y2="90" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="360" y1="160" x2="416" y2="206" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="580" y1="80" x2="646" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="580" y1="216" x2="646" y2="106" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="580" y1="96" x2="646" y2="200" stroke="#e8721c" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr11ao)"/>
+      <line x1="580" y1="228" x2="646" y2="228" stroke="#e8721c" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr11ao)"/>
+      <text x="410" y="286" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">plná šipka = All succeeded · čárkovaná = All done (úklid běží i po selhání)</text>
+    </svg>
+    <figcaption>DAG jobu s paralelními tasky a Run if podmínkami — publikace vyžaduje úspěch obou větví, úklid běží vždy.</figcaption>
+  </figure>
+
+  <p><strong>Job parametry</strong> definujete na úrovni jobu jako key-value páry a jsou automaticky dostupné všem taskům. Notebooky je čtou přes widgety, Python skripty je dostanou jako argumenty příkazové řádky. V hodnotách parametrů můžete používat <strong>dynamic value references</strong> — hodnoty doplněné až při spuštění:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># notebook cte job parametr pres widget</span>
+processing_date = dbutils.widgets.<span class="fn">get</span>(<span class="str">"processing_date"</span>)
+
+<span class="cm"># hodnota parametru v konfiguraci jobu muze byt dynamicka:</span>
+<span class="cm">#   {{job.trigger.time.iso_date}}                          -&gt; datum spusteni</span>
+<span class="cm">#   {{job.trigger.table_update.updated_tables}}            -&gt; ktere tabulky se zmenily</span>
+<span class="cm">#   {{job.trigger.table_update.&lt;cat.sch.tbl&gt;.version}}     -&gt; verze Delta tabulky</span></pre>
+  </div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> <strong>Tagy</strong> (labely nebo key-value) pomáhají joby filtrovat podle týmu, projektu či prostředí a propagují se i na job clustery — hodí se pro cost attribution.</div></div>
+</div>
+
+<div class="section" id="sec-triggery">
+  <div class="section-header">
+    <div class="section-num">11.3</div>
+    <h2>Triggery: scheduled, file arrival, table update, continuous</h2>
+  </div>
+
+  <p>Trigger určuje, <em>kdy</em> job poběží. Vedle časového plánu (viz sekce 11.4) nabízí Lakeflow Jobs <strong>event-based triggery</strong>, které reagují na data, ne na hodiny. Trigger přidáte v <code class="inline">Job details</code> → <code class="inline">Schedules &amp; Triggers</code> → <code class="inline">Add trigger</code>.</p>
+
+  <p><strong>File arrival trigger</strong> hlídá cestu v Unity Catalog external location nebo volume (včetně podadresářů, rekurzivně) a spustí job, když se objeví <em>nový</em> soubor. Kontrola probíhá best-effort zhruba každou minutu. Přepsání existujícího souboru stejným jménem běh nevyvolá — dodávky souborů proto navrhujte s unikátními názvy.</p>
+
+  <p><strong>Table update trigger</strong> sleduje jednu nebo více Unity Catalog tabulek (managed Delta/Iceberg, external Delta, streaming tables, materialized views i views nad nimi) a reaguje na inserty, updaty, merge i delete. U více tabulek volíte mezi <code class="inline">Any table is updated</code> (rychlá reakce) a <code class="inline">All tables are updated</code> (počká, až budou aktuální všechny zdroje).</p>
+
+  <p>Oba typy sdílejí dvě šikovné volby proti „trigger stormu": <code class="inline">Minimum time between triggers</code> (ochranná pauza po doběhnutí) a <code class="inline">Wait after last change</code> (odklad, který se resetuje s každou další změnou — dávkuje rychlé série updatů do jednoho běhu).</p>
+
+  <p><strong>Continuous trigger</strong> drží job v nekonečné smyčce: jakmile běh skončí (i selháním), okamžitě startuje další. Hodí se pro near real-time zpracování; počítejte ale s průběžnou spotřebou compute.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Continuous joby na serverless compute podporují jen <strong>bounded</strong> streaming triggery typu <code class="inline">Trigger.AvailableNow</code>. Časové triggery <code class="inline">ProcessingTime</code> a <code class="inline">Continuous</code> na serverless nefungují — pro ně použijte classic jobs compute, případně Lakeflow Spark Declarative Pipelines v continuous režimu.</div></div>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="Rozhodovací strom pro výběr triggeru: podle toho, zda data přicházejí jako soubory, zda job závisí na upstream tabulkách, a zda je potřeba near real-time zpracování, vede na file arrival, table update, continuous nebo scheduled trigger.">
+      <defs><marker id="arr11b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker></defs>
+      <rect x="0" y="0" width="820" height="320" fill="#ffffff"/>
+      <text x="410" y="26" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Který trigger zvolit?</text>
+      <!-- Q1 -->
+      <rect x="20" y="60" width="220" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="130" y="84" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Externí systém dodává</text>
+      <text x="130" y="101" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">soubory nepravidelně?</text>
+      <rect x="300" y="60" width="220" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="84" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">File arrival</text>
+      <text x="410" y="101" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">volume / external location</text>
+      <line x1="240" y1="88" x2="296" y2="88" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <text x="266" y="80" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">ano</text>
+      <!-- Q2 -->
+      <rect x="20" y="140" width="220" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="130" y="164" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Navazuje na upstream</text>
+      <text x="130" y="181" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">tabulky v Unity Catalogu?</text>
+      <rect x="300" y="140" width="220" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="164" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Table update</text>
+      <text x="410" y="181" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">any / all tables updated</text>
+      <line x1="240" y1="168" x2="296" y2="168" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <text x="266" y="160" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">ano</text>
+      <!-- Q3 -->
+      <rect x="20" y="220" width="220" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="130" y="244" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Near real-time,</text>
+      <text x="130" y="261" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">běh nesmí stát?</text>
+      <rect x="300" y="220" width="220" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="244" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Continuous</text>
+      <text x="410" y="261" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">běh za během, exponential backoff</text>
+      <line x1="240" y1="248" x2="296" y2="248" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <text x="266" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">ano</text>
+      <!-- default -->
+      <line x1="130" y1="116" x2="130" y2="136" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <line x1="130" y1="196" x2="130" y2="216" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <text x="112" y="130" text-anchor="end" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">ne</text>
+      <text x="112" y="210" text-anchor="end" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">ne</text>
+      <rect x="580" y="140" width="220" height="56" rx="8" fill="#1a3a6b"/>
+      <text x="690" y="164" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Scheduled</text>
+      <text x="690" y="181" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb">interval nebo cron (11.4)</text>
+      <line x1="240" y1="276" x2="600" y2="200" stroke="#6b7280" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arr11b)"/>
+      <text x="430" y="296" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">jinak: fixní časový plán je nejjednodušší a nejlevnější na provoz</text>
+    </svg>
+    <figcaption>Rozhodovací strom pro volbu typu triggeru podle charakteru datového toku.</figcaption>
+  </figure>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Limity file arrival triggerů a file events<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Bez zapnutých <strong>file events</strong> na external location platí limit 50 jobů s file arrival triggerem na workspace a max. 10 000 souborů ve sledované lokaci. Se zapnutými file events (jednorázové nastavení, využívá cloud notifikace o změnách) tato omezení odpadají a i table update triggery fungují efektivněji. Přesné aktuální limity ověřte v dokumentaci.</p>
+      <p>Před vytvořením file arrival triggeru potřebujete workspace s Unity Catalogem, <code class="inline">READ</code> na storage lokaci a <code class="inline">CAN MANAGE</code> na jobu.</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Triggery lze kdykoli pozastavit (<code class="inline">Pause</code>) a obnovit bez ztráty konfigurace — praktické při maintenance oknech. Aktivní běh se nechá doběhnout, jen nestartují nové.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/3-configure-job-triggers#configure-file-arrival-triggers" target="_blank" rel="noopener">Configure file arrival triggers</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/3-configure-job-triggers#configure-table-update-triggers" target="_blank" rel="noopener">Configure table update triggers</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-planovani">
+  <div class="section-header">
+    <div class="section-num">11.4</div>
+    <h2>Plánování: cron, časové zóny, souběžné běhy</h2>
+  </div>
+
+  <p>Scheduled trigger má dvě podoby. <strong>Simple</strong> schedule zadáte jako interval („každých 12 hodin") — první běh si scheduler zvolí sám při uložení. <strong>Advanced</strong> schedule používá <strong>cron výraz</strong> se šesti až sedmi poli: sekundy, minuty, hodiny, den v měsíci, měsíc, den v týdnu, volitelně rok. Minimální interval mezi běhy je 10 sekund.</p>
+
+  <table>
+    <tr><th>Cron výraz</th><th>Význam</th></tr>
+    <tr><td><code class="inline">0 0 12 * * ?</code></td><td>každý den v poledne</td></tr>
+    <tr><td><code class="inline">0 15 10 ? * MON-FRI</code></td><td>pracovní dny v 10:15</td></tr>
+    <tr><td><code class="inline">0 0 8 1 * ?</code></td><td>první den měsíce v 8:00</td></tr>
+    <tr><td><code class="inline">0 30 6 ? * 6L</code></td><td>poslední pátek měsíce v 6:30</td></tr>
+    <tr><td><code class="inline">0 0 */2 * * ?</code></td><td>každé 2 hodiny</td></tr>
+  </table>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Speciální znaky v cron výrazech<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><code class="inline">*</code> = všechny hodnoty · <code class="inline">?</code> = „žádná konkrétní hodnota" (použijte v poli den-v-měsíci nebo den-v-týdnu, když specifikujete to druhé) · <code class="inline">-</code> = rozsah (<code class="inline">10-12</code>) · <code class="inline">,</code> = výčet (<code class="inline">MON,WED,FRI</code>) · <code class="inline">/</code> = krok (<code class="inline">0/15</code> = každých 15 minut) · <code class="inline">L</code> = poslední (den měsíce, <code class="inline">6L</code> = poslední pátek) · <code class="inline">#</code> = n-tý výskyt (<code class="inline">6#3</code> = třetí pátek).</p>
+    </div>
+  </div>
+
+  <p><strong>Časová zóna</strong> není detail. Zóny s letním časem (DST) způsobí, že hodinový job při přechodu jednou za rok přeskočí běh nebo se o hodinu posune. Pravidlo z praxe: reporty pro lidi plánujte v jejich lokální zóně (a přijměte DST posuny), technické pipeline vázané na UTC timestampy nebo přesné intervaly plánujte v <strong>UTC</strong>.</p>
+
+  <p>Co když běh trvá déle než interval? To řídí <code class="inline">Maximum concurrent runs</code> — pro joby zapisující do stejných tabulek jej nastavte na <strong>1</strong> — a chování při překročení limitu:</p>
+
+  <table>
+    <tr><th>Chování</th><th>Co se stane s novým během</th><th>Kdy použít</th></tr>
+    <tr><td><strong>Queue</strong></td><td>čeká ve frontě, spustí se po uvolnění slotu</td><td>žádný trigger se nesmí ztratit (výchozí volba pro pipeline)</td></tr>
+    <tr><td><strong>Cancel</strong></td><td>okamžitě zrušen</td><td>zastaralý trigger nemá hodnotu</td></tr>
+    <tr><td><strong>Skip</strong></td><td>neproběhne</td><td>občasné vynechání běhu nevadí</td></tr>
+  </table>
+
+  <p>Dokumentace k frontě: <em>„Queued runs consume no compute resources while waiting."</em> Fronta je tedy zadarmo — platí se až samotný běh.</p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Scheduler není low-latency systém — start jobu se může kvůli síti nebo cloudové službě opozdit o minuty. Neplánujte byznys logiku na sub-minutovou přesnost a mezi závislými pipeline nechte časový polštář.</div></div>
+</div>
+
+<div class="section" id="sec-alerty">
+  <div class="section-header">
+    <div class="section-num">11.5</div>
+    <h2>Alerty a notifikace</h2>
+  </div>
+
+  <p>Notifikace konfigurujete na úrovni jobu (<code class="inline">Job notifications</code>) i jednotlivých tasků. K dispozici je pět typů událostí:</p>
+
+  <table>
+    <tr><th>Událost</th><th>Kdy se pošle</th><th>Typické použití</th></tr>
+    <tr><td><strong>Start</strong></td><td>běh začal</td><td>potvrzení, že scheduled job odstartoval</td></tr>
+    <tr><td><strong>Success</strong></td><td>běh úspěšně skončil</td><td>signál pro navazující procesy</td></tr>
+    <tr><td><strong>Failure</strong></td><td>běh selhal</td><td>incident response</td></tr>
+    <tr><td><strong>Duration warning</strong></td><td>běh překročil práh</td><td>detekce degradace výkonu</td></tr>
+    <tr><td><strong>Streaming backlog</strong></td><td>backlog nad prahem po 10 minut</td><td>zdraví streaming jobů</td></tr>
+  </table>
+
+  <p>Cílem může být e-mail nebo <strong>system destination</strong>: Slack, Microsoft Teams, PagerDuty a generický <strong>HTTP webhook</strong>. System destinations musí nejdřív založit workspace admin v <code class="inline">Admin Settings</code> → <code class="inline">Notifications</code>; na job/task lze navěsit max. tři destinace na typ události.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">JSON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre>{
+  <span class="str">"event_type"</span>: <span class="str">"jobs.on_failure"</span>,
+  <span class="str">"workspace_id"</span>: <span class="str">"your_workspace_id"</span>,
+  <span class="str">"run"</span>: { <span class="str">"run_id"</span>: <span class="str">"run_id"</span> },
+  <span class="str">"job"</span>: { <span class="str">"job_id"</span>: <span class="str">"job_id"</span>, <span class="str">"name"</span>: <span class="str">"job_name"</span> }
+}</pre>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Stav <strong>Succeeded with failures</strong> (job doběhl, ale některé tasky selhaly) se počítá jako úspěch. Pokud potřebujete vidět i částečná selhání, přidejte task-level notifikace. A pozor: job-level notifikace se neposílají při selhání a retry jednotlivých tasků.</div></div>
+
+  <p>Největší nepřítel alertingu je <strong>alert fatigue</strong> — tým zavalený notifikacemi je přestane číst, včetně těch kritických. Osvědčené zásady: ztlumte notifikace pro skipnuté a zrušené běhy (<code class="inline">Mute notifications for skipped/canceled runs</code> — platí jen pro job-level, na taskách je nutné nastavit zvlášť), duration warning nastavujte podle historie běhů (job běžící typicky 30 minut varujte ve 45, ne v 35), a u tasků s retry zapněte <code class="inline">Mute notifications until the last retry</code>. A zdokumentujte, proč každý alert existuje a co má příjemce udělat.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Pokud joby orchestruje Azure Data Factory, kombinujte vrstvy: Databricks notifikace pro job-level události, ADF alerty (<code class="inline">Monitor</code> → <code class="inline">Alerts &amp; metrics</code>) pro metriky orchestrace — stav pipeline runs, počty aktivit, vytížení Integration Runtime.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/5-configure-job-alerts#reduce-notification-noise" target="_blank" rel="noopener">Reduce notification noise</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/5-configure-job-alerts#monitor-with-http-webhooks" target="_blank" rel="noopener">Monitor with HTTP webhooks</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-retry">
+  <div class="section-header">
+    <div class="section-num">11.6</div>
+    <h2>Automatické restarty a retry policy</h2>
+  </div>
+
+  <p>Síťové výpadky a přechodné chyby cloudových služeb jsou v distribuovaných systémech normální provozní stav. <strong>Retry policy</strong> zajistí, že se job z takového selhání zotaví sám. Výchozí chování ale překvapí: většina jobů se <em>bez explicitní konfigurace neretryuje</em>. Výjimky jsou dvě — <strong>serverless joby</strong> mají ve výchozím stavu auto-optimalizované retry a <strong>continuous joby</strong> se restartují vždy, s <strong>exponential backoff</strong> algoritmem.</p>
+
+  <p>Retry nastavujete na úrovni tasku: počet pokusů a interval mezi nimi. Interval se počítá od <em>startu</em> selhaného běhu — při intervalu 60 s a tasku, který padl po 30 s, startuje retry 30 s po selhání. Timeout se přitom vztahuje na <em>každý</em> pokus zvlášť; vypršení timeoutu se počítá jako selhání a spotřebuje pokus.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 340" role="img" aria-label="Životní cyklus běhu Lakeflow Jobu: trigger vyvolá běh, ten projde kontrolou souběžnosti (fronta), spustí se, a končí úspěchem s notifikací, nebo selháním. Po selhání následuje retry, dokud zbývají pokusy; po vyčerpání pokusů se odešle failure alert. Continuous joby se restartují s exponential backoffem.">
+      <defs>
+        <marker id="arr11c" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+        <marker id="arr11cr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#ef4444"/></marker>
+        <marker id="arr11cg" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#22c55e"/></marker>
+      </defs>
+      <rect x="0" y="0" width="820" height="340" fill="#ffffff"/>
+      <text x="410" y="26" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Životní cyklus běhu jobu</text>
+      <!-- trigger -->
+      <rect x="20" y="70" width="150" height="90" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="95" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Trigger</text>
+      <text x="95" y="112" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">schedule · file arrival</text>
+      <text x="95" y="128" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">table update · manual</text>
+      <text x="95" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">continuous</text>
+      <!-- queue -->
+      <rect x="220" y="82" width="160" height="66" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="1.5"/>
+      <text x="300" y="106" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Concurrency check</text>
+      <text x="300" y="124" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">volno? → run</text>
+      <text x="300" y="139" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">plno? → queue / cancel / skip</text>
+      <!-- run -->
+      <rect x="430" y="82" width="130" height="66" rx="8" fill="#1a3a6b"/>
+      <text x="495" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Run</text>
+      <text x="495" y="128" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb">timeout na pokus</text>
+      <!-- success -->
+      <rect x="640" y="52" width="160" height="56" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="720" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#22c55e">Success</text>
+      <text x="720" y="93" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">notifikace „Success"</text>
+      <!-- fail -->
+      <rect x="640" y="140" width="160" height="56" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
+      <text x="720" y="164" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ef4444">Failure / Timed Out</text>
+      <text x="720" y="181" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">zbývá retry?</text>
+      <!-- retry box -->
+      <rect x="410" y="230" width="180" height="56" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="500" y="254" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Retry</text>
+      <text x="500" y="271" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">interval; muted notifikace</text>
+      <!-- alert box -->
+      <rect x="640" y="230" width="160" height="56" rx="8" fill="#ef4444"/>
+      <text x="720" y="254" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Failure alert</text>
+      <text x="720" y="271" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ffe4e6">e-mail · Slack · PagerDuty</text>
+      <!-- arrows -->
+      <line x1="170" y1="115" x2="216" y2="115" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11c)"/>
+      <line x1="380" y1="115" x2="426" y2="115" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11c)"/>
+      <line x1="560" y1="98" x2="636" y2="82" stroke="#22c55e" stroke-width="2" marker-end="url(#arr11cg)"/>
+      <line x1="560" y1="132" x2="636" y2="162" stroke="#ef4444" stroke-width="2" marker-end="url(#arr11cr)"/>
+      <line x1="680" y1="196" x2="580" y2="234" stroke="#e8721c" stroke-width="2" marker-end="url(#arr11c)"/>
+      <text x="640" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">ano</text>
+      <line x1="740" y1="196" x2="732" y2="226" stroke="#ef4444" stroke-width="2" marker-end="url(#arr11cr)"/>
+      <text x="762" y="216" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">ne, vyčerpáno</text>
+      <path d="M 410 250 C 340 250 340 148 424 128" fill="none" stroke="#e8721c" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr11c)"/>
+      <text x="330" y="200" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">nový pokus</text>
+      <text x="410" y="322" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">continuous job: po selhání startuje vždy znovu, s rostoucí čekací dobou (exponential backoff)</text>
+    </svg>
+    <figcaption>Životní cyklus běhu: od triggeru přes kontrolu souběžnosti a běh až po retry smyčku a finální alert.</figcaption>
+  </figure>
+
+  <p>U <strong>continuous jobů</strong> funguje exponential backoff takto: po překročení prahu po sobě jdoucích selhání job čeká, každé další selhání čekání prodlouží až do systémového maxima, a úspěšný běh (nebo běh bez selhání po prahovou dobu) sekvenci resetuje. Volbou <code class="inline">Task retry mode</code> (<code class="inline">On failure</code> / <code class="inline">Never</code>) řídíte, zda se selhané tasky zkusí znovu ještě uvnitř běhu. Klasické task-level retry politiky ani závislosti tasků continuous joby nepodporují.</p>
+
+  <p>Proti „zombie" taskům nasaďte <strong>Metric thresholds</strong> → <code class="inline">Run duration</code>: hodnota <code class="inline">Warning</code> pošle notifikaci, hodnota <code class="inline">Timeout</code> task ukončí se stavem <code class="inline">Timed Out</code> a předá ho retry logice.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Retry je bezpečné jen pro <strong>idempotentní</strong> operace. Job, který při opakovaném běhu duplikuje zápisy, retry politikou nespravíte — naopak. U non-idempotentních serverless jobů vypněte auto-optimalizaci retry.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Rozumný standard: 1–3 retry s intervalem 30 s až 5 minut. Neomezené retry nikdy — trvalé selhání nevyřeší, jen spálí compute. A sledujte trend: rostoucí podíl běhů zachráněných přes retry bývá první signál infrastrukturního nebo datového problému.</div></div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> Restarty řeší přechodné chyby, alerty ty trvalé. Kombinace: retry s mute do posledního pokusu + failure notifikace po vyčerpání pokusů + duration warning. Tak se dozvíte o problému právě jednou — a ve chvíli, kdy už má smysl vstávat.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/6-configure-job-automatic-restarts#configure-continuous-jobs-for-always-on-workloads" target="_blank" rel="noopener">Configure continuous jobs for always-on workloads</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/6-configure-job-automatic-restarts#apply-best-practices-for-production-workloads" target="_blank" rel="noopener">Apply best practices for production workloads</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">11.7</div>
+    <h2>Lab 11: Implement Lakeflow Jobs (45 minut)</h2>
+  </div>
+  <p>V roli data engineera telekomunikační firmy <strong>TelConnect</strong> zautomatizujete pipeline zpracovávající Call Detail Records (CDR) přes bronze → silver → gold vrstvy: postavíte job se dvěma závislými tasky (notebook <code class="inline">process_cdrs</code> + SQL <code class="inline">summarize_gold</code>), dynamickým parametrem <code class="inline">processing_date</code>, file arrival triggerem nad volume, nočním cron schedulem, failure notifikacemi a retry politikou s timeoutem.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/11-implement-lakeflow-jobs.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Jakou Run if podmínku nastavíte tasku, který má běžet jen po úspěchu všech předchůdců — a jakou úklidovému tasku? <strong>2)</strong> Proč file arrival trigger nezareaguje na přepsání existujícího souboru a jak to ovlivní návrh dodávek dat? <strong>3)</strong> Job běží každou hodinu a občas trvá 75 minut — jak zajistíte, že se běhy nepřekryjí a žádný se neztratí?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_10_pipelines.html">← Datové pipelines</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 11 z 16</span>
+      <a href="dp750_12_dev_lifecycle.html" style="margin-left:auto">Vývojový lifecycle →</a>
+    </div>
+  </main>
+</div>
+
+<script>function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?'🙈 Skrýt nápovědu':'💡 Zobrazit nápovědu'})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent='✓ Zkopírováno';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopírovat';btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent='Ctrl+C';setTimeout(()=>{btn.textContent='Kopírovat'},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent='☰ Kapitoly'}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent='✕ Zavřít'}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-orig',m==='orig');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

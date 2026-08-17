@@ -1,0 +1,5 @@
+# Materialy ke kurzu DP-750 - urceno ucastnikum kurzu, ne pro vyhledavace.
+# Pozor: GitHub Pages na public repu jsou vzdy verejne dostupne komukoli, kdo zna URL.
+# Tento soubor rizeni pristupu nenahrazuje - jen brani indexaci.
+User-agent: *
+Disallow: /

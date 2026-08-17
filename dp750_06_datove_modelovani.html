@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Datové modelování v Unity Catalogu — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+[data-view="orig"]{display:none}
+html.mode-orig [data-view="orig"]{display:revert}
+html.mode-orig [data-view="custom"]{display:none}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="orig")document.documentElement.className="mode-orig"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Datové modelování v Unity Catalogu</span>
+  </div>
+  <div class="nav-links">
+    <button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_07_ingest.html" class="next">Ingest dat →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-ingescni-logika" class="toc-item active" data-section="sec-ingescni-logika">Návrh ingesční logiky a konfigurace datových zdrojů</a>
+    <a href="#sec-volba-nastroje" class="toc-item" data-section="sec-volba-nastroje">Volba ingesčního nástroje</a>
+    <a href="#sec-format-tabulky" class="toc-item" data-section="sec-format-tabulky">Volba formátu tabulky: Delta, Iceberg, Parquet</a>
+    <a href="#sec-partitioning" class="toc-item" data-section="sec-partitioning">Partitioning</a>
+    <a href="#sec-scd" class="toc-item" data-section="sec-scd">Volba typu SCD a implementace SCD Type 2</a>
+    <a href="#sec-temporal-cdf" class="toc-item" data-section="sec-temporal-cdf">Temporal (history) tabulky a Change Data Feed</a>
+    <a href="#sec-granularita" class="toc-item" data-section="sec-granularita">Granularita sloupců a tabulek</a>
+    <a href="#sec-managed-external" class="toc-item" data-section="sec-managed-external">Managed vs. external (unmanaged) tabulky</a>
+    <a href="#sec-liquid-clustering" class="toc-item" data-section="sec-liquid-clustering">Liquid clustering vs. partitioning vs. Z-ORDER</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 6: Design and Implement a Data Model in Unity Catalog (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 6</div>
+      <h1>Datové modelování v Unity Catalogu</h1>
+      <div class="hero-subtitle">Ingesční nástroje, formáty tabulek, partitioning, SCD, temporal tabulky a liquid clustering</div>
+      <div class="hero-meta"><span>🗂 Datové modelování</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Navrhnout ingesční logiku podle požadavků — zvolit mezi full, inkrementální, streaming a CDC extrakcí.</li>
+    <li>Vybrat vhodný ingesční nástroj (Lakeflow Connect, Auto Loader, COPY INTO, notebooky, deklarativní pipelines) a formát tabulky (Delta, Iceberg, Parquet).</li>
+    <li>Implementovat SCD Type 2 dimenzi pomocí <code class="inline">MERGE</code> se sledováním platnosti verzí.</li>
+    <li>Navrhnout temporal (history) tabulky s Change Data Feed a time travel pro audit a debugging.</li>
+    <li>Rozhodnout mezi managed a external tabulkami a mezi partitioningem, Z-ORDER a liquid clusteringem.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-ingescni-logika">
+  <div class="section-header">
+    <div class="section-num">6.1</div>
+    <h2>Návrh ingesční logiky a konfigurace datových zdrojů</h2>
+  </div>
+  <p>Než sáhnete po jakémkoli nástroji, musíte rozhodnout, <strong>jak</strong> se data ze zdroje budou vůbec získávat. Tomu se říká <strong>extraction type</strong> a je to rozhodnutí, které určuje čerstvost dat, spotřebu compute i složitost pipeline. Databricks rozlišuje tři základní vzory — full, inkrementální a streaming — plus specializovaný vzor <strong>change data capture (CDC)</strong>.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="Čtyři typy extrakce dat: full extrakce čte celý dataset, inkrementální jen nové řádky od watermarku, streaming zpracovává události průběžně a CDC přenáší řádkové změny včetně typu operace (insert, update, delete).">
+      <defs>
+        <marker id="arr61" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker>
+      </defs>
+      <!-- Full -->
+      <rect x="20" y="20" width="150" height="52" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="95" y="42" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Zdroj (2 mil. řádků)</text>
+      <text x="95" y="60" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">celá tabulka</text>
+      <line x1="170" y1="46" x2="330" y2="46" stroke="#6b7280" stroke-width="2" marker-end="url(#arr61)"/>
+      <text x="250" y="38" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">2 000 000 řádků / běh</text>
+      <rect x="335" y="20" width="130" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="400" y="42" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">FULL</text>
+      <text x="400" y="60" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">vše znovu</text>
+      <text x="480" y="42" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">bez change trackingu,</text>
+      <text x="480" y="58" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">malé objemy, periodický rebuild</text>
+      <!-- Incremental -->
+      <rect x="20" y="95" width="150" height="52" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="95" y="117" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Zdroj + watermark</text>
+      <text x="95" y="135" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">updated_at &gt; poslední běh</text>
+      <line x1="170" y1="121" x2="330" y2="121" stroke="#6b7280" stroke-width="2" marker-end="url(#arr61)"/>
+      <text x="250" y="113" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">~2 000 změn / běh</text>
+      <rect x="335" y="95" width="130" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="400" y="117" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">INKREMENTÁLNÍ</text>
+      <text x="400" y="135" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">jen nové/změněné</text>
+      <text x="480" y="117" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">vyžaduje spolehlivý change indikátor</text>
+      <text x="480" y="133" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">(timestamp, sekvence) + správu stavu</text>
+      <!-- Streaming -->
+      <rect x="20" y="170" width="150" height="52" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="95" y="192" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Message bus</text>
+      <text x="95" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Event Hubs, Kafka</text>
+      <line x1="170" y1="196" x2="330" y2="196" stroke="#e8721c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr61)"/>
+      <text x="250" y="188" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">průběžně, event po eventu</text>
+      <rect x="335" y="170" width="130" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="400" y="192" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">STREAMING</text>
+      <text x="400" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">sekundy–minuty</text>
+      <text x="480" y="192" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">nejnižší latence, ale always-on</text>
+      <text x="480" y="208" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">infrastruktura = vyšší cena</text>
+      <!-- CDC -->
+      <rect x="20" y="245" width="150" height="52" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="95" y="267" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Transakční log DB</text>
+      <text x="95" y="285" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">SQL Server, MySQL…</text>
+      <line x1="170" y1="271" x2="330" y2="271" stroke="#6b7280" stroke-width="2" marker-end="url(#arr61)"/>
+      <text x="250" y="263" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">INSERT / UPDATE / DELETE</text>
+      <rect x="335" y="245" width="130" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="400" y="267" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">CDC</text>
+      <text x="400" y="285" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">změny + typ operace</text>
+      <text x="480" y="267" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">jediný vzor, který spolehlivě</text>
+      <text x="480" y="283" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">replikuje i mazání (delete)</text>
+    </svg>
+    <figcaption>Čtyři typy extrakce: full čte vždy vše, inkrementální jen změny od watermarku, streaming běží průběžně a CDC přenáší řádkové změny včetně typu operace.</figcaption>
+  </figure>
+
+  <p>Klíčový rozdíl mezi inkrementální extrakcí a CDC: inkrementální extrakce vidí jen „nový stav řádků", zatímco <strong>CDC zachovává typ operace</strong> — pozná tedy i mazání a změny klíčových sloupců. CDC ale vyžaduje <strong>sekvenční informaci</strong> (timestamp nebo pořadové číslo), aby šlo správně zpracovat eventy, které dorazí mimo pořadí.</p>
+
+  <p>Druhá část návrhu je <strong>konfigurace zdroje</strong>. U cloud storage (ADLS, S3, GCS) řídíte přístup přes Unity Catalog <strong>external locations</strong> (viz kapitola 3) a hodně záleží na struktuře složek: Hive-style partitioning (<code class="inline">key=value</code>) umožní automatickou extrakci partition hodnot a ploché adresáře s tisíci soubory zpomalují listing. U databází řešíte síť, secrets a dopad extrakce na zdrojový systém; u SaaS API zase rate limity, stránkování a OAuth; u message busů consumer groups a offset management.</p>
+
+  <table>
+    <tr><th>Požadavek</th><th>Zvolte</th></tr>
+    <tr><td>Malý objem (&lt; 100 tis. řádků), bez change trackingu</td><td>Full extrakce</td></tr>
+    <tr><td>Velký objem, spolehlivý timestamp/sekvence, stačí hodinová/denní čerstvost</td><td>Inkrementální extrakce</td></tr>
+    <tr><td>Čerstvost v sekundách/minutách, zdroj publikuje eventy</td><td>Streaming extrakce</td></tr>
+    <tr><td>Nutnost zachytit delete a typ operace, audit trail</td><td>CDC extrakce</td></tr>
+  </table>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Postupujte podle rámce z dokumentace: nejdřív požadavky (objem, latence, schopnosti zdroje, kvalita, síť, cena), pak mapování na extraction type, pak formát a nakonec validace návrhu. A rozhodnutí zdokumentujte — za rok se nikdo nedozví, proč jste nezvolili streaming, pokud to nikde nenapíšete.</div></div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Kdo čeká, že streaming je vždy „lepší", protože je rychlejší, plete si latenci s hodnotou. Pokud reporting potřebuje hodinovou čerstvost, always-on streaming infrastruktura jen pálí peníze — dokumentace v ukázkovém scénáři e-shopu volí právě hodinovou inkrementální dávku.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/2-design-data-ingestion-logic#identify-source-file-type-characteristics" target="_blank" rel="noopener">Identify source file type characteristics</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/2-design-data-ingestion-logic#apply-a-requirements-driven-design-framework" target="_blank" rel="noopener">Apply a requirements-driven design framework</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-volba-nastroje">
+  <div class="section-header">
+    <div class="section-num">6.2</div>
+    <h2>Volba ingesčního nástroje</h2>
+  </div>
+  <p>Azure Databricks nabízí spektrum ingesčních nástrojů od plně spravovaných po plně vlastní kód. Na jednom konci stojí <strong>Lakeflow Connect</strong> s hotovými konektory, na druhém <strong>Spark Structured Streaming</strong>, kde si vše píšete sami. Mezi nimi leží <strong>Auto Loader</strong> pro soubory v cloud storage, <strong>COPY INTO</strong> pro SQL dávky a notebooky s <strong>JDBC/ODBC</strong>. <strong>Azure Data Factory</strong> hraje roli orchestrátoru a „přistávací dráhy" pro data z Azure ekosystému — ne transformačního enginu.</p>
+
+  <p>Lakeflow Connect má tři kategorie managed konektorů (podrobně v sekci 7.1): <strong>SaaS konektory</strong> (Salesforce, HubSpot, Jira, Workday…), které řeší autentizaci, inkrementální čtení, rate limity i schema evolution a běží na serverless compute; <strong>databázové konektory (CDC)</strong> (SQL Server, MySQL, PostgreSQL) postavené na čtení transakčního logu, které vyžadují <strong>ingestion gateway</strong> ve vaší síti a staging volume; a <strong>query-based konektory</strong> pro databáze bez CDC (Oracle, Teradata a další), které se plánovaně dotazují přes cursor column a gateway nepotřebují. Doplňkem jsou <strong>community konektory</strong> udržované komunitou. K tomu <strong>standard konektory</strong> pro cloud storage (interně Auto Loader) a message busy (Kafka, Pub/Sub, Pulsar), typicky používané v rámci <strong>Lakeflow Spark Declarative Pipelines</strong>. Seznam konektorů roste rychle — aktuální stav ověřte v dokumentaci.</p>
+
+  <table>
+    <tr><th>Nástroj</th><th>Typický zdroj</th><th>Režim</th><th>Míra správy</th><th>Kdy sáhnout jinam</th></tr>
+    <tr><td><strong>Lakeflow Connect</strong> (managed)</td><td>SaaS aplikace, databáze (CDC)</td><td>plánovaný i on-demand</td><td>plně managed</td><td>zdroj není podporován</td></tr>
+    <tr><td><strong>Auto Loader</strong></td><td>soubory v cloud storage</td><td>inkrementální / streaming</td><td>managed discovery, vlastní logika</td><td>jednorázový load → COPY INTO</td></tr>
+    <tr><td><strong>COPY INTO</strong></td><td>soubory v cloud storage</td><td>idempotentní batch (SQL)</td><td>jednoduchá konfigurace</td><td>průběžná ingesce ve velkém → Auto Loader</td></tr>
+    <tr><td><strong>Structured Streaming</strong></td><td>Kafka, Event Hubs, CDF</td><td>streaming</td><td>plná kontrola = plná odpovědnost</td><td>stačí-li deklarativní pipeline</td></tr>
+    <tr><td><strong>Notebook + JDBC/ODBC</strong></td><td>libovolná DB s driverem</td><td>batch, vlastní kód</td><td>vše ručně</td><td>existuje-li managed konektor</td></tr>
+    <tr><td><strong>Azure Data Factory</strong> / partner nástroje</td><td>Azure ekosystém, ETL platformy</td><td>orchestrace + landing</td><td>mimo Databricks</td><td>transformace patří do Databricks</td></tr>
+  </table>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 420" role="img" aria-label="Rozhodovací strom volby ingesčního nástroje: podle typu zdroje (SaaS aplikace, relační databáze, soubory v cloud storage, message bus) vede na Lakeflow Connect, databázové či query-based konektory, Auto Loader, COPY INTO nebo Structured Streaming.">
+      <defs>
+        <marker id="arr62" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="310" y="15" width="200" height="44" rx="8" fill="#1a3a6b"/>
+      <text x="410" y="42" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#ffffff">Odkud data přicházejí?</text>
+      <!-- branches level 2 -->
+      <line x1="410" y1="59" x2="110" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <line x1="410" y1="59" x2="310" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <line x1="410" y1="59" x2="530" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <line x1="410" y1="59" x2="720" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <rect x="30" y="108" width="160" height="40" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="110" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">SaaS aplikace</text>
+      <rect x="230" y="108" width="160" height="40" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="310" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Relační databáze</text>
+      <rect x="450" y="108" width="160" height="40" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="530" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Soubory v cloud storage</text>
+      <rect x="650" y="108" width="150" height="40" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="725" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Message bus</text>
+      <!-- SaaS leaf -->
+      <line x1="110" y1="148" x2="96" y2="333" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <rect x="25" y="338" width="137" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="93" y="361" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Lakeflow Connect</text>
+      <text x="93" y="379" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">managed SaaS konektor</text>
+      <!-- DB decision -->
+      <line x1="310" y1="148" x2="310" y2="185" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <rect x="225" y="188" width="170" height="44" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="310" y="207" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Potřebuji CDC</text>
+      <text x="310" y="224" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">(delete, mezistavy)?</text>
+      <line x1="280" y1="232" x2="250" y2="332" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <text x="236" y="285" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#22c55e">ano</text>
+      <line x1="340" y1="232" x2="415" y2="332" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <text x="352" y="285" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#ef4444">ne</text>
+      <rect x="177" y="338" width="142" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="248" y="361" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">DB konektor (CDC)</text>
+      <text x="248" y="379" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">+ ingestion gateway</text>
+      <rect x="334" y="338" width="166" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="417" y="355" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Query-based konektor</text>
+      <text x="417" y="372" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">cursor column, bez gateway</text>
+      <text x="417" y="388" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">nepodporovaná DB → JDBC</text>
+      <!-- files decision -->
+      <line x1="530" y1="148" x2="530" y2="185" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <rect x="452" y="188" width="156" height="44" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="530" y="207" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Průběžná ingesce,</text>
+      <text x="530" y="224" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">nebo jednorázová dávka?</text>
+      <line x1="505" y1="232" x2="570" y2="332" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <text x="472" y="282" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#22c55e">průběžně</text>
+      <line x1="575" y1="232" x2="640" y2="268" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <text x="612" y="250" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">dávka</text>
+      <rect x="515" y="338" width="113" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="571" y="356" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Auto Loader</text>
+      <text x="571" y="373" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">inkrementální</text>
+      <text x="571" y="388" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">discovery souborů</text>
+      <rect x="600" y="273" width="115" height="48" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="657" y="293" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">COPY INTO</text>
+      <text x="657" y="310" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">idempotentní SQL</text>
+      <!-- bus leaf -->
+      <line x1="725" y1="148" x2="726" y2="333" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr62)"/>
+      <rect x="650" y="338" width="152" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="726" y="355" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">Standard konektor /</text>
+      <text x="726" y="371" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">Structured Streaming</text>
+      <text x="726" y="388" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">deklarativní pipeline</text>
+    </svg>
+    <figcaption>Rozhodovací strom volby ingesčního nástroje podle typu datového zdroje. Obecné pravidlo: začněte nejvíce managed variantou, která splní požadavky.</figcaption>
+  </figure>
+
+  <div class="collapsible">
+    <div class="collapsible-header">CDC konektor vs. query-based konektor — kdy který?<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><strong>Query-based konektory</strong> jsou lehčí alternativa CDC konektorů: místo čtení transakčního logu se dotazují přímo na zdrojovou tabulku přes <strong>cursor column</strong> (monotónně rostoucí timestamp nebo integer) a načítají řádky nad high-water markem z minulého běhu. Nepotřebují ingestion gateway ani staging storage a podporují mj. Oracle, Teradata, SQL Server, MySQL, PostgreSQL a zdroje Lakehouse Federation. Cílové tabulky umí vést jako SCD Type 1, SCD Type 2 nebo append-only.</p>
+      <p>Zvolte je, když CDC infrastruktura není dostupná, ale existuje spolehlivý cursor column. CDC konektor naopak potřebujete, když musíte zachytit <strong>každý mezistav řádku</strong> mezi běhy nebo spolehlivě sledovat delete. Daň za jednoduchost: query-based konektor zatěžuje zdrojovou tabulku přímými dotazy.</p>
+    </div>
+  </div>
+
+  <p>Auto Loader si drží stav zpracovaných souborů v checkpointu a nové soubory objevuje buď directory listingem, nebo přes file notification eventy — zvládá <strong>exactly-once</strong> zpracování i miliardy souborů a schema inference/evolution. <code class="inline">COPY INTO</code> je jeho dávkový sourozenec: idempotentní SQL příkaz, který si zpracované soubory eviduje v transakčním logu Delta tabulky, takže opakované spuštění data neduplikuje.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- idempotentni davkovy load z landing zony</span>
+<span class="kw">COPY INTO</span> <span class="tbl">banka.bronze.transakce</span>
+<span class="kw">FROM</span> <span class="str">'abfss://landing@datalake.dfs.core.windows.net/transakce/'</span>
+<span class="kw">FILEFORMAT</span> = PARQUET
+<span class="kw">COPY_OPTIONS</span> (<span class="str">'mergeSchema'</span> = <span class="str">'true'</span>);</pre>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Dokumentace: <em>„Start with the most managed option that meets your requirements."</em> K vlastnímu kódu (Structured Streaming, JDBC notebooky) sestupujte, až když managed vrstva vaše požadavky nesplní — každý řádek vlastního kódu je řádek, který budete udržovat.</div></div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> ADF používejte na orchestraci a landing dat, ne na ETL transformace „přes" Databricks — transformační logika patří do Databricks. Pro on-premises databáze počítejte s ExpressRoute/VPN, nebo s ADF Self-Hosted Integration Runtime, který data nejdřív složí do cloud storage. Vedle ADF existují i partnerské ETL nástroje (přes Partner Connect, např. Fivetran) — nabídku ověřte v dokumentaci.</div></div>
+</div>
+
+<div class="section" id="sec-format-tabulky">
+  <div class="section-header">
+    <div class="section-num">6.3</div>
+    <h2>Volba formátu tabulky: Delta, Iceberg, Parquet</h2>
+  </div>
+  <p>Nejdřív pojmy: <strong>file format</strong> (Parquet, CSV, JSON) určuje fyzické uložení dat na disku, <strong>table format</strong> (Delta Lake, Apache Iceberg) nad ním přidává metadatovou vrstvu — transakce, evidenci souborů a verzí schématu. Delta i Iceberg používají pod kapotou Parquet; liší se právě metadatovou vrstvou.</p>
+  <p>Parquet ukládá data <strong>sloupcově</strong> v row groups s min/max statistikami — odtud <strong>column pruning</strong> (čtou se jen potřebné sloupce) a <strong>predicate pushdown</strong> (přeskočí se row groups mimo rozsah filtru). <strong>Delta Lake</strong> k tomu přidává transakční log: <strong>ACID transakce</strong>, <strong>time travel</strong>, schema enforcement/evolution a jednotný batch + streaming přístup. V Azure Databricks je Delta výchozím formátem — když formát neuvedete, dostanete Delta tabulku.</p>
+  <p><strong>Apache Iceberg</strong> volte primárně kvůli <strong>interoperabilitě</strong>: čtou a zapisují ho Snowflake, Trino, Athena, Flink a další. Unity Catalog umí spravovat managed Iceberg tabulky a fungovat jako Iceberg katalog pro externí enginy; cizí Iceberg tabulky (AWS Glue, Snowflake Horizon) lze připojit jako foreign tables. Existuje i <strong>UniForm</strong> — Delta tabulka, která si vedle sebe generuje Iceberg metadata, takže ji externí Iceberg klienti čtou bez kopírování dat; přesné schopnosti a limity ověřte v dokumentaci. Pozor na jednu asymetrii: liquid clustering a predictive optimization fungují pro Delta i managed Iceberg, ale <strong>Change Data Feed je specialita Delta Lake</strong> — stojí na jejím transakčním logu.</p>
+
+  <table>
+    <tr><th>Kritérium</th><th>Delta Lake</th><th>Apache Iceberg</th><th>CSV/JSON</th></tr>
+    <tr><td>Výkon pro analytiku</td><td>výborný</td><td>výborný</td><td>slabý</td></tr>
+    <tr><td>ACID transakce / time travel</td><td>ano</td><td>ano</td><td>ne</td></tr>
+    <tr><td>Integrace s Databricks</td><td>nejhlubší (výchozí)</td><td>podporovaná</td><td>základní</td></tr>
+    <tr><td>Interoperabilita napříč platformami</td><td>roste (+ UniForm)</td><td>široká</td><td>univerzální</td></tr>
+    <tr><td>Produkční doporučení</td><td>výchozí volba</td><td>při cross-platform požadavku</td><td>jen landing zóna</td></tr>
+  </table>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> Výchozí odpověď je Delta Lake. Iceberg nasaďte, když stejné tabulky musí číst a zapisovat enginy mimo Databricks. CSV/JSON konvertujte při ingesci do Delta — v landing zóně jsou v pořádku, jako trvalé analytické úložiště ne.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/4-choose-data-table-format#how-parquet-stores-data-differently" target="_blank" rel="noopener">How Parquet stores data differently</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/4-choose-data-table-format#apache-iceberg-for-cross-platform-scenarios" target="_blank" rel="noopener">Apache Iceberg for cross-platform scenarios</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-partitioning">
+  <div class="section-header">
+    <div class="section-num">6.4</div>
+    <h2>Partitioning</h2>
+  </div>
+  <p><strong>Partitioning</strong> rozděluje tabulku do segmentů podle hodnot sloupce; dotazy filtrované na partition klíč pak čtou jen relevantní část dat (<strong>partition pruning</strong>). Zní to jako univerzální dobro — ale dokumentace je nečekaně zdrženlivá: <em>„Databricks recommends that you do not partition tables that contain less than a terabyte of data."</em> Pod 1 TB režie správy partition metadat a riziko malých souborů převáží přínosy; nepartitionované Delta tabulky navíc automaticky těží z <strong>ingestion time clusteringu</strong>.</p>
+  <p>Pokud partitionujete, dodržujte dvě čísla: tabulka <strong>nad 1 TB</strong> a každá partition <strong>alespoň 1 GB</strong> dat. Dobrý partition klíč má <strong>nízkou kardinalitu</strong> (datum, region, kategorie), odpovídá nejčastějším filtrům dotazů a škáluje s růstem dat. Klíče jako <code class="inline">customer_id</code> nebo timestamp na sekundy vyrobí miliony mini-partitions a výkon zabijí.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- partition podle data odvozeneho z timestampu (generated column)</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">banka.silver.transakce</span> (
+    <span class="col">transaction_id</span> STRING,
+    <span class="col">customer_id</span>    STRING,
+    <span class="col">amount</span>         DECIMAL(12,2),
+    <span class="col">transaction_ts</span> TIMESTAMP,
+    <span class="col">transaction_date</span> DATE <span class="kw">GENERATED ALWAYS AS</span> (<span class="fn">CAST</span>(<span class="col">transaction_ts</span> <span class="kw">AS</span> DATE))
+)
+<span class="kw">PARTITIONED BY</span> (<span class="col">transaction_date</span>);</pre>
+  </div>
+
+  <p>Trik s <strong>generated column</strong> stojí za zapamatování: Delta Lake pak umí odvodit partition filtry i z dotazů filtrujících na původní <code class="inline">transaction_ts</code> — analytici nemusí vědět, že tabulka je partitionovaná podle odvozeného data.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Časté chyby partitioningu<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <ul>
+        <li><strong>Over-partitioning:</strong> mnoho partitions s málo daty → problém malých souborů, pomalé listingy a dlouhé optimalizace. Příznak: pruning „funguje", ale dotazy jsou stále pomalé.</li>
+        <li><strong>Vysoká kardinalita klíče:</strong> partitionování podle ID zákazníka či transakce nikdy nedopadne dobře — na to jsou clustering techniky (viz sekce 6.9).</li>
+        <li><strong>Změna strategie = přepis tabulky:</strong> partition sloupce jsou součástí struktury tabulky; změna vyžaduje kompletní rewrite do nové lokace. Rozmyslete si klíč, než nalijete terabajty.</li>
+        <li><strong>Nezdokumentované rozhodnutí:</strong> zapište klíč, očekávané velikosti partitions i dotazové vzory, které schéma zvýhodňuje.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Pro nové tabulky je dnes doporučenou alternativou <strong>liquid clustering</strong> — řeší přesně ty situace, kde partitioning selhává (vysoká kardinalita, nejisté dotazové vzory), a klíče lze měnit bez přepisu dat. Liquid clustering a partitioning se na jedné tabulce vylučují. Podrobně v sekci 6.9.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/5-design-data-partitioning-scheme#choose-effective-partition-keys" target="_blank" rel="noopener">Choose effective partition keys</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/5-design-data-partitioning-scheme#avoid-common-partitioning-mistakes" target="_blank" rel="noopener">Avoid common partitioning mistakes</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-scd">
+  <div class="section-header">
+    <div class="section-num">6.5</div>
+    <h2>Volba typu SCD a implementace SCD Type 2</h2>
+  </div>
+  <p>Atributy dimenzí (zákazník, produkt, pobočka) se v čase mění a <strong>slowly changing dimensions (SCD)</strong> definují, co s tím. Když se zákazník přestěhuje ze Seattlu do Portlandu, máte tři možnosti: hodnotu <strong>přepsat</strong> (a přijít o historii), <strong>zachovat</strong> starou verzi a založit novou, nebo <strong>sledovat</strong> jen předchozí hodnotu ve zvláštním sloupci.</p>
+
+  <table>
+    <tr><th>Kritérium</th><th>Type 0</th><th>Type 1</th><th>Type 2</th><th>Type 3</th></tr>
+    <tr><td>Zachovaná historie</td><td>jen původní hodnota</td><td>žádná</td><td>kompletní</td><td>omezená (předchozí hodnota)</td></tr>
+    <tr><td>Dopad na storage</td><td>minimální</td><td>minimální</td><td>vysoký</td><td>střední</td></tr>
+    <tr><td>Složitost dotazů</td><td>jednoduchá</td><td>jednoduchá</td><td>vyšší</td><td>střední</td></tr>
+    <tr><td>Typické užití</td><td>konstanty, audit původní hodnoty</td><td>opravy chyb, kontakty</td><td>atribuce prodejů, teritoria</td><td>srovnání před/po</td></tr>
+    <tr><td>Vazba z faktů</td><td>natural key</td><td>natural key</td><td><strong>surrogate key</strong></td><td>natural key</td></tr>
+  </table>
+
+  <p>V praxi dimenze typy <strong>kombinují</strong>: datum registrace jako Type 0, e-mail a telefon jako Type 1, přiřazený region jako Type 2. Type 2 si šetřete na atributy, kde historická perspektiva ovlivňuje byznys rozhodnutí — verzovat kvůli změně telefonního čísla je zbytečná režie. Type 3 je nejméně častý; většinu scénářů, které po něm volají, lépe obslouží Type 2.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="Mechanismus SCD Type 2: po přestěhování zákazníka MERGE uzavře platnost původního řádku (valid_to, is_current false) a vloží se nový řádek s novým surrogate klíčem platný do 9999-12-31. Časová osa dole ukazuje navazující intervaly platnosti obou verzí.">
+      <defs>
+        <marker id="arr65" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e8721c"/></marker>
+      </defs>
+      <rect x="20" y="18" width="230" height="46" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="135" y="38" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Změna ve zdroji (1. 3. 2024)</text>
+      <text x="135" y="55" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">C-555: Seattle → Portland</text>
+      <line x1="250" y1="41" x2="330" y2="41" stroke="#e8721c" stroke-width="2" marker-end="url(#arr65)"/>
+      <text x="290" y="33" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#e8721c">MERGE</text>
+      <!-- table header -->
+      <rect x="335" y="18" width="465" height="30" rx="8" fill="#1a3a6b"/>
+      <text x="365" y="38" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">SK</text>
+      <text x="415" y="38" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">cust_id</text>
+      <text x="483" y="38" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">city</text>
+      <text x="553" y="38" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">valid_from</text>
+      <text x="638" y="38" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">valid_to</text>
+      <text x="723" y="38" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">is_current</text>
+      <!-- row 1 -->
+      <rect x="335" y="52" width="465" height="34" rx="6" fill="#ffffff" stroke="#6b7280"/>
+      <text x="365" y="74" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">1001</text>
+      <text x="415" y="74" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">C-555</text>
+      <text x="483" y="74" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">Seattle</text>
+      <text x="553" y="74" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">2020-01-15</text>
+      <text x="638" y="74" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">2024-03-01</text>
+      <text x="723" y="74" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">false</text>
+      <!-- row 2 -->
+      <rect x="335" y="92" width="465" height="34" rx="6" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="365" y="114" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">1002</text>
+      <text x="415" y="114" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">C-555</text>
+      <text x="483" y="114" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Portland</text>
+      <text x="553" y="114" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">2024-03-01</text>
+      <text x="638" y="114" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">9999-12-31</text>
+      <text x="723" y="114" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">true</text>
+      <!-- annotations -->
+      <text x="335" y="150" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">1) UPDATE: uzavření platnosti staré verze</text>
+      <text x="335" y="168" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">2) INSERT: nová verze s novým surrogate key (identity)</text>
+      <!-- timeline -->
+      <line x1="60" y1="250" x2="790" y2="250" stroke="#6b7280" stroke-width="2"/>
+      <rect x="80" y="222" width="330" height="26" rx="6" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="245" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SK 1001 · Seattle · platnost 2020-01-15 až 2024-03-01</text>
+      <rect x="410" y="222" width="330" height="26" rx="6" fill="#22c55e" fill-opacity="0.15" stroke="#22c55e"/>
+      <text x="575" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SK 1002 · Portland · platnost od 2024-03-01 (aktuální)</text>
+      <line x1="410" y1="214" x2="410" y2="258" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="278" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">okamžik změny — intervaly na sebe navazují bez mezery</text>
+      <text x="60" y="278" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">2020</text>
+      <text x="775" y="278" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">9999-12-31</text>
+      <text x="60" y="305" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Fakta odkazují na konkrétní verzi přes surrogate key → historické prodeje zůstávají přiřazené Seattlu.</text>
+    </svg>
+    <figcaption>SCD Type 2: změna zákaznického atributu uzavře platnost staré verze řádku a vloží novou verzi; obě sdílí natural key, ale mají různé surrogate keys.</figcaption>
+  </figure>
+
+  <p>Implementace v Delta Lake: surrogate key vygeneruje <code class="inline">GENERATED ALWAYS AS IDENTITY</code>, platnost verzí drží sloupce <code class="inline">valid_from</code>/<code class="inline">valid_to</code> a příznak <code class="inline">is_current</code>:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">CREATE TABLE</span> <span class="tbl">banka.gold.dim_zakaznik</span> (
+    <span class="col">customer_sk</span>   BIGINT <span class="kw">GENERATED ALWAYS AS IDENTITY</span>,
+    <span class="col">customer_id</span>   STRING <span class="kw">NOT NULL</span>,   <span class="cm">-- natural / business key</span>
+    <span class="col">customer_name</span> STRING,
+    <span class="col">city</span>          STRING,
+    <span class="col">region</span>        STRING,
+    <span class="col">valid_from</span>    TIMESTAMP <span class="kw">NOT NULL</span>,
+    <span class="col">valid_to</span>      TIMESTAMP <span class="kw">NOT NULL</span>,
+    <span class="col">is_current</span>    BOOLEAN
+)
+<span class="kw">USING</span> DELTA
+<span class="kw">TBLPROPERTIES</span> (<span class="str">'delta.enableChangeDataFeed'</span> = <span class="str">'true'</span>);</pre>
+  </div>
+
+  <p>Samotné zpracování změn je dvoufázové: <code class="inline">MERGE</code> nejdřív uzavře aktuální verze změněných záznamů a vloží úplně nové zákazníky, druhý krok pak vloží nové verze pro záznamy, jejichž stará verze byla právě uzavřena. Obě fáze přitom musí pracovat se <strong>stejným časovým okamžikem</strong> — jinak mezi <code class="inline">valid_to</code> staré a <code class="inline">valid_from</code> nové verze vznikne mikro-mezera a point-in-time dotaz do ní spadne. Čas si proto uložte do proměnné:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- jeden casovy okamzik pro obe faze: intervaly pak navazuji bez mezery</span>
+<span class="kw">DECLARE OR REPLACE VARIABLE</span> zmena_ts TIMESTAMP <span class="kw">DEFAULT</span> <span class="fn">current_timestamp</span>();
+
+<span class="cm">-- krok 1: uzavri stare verze + vloz nove zakazniky</span>
+<span class="kw">MERGE INTO</span> <span class="tbl">banka.gold.dim_zakaznik</span> <span class="kw">AS</span> t
+<span class="kw">USING</span> <span class="tbl">banka.staging.zakaznici</span> <span class="kw">AS</span> s
+<span class="kw">ON</span> t.<span class="col">customer_id</span> <span class="op">=</span> s.<span class="col">customer_id</span> <span class="kw">AND</span> t.<span class="col">is_current</span> <span class="op">=</span> true
+<span class="kw">WHEN MATCHED AND</span> (t.<span class="col">city</span> <span class="op">&lt;&gt;</span> s.<span class="col">city</span> <span class="kw">OR</span> t.<span class="col">region</span> <span class="op">&lt;&gt;</span> s.<span class="col">region</span>
+                  <span class="kw">OR</span> t.<span class="col">customer_name</span> <span class="op">&lt;&gt;</span> s.<span class="col">customer_name</span>)
+<span class="kw">THEN UPDATE SET</span> t.<span class="col">valid_to</span> <span class="op">=</span> zmena_ts, t.<span class="col">is_current</span> <span class="op">=</span> false
+<span class="kw">WHEN NOT MATCHED THEN INSERT</span>
+    (<span class="col">customer_id</span>, <span class="col">customer_name</span>, <span class="col">city</span>, <span class="col">region</span>, <span class="col">valid_from</span>, <span class="col">valid_to</span>, <span class="col">is_current</span>)
+<span class="kw">VALUES</span> (s.<span class="col">customer_id</span>, s.<span class="col">customer_name</span>, s.<span class="col">city</span>, s.<span class="col">region</span>,
+        zmena_ts, <span class="fn">CAST</span>(<span class="str">'9999-12-31'</span> <span class="kw">AS</span> TIMESTAMP), true);
+
+<span class="cm">-- krok 2: vloz nove verze pro prave uzavrene zaznamy</span>
+<span class="cm">-- EXISTS misto JOIN: jinak by zakaznik s N uzavrenymi verzemi dostal N kopii</span>
+<span class="kw">INSERT INTO</span> <span class="tbl">banka.gold.dim_zakaznik</span>
+    (<span class="col">customer_id</span>, <span class="col">customer_name</span>, <span class="col">city</span>, <span class="col">region</span>, <span class="col">valid_from</span>, <span class="col">valid_to</span>, <span class="col">is_current</span>)
+<span class="kw">SELECT</span> s.<span class="col">customer_id</span>, s.<span class="col">customer_name</span>, s.<span class="col">city</span>, s.<span class="col">region</span>,
+       zmena_ts, <span class="fn">CAST</span>(<span class="str">'9999-12-31'</span> <span class="kw">AS</span> TIMESTAMP), true
+<span class="kw">FROM</span> <span class="tbl">banka.staging.zakaznici</span> s
+<span class="kw">WHERE EXISTS</span> (<span class="kw">SELECT</span> 1 <span class="kw">FROM</span> <span class="tbl">banka.gold.dim_zakaznik</span> h
+              <span class="kw">WHERE</span> h.<span class="col">customer_id</span> <span class="op">=</span> s.<span class="col">customer_id</span> <span class="kw">AND</span> h.<span class="col">valid_to</span> <span class="op">=</span> zmena_ts)
+  <span class="kw">AND NOT EXISTS</span> (<span class="kw">SELECT</span> 1 <span class="kw">FROM</span> <span class="tbl">banka.gold.dim_zakaznik</span> c
+                  <span class="kw">WHERE</span> c.<span class="col">customer_id</span> <span class="op">=</span> s.<span class="col">customer_id</span> <span class="kw">AND</span> c.<span class="col">is_current</span> <span class="op">=</span> true);</pre>
+  </div>
+
+  <p>Dotaz na stav „k datu" pak filtruje interval platnosti — vrátí přesně jednu verzi na zákazníka:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- stav dimenze k 15. 6. 2023 (point-in-time)</span>
+<span class="kw">SELECT</span> <span class="col">customer_id</span>, <span class="col">customer_name</span>, <span class="col">city</span>
+<span class="kw">FROM</span> <span class="tbl">banka.gold.dim_zakaznik</span>
+<span class="kw">WHERE</span> <span class="col">valid_from</span> <span class="op">&lt;=</span> <span class="str">'2023-06-15 12:00:00'</span>
+  <span class="kw">AND</span> <span class="col">valid_to</span>   <span class="op">&gt;</span>  <span class="str">'2023-06-15 12:00:00'</span>;</pre>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Dvě klasické pasti druhého kroku. První je <strong>fan-out</strong>: kdo místo <code class="inline">EXISTS</code> napíše <code class="inline">JOIN</code> na historické řádky (<code class="inline">h.is_current = false</code>), dostane pro zákazníka s N uzavřenými verzemi N kopií nové verze — a dimenze tiše nabobtná duplicitami. Druhá je <strong>volání <code class="inline">current_timestamp()</code> zvlášť v každém kroku</strong>: mezi <code class="inline">valid_to</code> staré a <code class="inline">valid_from</code> nové verze pak zbude mikro-mezera a point-in-time dotaz padnoucí přesně do ní nevrátí žádnou verzi. Obojí řeší jediná proměnná se sdíleným časem a <code class="inline">EXISTS</code> místo joinu.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Ruční MERGE je skvělý na pochopení mechanismu, ale v produkci zvažte <strong>deklarativní pipeline</strong> s <code class="inline">AUTO CDC</code> API — SCD Type 2 tabulku udržuje automaticky včetně ošetření out-of-order záznamů (viz kapitola 7).</div></div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Kdo čeká, že SCD Type 2 nahradí Delta time travel, narazí na retenci: time travel má výchozí dostupnost 7 dní. Byznys historie patří do explicitních <code class="inline">valid_from</code>/<code class="inline">valid_to</code> sloupců; time travel je nástroj na provozní forenziku (viz sekce 6.6).</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/6-choose-slowly-changing-dimension-type#compare-scd-types" target="_blank" rel="noopener">Compare SCD types</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/6-choose-slowly-changing-dimension-type#apply-mixed-scd-strategies" target="_blank" rel="noopener">Apply mixed SCD strategies</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-temporal-cdf">
+  <div class="section-header">
+    <div class="section-num">6.6</div>
+    <h2>Temporal (history) tabulky a Change Data Feed</h2>
+  </div>
+  <p>SCD Type 2 sleduje <strong>byznysovou</strong> historii pro analytiku. <strong>Temporal (history) tabulky</strong> řeší něco jiného: <strong>technickou</strong> historii pro audit, debugging a reprodukovatelnost — „co přesně bylo v tabulce v úterý ve 14:30 a kdo to změnil". V Delta Lake se staví na dvou mechanismech: <strong>Change Data Feed (CDF)</strong> a <strong>time travel</strong>.</p>
+  <p>CDF po zapnutí zaznamenává každou řádkovou změnu s metadaty: <code class="inline">_change_type</code> (<code class="inline">insert</code>, <code class="inline">update_preimage</code>, <code class="inline">update_postimage</code>, <code class="inline">delete</code>), <code class="inline">_commit_version</code> a <code class="inline">_commit_timestamp</code>. Ve výchozím stavu je <strong>vypnutý</strong> a zachytává jen změny provedené <strong>po</strong> zapnutí — zapněte ho tedy dřív, než do tabulky nalijete produkční data.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- zapnuti CDF na existujici tabulce</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">banka.silver.transakce</span>
+<span class="kw">SET TBLPROPERTIES</span> (<span class="str">'delta.enableChangeDataFeed'</span> = <span class="str">'true'</span>);
+
+<span class="cm">-- kdo, co a kdy zmenil v lednu (audit dotaz)</span>
+<span class="kw">SELECT</span> <span class="col">transaction_id</span>, <span class="col">amount</span>, <span class="col">_change_type</span>, <span class="col">_commit_version</span>, <span class="col">_commit_timestamp</span>
+<span class="kw">FROM</span> <span class="fn">table_changes</span>(<span class="str">'banka.silver.transakce'</span>, <span class="str">'2026-01-01'</span>, <span class="str">'2026-01-31'</span>)
+<span class="kw">WHERE</span> <span class="col">_change_type</span> <span class="kw">IN</span> (<span class="str">'insert'</span>, <span class="str">'update_postimage'</span>)
+<span class="kw">ORDER BY</span> <span class="col">_commit_timestamp</span>;</pre>
+  </div>
+
+  <p><strong>Time travel</strong> doplňuje CDF o dotazy na celý stav tabulky v minulosti — přes <code class="inline">TIMESTAMP AS OF</code> nebo <code class="inline">VERSION AS OF</code>; přehled operací dá <code class="inline">DESCRIBE HISTORY</code>. Dostupnost historie ale řídí retence: standardně se datové soubory drží 7 dní a log 30 dní. Pro compliance scénáře retenci prodlužte — obě vlastnosti nastavujte společně:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">banka.silver.transakce</span> <span class="kw">TIMESTAMP AS OF</span> <span class="str">'2026-01-15 14:30:00'</span>;
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">banka.silver.transakce</span> <span class="kw">VERSION AS OF</span> <span class="num">42</span>;
+<span class="kw">DESCRIBE HISTORY</span> <span class="tbl">banka.silver.transakce</span>;
+
+<span class="cm">-- prodlouzeni retence pro audit (obe vlastnosti spolecne)</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">banka.silver.transakce</span> <span class="kw">SET TBLPROPERTIES</span> (
+    <span class="str">'delta.logRetentionDuration'</span> = <span class="str">'interval 90 days'</span>,
+    <span class="str">'delta.deletedFileRetentionDuration'</span> = <span class="str">'interval 90 days'</span>);</pre>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Trvalý audit trail: perzistence CDF do history tabulky<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Protože time travel i CDF podléhají retenci, dlouhodobý audit vyžaduje <strong>perzistenci změn do samostatné history tabulky</strong>. Elegantní vzor je Structured Streaming čtoucí change feed s <code class="inline">trigger(availableNow=True)</code> — spustí se po každém loadu, zpracuje vše nové jako dávku a skončí:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+        <pre>(spark.readStream
+    .<span class="fn">option</span>(<span class="str">"readChangeFeed"</span>, <span class="str">"true"</span>)   <span class="cm"># delete prijdou jako _change_type = 'delete'</span>
+    .<span class="fn">table</span>(<span class="str">"banka.silver.transakce"</span>)
+    .writeStream
+    .<span class="fn">option</span>(<span class="str">"checkpointLocation"</span>, <span class="str">"/Volumes/banka/audit/checkpoints/transakce_history"</span>)
+    .<span class="fn">trigger</span>(availableNow=<span class="kw">True</span>)
+    .<span class="fn">toTable</span>(<span class="str">"banka.audit.transakce_history"</span>))</pre>
+      </div>
+      <p>History tabulka pak obsahuje každou změnu za celý život dat — bez ohledu na retenční okno zdrojové tabulky.</p>
+    </div>
+  </div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Delší retence = vyšší náklady na storage (staré soubory nesmí smazat <code class="inline">VACUUM</code>). U regulovaných dat (FCA, ČNB) to je vědomý a zdokumentovaný obchod: platíte za storage, kupujete si prokazatelnost.</div></div>
+</div>
+
+<div class="section" id="sec-granularita">
+  <div class="section-header">
+    <div class="section-num">6.7</div>
+    <h2>Granularita sloupců a tabulek</h2>
+  </div>
+  <p><strong>Granularita</strong> („grain") říká, co reprezentuje jeden řádek tabulky. Je to nejtěžší reverzibilní rozhodnutí v modelování: jednou agregovaná data <strong>už nikdy nerozagregujete</strong>. Pokud minutový agregát říká „průměrná teplota senzoru 75 °C", nikdy z něj nezjistíte, ve které milisekundě přišla špička.</p>
+  <p>Grain faktové tabulky určuje kombinace dimenzních klíčů: „jeden řádek na produkt, zákazníka, prodejnu a den". Přidáte-li hodinu, počet řádků násobíte. Dokumentace doporučuje grain <strong>explicitně deklarovat</strong> jako kontrakt („tato tabulka obsahuje jeden řádek na položku objednávky") dřív, než přidáte první sloupec. Volba je pak mezi <strong>atomic grain</strong> (nejjemnější detail ze zdroje — maximální flexibilita) a <strong>aggregate grain</strong> (předsumarizovaná data — rychlejší dotazy, omezené otázky). Časté řešení: držet obojí a agregáty udržovat jako <strong>materialized views</strong> nad atomickými daty.</p>
+  <p>U dimenzí granularita znamená způsob verzování: jeden řádek na zákazníka (Type 1), na verzi zákazníka (Type 2), nebo na zákazníka a období (periodické snapshoty). Grain dimenze musí sedět ke grainu faktů — transakce odkazující na verzi 5 zákazníka musí tu verzi v dimenzi najít.</p>
+  <p>Rozhodnutí ovlivňují čtyři síly: <strong>byznys otázky</strong> (nejdetailnější požadovaná analýza je dolní mez), <strong>dotazové vzory</strong> (příliš jemná data zdražují běžné agregace), <strong>náklady</strong> (jemnější grain = více řádků = více storage i compute; agregace senzorických dat na sekundy/minuty umí srazit počty řádků o 99 %) a <strong>compliance</strong> — finanční instituce často musí držet transakční detail bez ohledu na cenu.</p>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Když si nejste jistí, volte jemnější granularitu — agregáty dostavíte kdykoli později, ztracený detail už nikdy. Podmínkou je rozpočet na storage; proto tenhle argument vždy podložte odhadem objemů.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/9-choose-granularity#evaluate-factors-that-influence-granularity-decisions" target="_blank" rel="noopener">Evaluate factors that influence granularity decisions</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/9-choose-granularity#balance-trade-offs-when-selecting-granularity" target="_blank" rel="noopener">Balance trade-offs when selecting granularity</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-managed-external">
+  <div class="section-header">
+    <div class="section-num">6.8</div>
+    <h2>Managed vs. external (unmanaged) tabulky</h2>
+  </div>
+  <p>U <strong>managed tables</strong> spravuje Unity Catalog metadata <em>i</em> datové soubory — data leží v managed storage lokaci schématu, katalogu nebo metastoru. U <strong>external tables</strong> spravuje Unity Catalog jen metadata; soubory leží v lokaci, kterou určíte klauzulí <code class="inline">LOCATION</code> nad registrovanou external location, a za jejich životní cyklus odpovídáte vy.</p>
+  <p>Kdo čeká, že „managed" znamená jen „Databricks mi vybral cestu", podceňuje, co všechno tím získává. Plná kontrola nad soubory umožňuje Unity Catalogu exkluzivní funkce: <strong>predictive optimization</strong> (automatická komprese a vacuum), <strong>automatic liquid clustering</strong> (výběr clustering klíčů podle dotazů), metadata caching a automatický úklid souborů po dropu. Smazaná managed tabulka jde vrátit příkazem <code class="inline">UNDROP TABLE</code> — výchozí okno je <strong>7 dní</strong> a je konfigurovatelné v rozsahu 7–30 dní. Teprve po uplynutí tohoto okna Databricks datové soubory smaže, typicky do 48 hodin. Přesné hodnoty ověřte v dokumentaci.</p>
+
+  <table>
+    <tr><th>Charakteristika</th><th>Managed table</th><th>External table</th></tr>
+    <tr><td>Datové soubory spravuje</td><td>Unity Catalog</td><td>uživatel</td></tr>
+    <tr><td>Formáty</td><td>Delta Lake, Apache Iceberg</td><td>Delta, Parquet, CSV, JSON, Avro, ORC, text</td></tr>
+    <tr><td>Predictive optimization</td><td>ano</td><td>ne</td></tr>
+    <tr><td><code class="inline">DROP TABLE</code></td><td><code class="inline">UNDROP</code> možný po výchozích 7 dní (7–30 konfigurovatelně), pak se soubory smažou</td><td>soubory zůstávají ve storage</td></tr>
+    <tr><td>Typické užití</td><td>výchozí volba pro většinu tabulek</td><td>sdílení souborů s externími systémy, migrace z Hive metastore, ne-Delta formáty</td></tr>
+  </table>
+
+  <p>External tables mají legitimní use-cases: data musí přežít nezávisle na workspace, čtou/zapisují je nástroje mimo Databricks, migrujete z Hive metastore bez přesunu souborů, nebo potřebujete formáty mimo Delta/Iceberg. Počítejte ale s tím, že přímý přístup do storage <strong>obchází přístupová práva i audit Unity Catalogu</strong> — pro řízené sdílení je lepší <strong>Delta Sharing</strong> (viz sekce 5.6). A neregistrujte tutéž external tabulku ve více metastorech; změny se mezi nimi nepropagují.</p>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> Dokumentace: <em>„Databricks recommends managed tables for most use cases."</em> External tabulky nasazujte cíleně, zápisy pokud možno nechte jen přes Databricks a plánujte jejich konverzi na managed, jakmile původní důvod pomine.</div></div>
+</div>
+
+<div class="section" id="sec-liquid-clustering">
+  <div class="section-header">
+    <div class="section-num">6.9</div>
+    <h2>Liquid clustering vs. partitioning vs. Z-ORDER</h2>
+  </div>
+  <p>Všechny tři techniky stojí na stejném základu: <strong>data skipping</strong>. Delta Lake si pro každý soubor drží statistiky (min/max, počty nulls) a dotaz s filtrem přeskočí soubory, které hledané hodnoty obsahovat nemohou. Skipping ale funguje jen tehdy, když jsou <strong>související záznamy fyzicky pohromadě</strong> — a přesně to clustering techniky zařizují.</p>
+  <p><strong>Liquid clustering</strong> je doporučený přístup pro nové tabulky (a v Public Preview i pro managed Iceberg tabulky — stav ověřte v dokumentaci). Na rozdíl od partitioningu umí <strong>změnit strategii bez přepisu dat</strong>: klíče definujete přes <code class="inline">CLUSTER BY</code> (až 4 sloupce), fyzickou organizaci provádí inkrementální <code class="inline">OPTIMIZE</code>, a když se dotazové vzory změní, prostě klíče přepnete přes <code class="inline">ALTER TABLE</code>.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- faktova tabulka s liquid clusteringem (az 4 klice)</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">banka.gold.fakt_transakce</span> (
+    <span class="col">transaction_id</span> STRING,
+    <span class="col">customer_sk</span>    BIGINT,
+    <span class="col">branch_id</span>      STRING,
+    <span class="col">transaction_date</span> DATE,
+    <span class="col">amount</span>         DECIMAL(12,2)
+)
+<span class="kw">CLUSTER BY</span> (<span class="col">transaction_date</span>, <span class="col">customer_sk</span>);
+
+<span class="kw">OPTIMIZE</span> <span class="tbl">banka.gold.fakt_transakce</span>;          <span class="cm">-- inkrementalni clustering</span>
+
+<span class="cm">-- zmena dotazovych vzoru? zadny prepis tabulky:</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">banka.gold.fakt_transakce</span> <span class="kw">CLUSTER BY</span> (<span class="col">branch_id</span>, <span class="col">transaction_date</span>);
+<span class="kw">OPTIMIZE</span> <span class="tbl">banka.gold.fakt_transakce</span> <span class="kw">FULL</span>;     <span class="cm">-- preusporadat i stara data</span>
+
+<span class="cm">-- nebo vyber klicu nechat na platforme (vyzaduje predictive optimization)</span>
+<span class="cm">-- CREATE TABLE potrebuje definici sloupcu nebo AS SELECT</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">banka.gold.objednavky</span> (
+    <span class="col">order_id</span>     STRING,
+    <span class="col">customer_sk</span>  BIGINT,
+    <span class="col">order_date</span>   DATE,
+    <span class="col">amount</span>       DECIMAL(12,2)
+)
+<span class="kw">CLUSTER BY AUTO</span>;
+
+<span class="cm">-- automatiku lze zapnout i na existujici tabulce</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">banka.gold.objednavky</span> <span class="kw">CLUSTER BY AUTO</span>;</pre>
+  </div>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 340" role="img" aria-label="Srovnání partitioningu a liquid clusteringu: partitioning vytváří pevné adresáře podle hodnoty klíče s rizikem malých souborů a změna klíče vyžaduje přepis tabulky; liquid clustering seskupuje související data do vyvážených souborů, klíče lze měnit ALTER TABLE příkazem a OPTIMIZE probíhá inkrementálně.">
+      <line x1="410" y1="15" x2="410" y2="290" stroke="#e2e8f0" stroke-width="2"/>
+      <!-- left: partitioning -->
+      <text x="205" y="34" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">PARTITIONING</text>
+      <text x="205" y="52" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">pevné adresáře podle hodnoty klíče</text>
+      <rect x="30" y="65" width="110" height="100" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="85" y="83" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">date=2026-01-01/</text>
+      <rect x="45" y="95" width="34" height="24" rx="4" fill="#ffffff" stroke="#1a3a6b"/>
+      <rect x="87" y="95" width="34" height="24" rx="4" fill="#ffffff" stroke="#1a3a6b"/>
+      <rect x="45" y="127" width="34" height="24" rx="4" fill="#ffffff" stroke="#1a3a6b"/>
+      <rect x="145" y="65" width="110" height="100" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="200" y="83" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">date=2026-01-02/</text>
+      <rect x="160" y="95" width="18" height="14" rx="3" fill="#ffffff" stroke="#ef4444"/>
+      <rect x="184" y="95" width="18" height="14" rx="3" fill="#ffffff" stroke="#ef4444"/>
+      <rect x="208" y="95" width="18" height="14" rx="3" fill="#ffffff" stroke="#ef4444"/>
+      <rect x="160" y="115" width="18" height="14" rx="3" fill="#ffffff" stroke="#ef4444"/>
+      <rect x="184" y="115" width="18" height="14" rx="3" fill="#ffffff" stroke="#ef4444"/>
+      <rect x="208" y="115" width="18" height="14" rx="3" fill="#ffffff" stroke="#ef4444"/>
+      <text x="200" y="152" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">malé soubory!</text>
+      <rect x="260" y="65" width="110" height="100" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="315" y="83" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">date=2026-01-03/</text>
+      <rect x="275" y="95" width="34" height="24" rx="4" fill="#ffffff" stroke="#1a3a6b"/>
+      <rect x="317" y="95" width="34" height="24" rx="4" fill="#ffffff" stroke="#1a3a6b"/>
+      <text x="40" y="195" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• smysl až od ~1 TB, partition ≥ 1 GB</text>
+      <text x="40" y="213" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• jen nízká kardinalita klíče</text>
+      <text x="40" y="231" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">• změna klíče = přepis celé tabulky</text>
+      <text x="40" y="249" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">• riziko over-partitioningu</text>
+      <!-- right: liquid -->
+      <text x="615" y="34" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#e8721c">LIQUID CLUSTERING</text>
+      <text x="615" y="52" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">vyvážené soubory, související data pohromadě</text>
+      <rect x="450" y="65" width="100" height="100" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <rect x="462" y="78" width="76" height="22" rx="4" fill="#e8721c" fill-opacity="0.25"/>
+      <rect x="462" y="106" width="76" height="22" rx="4" fill="#e8721c" fill-opacity="0.25"/>
+      <rect x="462" y="134" width="76" height="22" rx="4" fill="#e8721c" fill-opacity="0.45"/>
+      <rect x="562" y="65" width="100" height="100" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <rect x="574" y="78" width="76" height="22" rx="4" fill="#1a3a6b" fill-opacity="0.25"/>
+      <rect x="574" y="106" width="76" height="22" rx="4" fill="#1a3a6b" fill-opacity="0.4"/>
+      <rect x="574" y="134" width="76" height="22" rx="4" fill="#1a3a6b" fill-opacity="0.25"/>
+      <rect x="674" y="65" width="100" height="100" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <rect x="686" y="78" width="76" height="22" rx="4" fill="#22c55e" fill-opacity="0.3"/>
+      <rect x="686" y="106" width="76" height="22" rx="4" fill="#22c55e" fill-opacity="0.45"/>
+      <rect x="686" y="134" width="76" height="22" rx="4" fill="#22c55e" fill-opacity="0.3"/>
+      <text x="612" y="182" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">soubory ~cílové velikosti, data seskupená podle CLUSTER BY klíčů</text>
+      <text x="450" y="205" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">• změna klíčů bez přepisu (ALTER TABLE)</text>
+      <text x="450" y="223" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">• inkrementální OPTIMIZE, clustering-on-write</text>
+      <text x="450" y="241" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• zvládá i vyšší kardinalitu, až 4 klíče</text>
+      <text x="450" y="259" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• CLUSTER BY AUTO s predictive optimization</text>
+      <rect x="30" y="285" width="760" height="38" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="410" y="309" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Nové tabulky: liquid clustering. Partitioning jen pro velmi velké tabulky s jasným, stabilním klíčem. Nelze kombinovat!</text>
+    </svg>
+    <figcaption>Partitioning ukládá data do pevných adresářů podle hodnoty klíče; liquid clustering seskupuje související záznamy do vyvážených souborů a strategii lze měnit bez přepisu dat.</figcaption>
+  </figure>
+
+  <p><strong>Z-ORDER</strong> je předchůdce liquid clusteringu: <code class="inline">OPTIMIZE … ZORDER BY (…)</code> kolokuje související data do stejných souborů, ale aplikuje se jen během OPTIMIZE, změna klíčů znamená plný přepis a nabízí jen transaction-level konkurenci (liquid clustering podporuje row-level). Potkáte ho u zděděných tabulek; migrace je přímočará — <code class="inline">ALTER TABLE … CLUSTER BY (…)</code> na nepartitionované tabulce a poté <code class="inline">OPTIMIZE … FULL</code>.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Deletion vectors — třetí kus skládačky<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Bez <strong>deletion vectors</strong> znamená update/delete jediného řádku přepis celého Parquet souboru. S nimi Delta jen označí řádky za smazané v malém metadata souboru a čtení je aplikuje za běhu; fyzicky se soubory přepíší až při <code class="inline">OPTIMIZE</code>, auto-compaction nebo <code class="inline">REORG TABLE … APPLY (PURGE)</code>. Vedlejší benefit: <strong>row-level concurrency</strong> — souběžné transakce mohou měnit různé řádky téže tabulky bez konfliktu. Pro nové tabulky jsou od Databricks Runtime 14.1 zapnuté ve výchozím stavu. Pozor pro compliance: „smazáno" neznamená „fyzicky pryč" — na to je potřeba <code class="inline">REORG … APPLY (PURGE)</code> + <code class="inline">VACUUM</code>.</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> U tabulek s častými zápisy plánujte <code class="inline">OPTIMIZE</code> každou hodinu až dvě — nebo u managed tabulek zapněte <strong>predictive optimization</strong> a nechte to na platformě. <code class="inline">CLUSTER BY AUTO</code> pak posouvá automatiku ještě dál: platforma klíče sama vybírá i mění podle skutečných dotazů.</div></div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Liquid clustering nelze kombinovat s partitioningem na téže tabulce. U managed Iceberg tabulek v Unity Catalogu se dokonce klauzule <code class="inline">PARTITIONED BY</code> interpretuje jako liquid clustering klíče — žádné Hive-style partitions nevzniknou.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/11-design-clustering-strategy#migrate-from-z-ordering-to-liquid-clustering" target="_blank" rel="noopener">Migrate from Z-ordering to liquid clustering</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/11-design-clustering-strategy#manage-deletion-vectors-for-efficient-updates" target="_blank" rel="noopener">Manage deletion vectors for efficient updates</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">6.10</div>
+    <h2>Lab 6: Design and Implement a Data Model in Unity Catalog (45 minut)</h2>
+  </div>
+  <p>V roli data engineera retailové banky navrhnete a postavíte datový model v Unity Catalogu: zákaznickou dimenzi se SCD Type 2 historií, transakční faktovou tabulku s liquid clusteringem, audit trail pro FCA compliance nad Change Data Feed a inspekci i obnovu předchozích verzí tabulek přes Delta time travel.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/06-design-implement-data-modeling-unity-catalog.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-modeling-unity-catalog/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Proč faktová tabulka odkazuje na SCD Type 2 dimenzi přes surrogate key, a ne přes customer_id? <strong>2)</strong> Proč audit trail nestačí postavit jen na time travel a potřebujete Change Data Feed s perzistencí do history tabulky? <strong>3)</strong> Kdy byste pro transakční fakta zvolili partitioning místo liquid clusteringu — a jaká dvě čísla přitom musí platit?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_05_governance.html">← Governance Unity Catalogu</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 6 z 16</span>
+      <a href="dp750_07_ingest.html" style="margin-left:auto">Ingest dat →</a>
+    </div>
+  </main>
+</div>
+
+<script>function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?'🙈 Skrýt nápovědu':'💡 Zobrazit nápovědu'})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent='✓ Zkopírováno';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopírovat';btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent='Ctrl+C';setTimeout(()=>{btn.textContent='Kopírovat'},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent='☰ Kapitoly'}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent='✕ Zavřít'}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-orig',m==='orig');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

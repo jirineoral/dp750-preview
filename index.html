@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>DP-750 — Data engineering s Azure Databricks</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+[data-view="orig"]{display:none}
+html.mode-orig [data-view="orig"]{display:revert}
+html.mode-orig [data-view="custom"]{display:none}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}
+body { overflow: auto !important; }
+.index-hero { background: linear-gradient(135deg, #1a3a6b 0%, #2d5a9e 100%); color: white; padding: 64px 48px; text-align: center; }
+.index-hero .logo { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; opacity: .6; margin-bottom: 16px; }
+.index-hero h1 { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
+.index-hero p { font-size: 17px; opacity: .8; max-width: 620px; margin: 0 auto 24px; }
+.index-hero .tags { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.index-hero .tag { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 20px; padding: 5px 14px; font-size: 13px; }
+.index-content { max-width: 980px; margin: 0 auto; padding: 48px 32px; }
+.course-section { margin-bottom: 40px; }
+.course-section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0; }
+.course-section-header h2 { font-size: 22px; font-weight: 700; color: #1a3a6b; }
+.course-badge { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; white-space: nowrap; }
+.badge-ex { background: #f0fdf4; color: #15803d; }
+.badge-moc { background: #e8f0fb; color: #1a3a6b; }
+.badge-extra { background: #f3e8ff; color: #6b21a8; }
+.chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.chapter-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; text-decoration: none; color: inherit; transition: all .15s; display: flex; flex-direction: column; gap: 6px; }
+.chapter-card:hover { border-color: #1a3a6b; box-shadow: 0 4px 12px rgba(26,58,107,.12); transform: translateY(-1px); }
+.chapter-card .ch-num { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #e8721c; }
+.chapter-card .ch-title { font-size: 15px; font-weight: 600; color: #1a1f2e; }
+.chapter-card .ch-topics { font-size: 12px; color: #6b7280; line-height: 1.5; }
+.out-card { border-style: dashed; background: #fbfcfd; }
+.out-card .ch-num { color: #64748b; }
+.out-card .ch-title { color: #4b5563; }
+.badge-out { display: inline-block; align-self: flex-start; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+.extra-card { border-left: 4px solid #9333ea; }
+.extra-card .ch-num { color: #6b21a8; }
+.section-divider { border: none; border-top: 2px dashed #cbd5e1; margin: 8px 0 40px; }
+.how-to { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px 28px; margin-bottom: 32px; }
+.how-to h3 { font-size: 15px; font-weight: 600; color: #1a3a6b; margin-bottom: 12px; }
+.how-to ul { padding-left: 18px; }
+.how-to li { font-size: 14px; margin-bottom: 6px; color: #374151; }
+.group-note { font-size: 14px; color: #6b7280; margin: -8px 0 18px; }
+.view-switch { display: inline-flex; gap: 4px; padding: 4px; background: #eef2f7; border: 1px solid #e2e8f0; border-radius: 999px; margin-bottom: 10px; }
+.view-btn { font-family: var(--font-ui); font-size: 13px; font-weight: 600; padding: 8px 18px; border: none; border-radius: 999px; background: transparent; color: #64748b; cursor: pointer; transition: all .15s; white-space: nowrap; }
+.view-btn:hover { color: #1a3a6b; }
+.view-btn[data-view-set="custom"] { background: #1a3a6b; color: #fff; box-shadow: 0 1px 3px rgba(26,58,107,.3); }
+html.mode-orig .view-btn[data-view-set="custom"] { background: transparent; color: #64748b; box-shadow: none; }
+html.mode-orig .view-btn[data-view-set="orig"] { background: #1a3a6b; color: #fff; box-shadow: 0 1px 3px rgba(26,58,107,.3); }
+.view-note { font-size: 14px; color: #6b7280; margin-bottom: 28px; }
+.osnova-blok { margin-bottom: 12px; }
+.osnova-blok:last-child { margin-bottom: 0; }
+.osnova-blok strong { display: block; font-size: 13px; color: #1a3a6b; margin-bottom: 3px; }
+.osnova-blok ul { padding-left: 18px; }
+.osnova-blok li { font-size: 13px; color: #374151; margin-bottom: 2px; }
+.osnova-blok li em { color: #94a3b8; font-style: normal; font-size: 12px; }
+.osnova-podcarou { margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbd5e1; }
+.collapsible.osnova-box { margin-bottom: 32px; }
+@media (max-width: 700px) { .index-hero { padding: 40px 20px; } .index-content { padding: 28px 16px; } .view-switch { display: flex; flex-direction: column; border-radius: 12px; } .view-btn { border-radius: 8px; } }</style>
+<script>try{if(localStorage.getItem("dp750-view")==="orig")document.documentElement.className="mode-orig"}catch(e){}</script>
+</head>
+<body>
+
+<div class="index-hero">
+  <h1>Data engineering s Azure Databricks</h1>
+  <p data-view="custom">Podkladové materiály ke kurzu DP-750 ve zkrácené třídenní verzi — od workspace, compute a Unity Catalogu přes ETL a pipelines až po propojení s Microsoft Fabric a Power BI.</p>
+  <p data-view="orig">Podkladové materiály ke kurzu DP-750 v rozsahu originální osnovy Microsoftu — od workspace, compute a Unity Catalogu přes ETL a pipelines až po monitoring a optimalizaci workloadů.</p>
+  <div class="tags">
+    <span class="tag" data-view="custom">🎓 DP-750 · 3 dny</span>
+    <span class="tag" data-view="orig">🎓 DP-750 · 4 dny</span>
+    <span class="tag">🧱 Azure Databricks</span>
+    <span class="tag">🗂 Unity Catalog</span>
+    <span class="tag" data-view="custom">🔷 Microsoft Fabric</span>
+    <span class="tag">📜 Zkouška DP-750</span>
+  </div>
+</div>
+
+<div class="index-content">
+
+  <div class="view-switch" role="group" aria-label="Zobrazení osnovy kurzu">
+    <button type="button" class="view-btn" data-view-set="custom">🎓 Osnova tohoto kurzu · 3 dny</button>
+    <button type="button" class="view-btn" data-view-set="orig">📘 Originál osnova DP-750 · 4 dny</button>
+  </div>
+  <p class="view-note" data-view="custom">Zkrácená třídenní verze: 13 modulů oficiální osnovy (dva z nich zůstávají na samostudium) plus tři vlastní témata pod čarou.</p>
+  <p class="view-note" data-view="orig">Oficiální čtyřdenní osnova Microsoftu: 13 modulů DP-750 v původním pořadí, bez vlastních doplňků.</p>
+
+<div class="how-to">
+    <h3>ℹ️ Jak používat tyto materiály</h3>
+    <ul>
+      <li>Každá kapitola je samostatný HTML soubor — otevřete ji přímo v prohlížeči, obsah funguje i offline.</li>
+      <li>Mezi kapitolami se pohybujete tlačítky vpravo nahoře nebo přes <strong>☰ Kapitoly</strong>. Obsah aktuální kapitoly je v levém postranním panelu.</li>
+      <li>Rozbalovací sekce otevřete kliknutím, ukázky kódu zkopírujete tlačítkem <em>Kopírovat</em>.</li>
+      <li>Kapitoly odpovídají 1:1 modulům oficiálního kurzu <strong>DP-750</strong>. Praktická část = oficiální laby na GitHubu (anglicky) — na kurzu je lektor prochází jako dema; jsou krokové a samoobslužné, takže si je můžete kdykoli projít i sami.</li>
+      <li data-view="custom">Kapitoly se štítkem <strong>Mimo osnovu · samostudium</strong> jsou součástí oficiálního čtyřdenního kurzu, ale ve zkrácené třídenní verzi se neprobírají.</li>
+      <li>Přepínačem nahoře volíte, jestli chcete vidět <strong>osnovu tohoto kurzu</strong> (vlastní bloky + témata pod čarou), nebo <strong>originální osnovu MOC</strong> (13 modulů oficiálního kurzu). Volba se pamatuje i při přechodu mezi kapitolami.</li>
+    </ul>
+  </div>
+
+  <div class="collapsible osnova-box" data-view="custom">
+    <div class="collapsible-header">📋 Osnova tohoto kurzu<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+    <div class="osnova-blok">
+      <strong>Představení Azure Databricks</strong>
+      <ul>
+      <li>1. Představení Azure Databricks</li>
+      </ul>
+    </div>
+    <div class="osnova-blok">
+      <strong>Výběr a konfigurace Compute</strong>
+      <ul>
+      <li>2. Výběr a konfigurace compute</li>
+      </ul>
+    </div>
+    <div class="osnova-blok">
+      <strong>Organizace objektů v Unity Catalogu</strong>
+      <ul>
+      <li>3. Objekty v Unity Catalogu</li>
+      </ul>
+    </div>
+    <div class="osnova-blok">
+      <strong>Zabezpečení a governance</strong>
+      <ul>
+      <li>4. Zabezpečení Unity Catalogu</li>
+      <li>5. Governance Unity Catalogu</li>
+      </ul>
+    </div>
+    <div class="osnova-blok">
+      <strong>Datové modelování</strong>
+      <ul>
+      <li>6. Datové modelování</li>
+      </ul>
+    </div>
+    <div class="osnova-blok">
+      <strong>Plnění dat do Unity Catalogu, ETL a Pipelines</strong>
+      <ul>
+      <li>7. Ingest dat</li>
+      <li>8. Čištění a transformace dat</li>
+      <li>9. Data quality constraints <em>· samostudium</em></li>
+      <li>10. Datové pipelines</li>
+      </ul>
+    </div>
+    <div class="osnova-blok">
+      <strong>Automatizace</strong>
+      <ul>
+      <li>11. Lakeflow Jobs</li>
+      <li>12. Vývojový lifecycle <em>· samostudium</em></li>
+      </ul>
+    </div>
+    <div class="osnova-blok">
+      <strong>Monitoring</strong>
+      <ul>
+      <li>13. Monitoring a optimalizace</li>
+      </ul>
+    </div>
+    <div class="osnova-blok osnova-podcarou">
+      <strong>Pod čarou — vlastní témata mimo oficiální MOC</strong>
+      <ul>
+      <li>14. Průřez Microsoft Fabric</li>
+      <li>15. Power BI + Fabric + Databricks</li>
+      <li>16. Migrace z Oracle</li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Představení Azure Databricks</h2>
+    </div>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_01_explore_databricks.html">
+        <span class="ch-num">Kapitola 01</span>
+        <span class="ch-title">Představení Azure Databricks</span>
+        <span class="ch-topics">Workspace a UI · Workloady · Klíčové koncepty · Unity Catalog + Purview · Lab 1</span>
+      </a>
+    </div>
+  </div>
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Výběr a konfigurace Compute</h2>
+    </div>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_02_compute.html">
+        <span class="ch-num">Kapitola 02</span>
+        <span class="ch-title">Výběr a konfigurace compute</span>
+        <span class="ch-topics">Typy compute · Výkon · Photon a autoscaling · Knihovny · Access mode · Lab 2</span>
+      </a>
+    </div>
+  </div>
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Organizace objektů v Unity Catalogu</h2>
+    </div>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_03_objekty_unity_catalog.html">
+        <span class="ch-num">Kapitola 03</span>
+        <span class="ch-title">Objekty v Unity Catalogu</span>
+        <span class="ch-topics">Naming · Katalog a schéma · Tabulky a views · Volumes · DDL · Foreign catalog · Genie · Lab 3</span>
+      </a>
+    </div>
+  </div>
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Zabezpečení a governance</h2>
+    </div>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_04_zabezpeceni.html">
+        <span class="ch-num">Kapitola 04</span>
+        <span class="ch-title">Zabezpečení objektů Unity Catalogu</span>
+        <span class="ch-topics">Query lifecycle · Access control · Row filtering · Column masking · Key Vault · Service principals · Lab 4</span>
+      </a>
+      <a class="chapter-card" href="dp750_05_governance.html">
+        <span class="ch-num">Kapitola 05</span>
+        <span class="ch-title">Governance objektů Unity Catalogu</span>
+        <span class="ch-topics">Table definitions · ABAC · Retence a VACUUM · Lineage · Audit · Delta Sharing · Lab 5</span>
+      </a>
+    </div>
+  </div>
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Datové modelování</h2>
+    </div>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_06_datove_modelovani.html">
+        <span class="ch-num">Kapitola 06</span>
+        <span class="ch-title">Datové modelování v Unity Catalogu</span>
+        <span class="ch-topics">Ingesční nástroje · Formáty · Partitioning · SCD Type 2 · Temporal tabulky · Granularita · Liquid clustering · Lab 6</span>
+      </a>
+    </div>
+  </div>
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Plnění dat do Unity Catalogu, ETL a Pipelines</h2>
+    </div>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_07_ingest.html">
+        <span class="ch-num">Kapitola 07</span>
+        <span class="ch-title">Ingest dat do Unity Catalogu</span>
+        <span class="ch-topics">Lakeflow Connect · COPY INTO a CTAS · CDC · Structured Streaming · Auto Loader · Deklarativní pipelines · Lab 7</span>
+      </a>
+      <a class="chapter-card" href="dp750_08_transformace.html">
+        <span class="ch-num">Kapitola 08</span>
+        <span class="ch-title">Čištění, transformace a load dat</span>
+        <span class="ch-topics">Profiling · Datové typy · Duplicity a NULL · Filtry a agregace · Joins · Pivot · MERGE · Lab 8</span>
+      </a>
+      <a class="chapter-card out-card" href="dp750_09_data_quality.html">
+        <span class="ch-num">Kapitola 09</span>
+        <span class="ch-title">Data quality constraints</span>
+        <span class="ch-topics">Validace · Type checks · Schema drift · Expectations · Lab 9</span>
+        <span class="badge-out">Mimo osnovu · samostudium</span>
+      </a>
+      <a class="chapter-card" href="dp750_10_pipelines.html">
+        <span class="ch-num">Kapitola 10</span>
+        <span class="ch-title">Návrh a implementace datových pipelines</span>
+        <span class="ch-topics">Pořadí operací · Notebook vs. pipeline · Logika jobů · Error handling · Lab 10</span>
+      </a>
+    </div>
+  </div>
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Automatizace</h2>
+    </div>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_11_lakeflow_jobs.html">
+        <span class="ch-num">Kapitola 11</span>
+        <span class="ch-title">Lakeflow Jobs</span>
+        <span class="ch-topics">Setup jobu · Triggery · Plánování · Alerty · Restarty · Lab 11</span>
+      </a>
+      <a class="chapter-card out-card" href="dp750_12_dev_lifecycle.html">
+        <span class="ch-num">Kapitola 12</span>
+        <span class="ch-title">Vývojový lifecycle v Azure Databricks</span>
+        <span class="ch-topics">Git · Branching a PR · Testování · Automation Bundles · Databricks CLI · Lab 12</span>
+        <span class="badge-out">Mimo osnovu · samostudium</span>
+      </a>
+    </div>
+  </div>
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Monitoring</h2>
+    </div>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_13_monitoring.html">
+        <span class="ch-num">Kapitola 13</span>
+        <span class="ch-title">Monitoring, troubleshooting a optimalizace</span>
+        <span class="ch-topics">Spotřeba clusterů · Oprava jobů · Spark UI · Skew a shuffle · Log Analytics · Lab 13</span>
+      </a>
+    </div>
+  </div>
+
+  <hr class="section-divider" data-view="custom">
+  <div class="course-section" data-view="custom">
+    <div class="course-section-header">
+      <span class="course-badge badge-extra">Pod čarou</span>
+      <h2>Mimo MOC — vlastní témata</h2>
+    </div>
+    <p class="group-note">Nadstavba nad oficiální kurz: Microsoft Fabric, napojení na Power BI a migrace z Oracle.</p>
+    <div class="chapter-grid">
+      <a class="chapter-card extra-card" href="dp750_14_fabric_prehled.html">
+        <span class="ch-num">Kapitola 14</span>
+        <span class="ch-title">Průřez Microsoft Fabric</span>
+        <span class="ch-topics">Co je Fabric · Capacity a CU · OneLake · Workloady · Fabric vs. Databricks</span>
+      </a>
+      <a class="chapter-card extra-card" href="dp750_15_pbi_fabric_databricks.html">
+        <span class="ch-num">Kapitola 15</span>
+        <span class="ch-title">Power BI, Fabric a Azure Databricks</span>
+        <span class="ch-topics">DirectQuery vs. Import · Optimalizace · Mirroring · Delta Sharing · OneLake shortcuts · Direct Lake</span>
+      </a>
+      <a class="chapter-card extra-card" href="dp750_16_migrace_oracle.html">
+        <span class="ch-num">Kapitola 16</span>
+        <span class="ch-title">Migrace z Oracle</span>
+        <span class="ch-topics">Strategie migrace · Lakebridge · PL/SQL → Spark SQL · Typické zrady · Zdroje</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="course-section" data-view="orig">
+    <div class="course-section-header">
+      <span class="course-badge badge-moc">MOC</span>
+      <h2>Moduly oficiálního kurzu DP-750</h2>
+    </div>
+    <p class="group-note">13 modulů oficiální osnovy Microsoftu v původním pořadí.</p>
+    <div class="chapter-grid">
+      <a class="chapter-card" href="dp750_01_explore_databricks.html">
+        <span class="ch-num">Kapitola 01</span>
+        <span class="ch-title">Představení Azure Databricks</span>
+        <span class="ch-topics">Workspace a UI · Workloady · Klíčové koncepty · Unity Catalog + Purview · Lab 1</span>
+      </a>
+      <a class="chapter-card" href="dp750_02_compute.html">
+        <span class="ch-num">Kapitola 02</span>
+        <span class="ch-title">Výběr a konfigurace compute</span>
+        <span class="ch-topics">Typy compute · Výkon · Photon a autoscaling · Knihovny · Access mode · Lab 2</span>
+      </a>
+      <a class="chapter-card" href="dp750_03_objekty_unity_catalog.html">
+        <span class="ch-num">Kapitola 03</span>
+        <span class="ch-title">Objekty v Unity Catalogu</span>
+        <span class="ch-topics">Naming · Katalog a schéma · Tabulky a views · Volumes · DDL · Foreign catalog · Genie · Lab 3</span>
+      </a>
+      <a class="chapter-card" href="dp750_04_zabezpeceni.html">
+        <span class="ch-num">Kapitola 04</span>
+        <span class="ch-title">Zabezpečení objektů Unity Catalogu</span>
+        <span class="ch-topics">Query lifecycle · Access control · Row filtering · Column masking · Key Vault · Service principals · Lab 4</span>
+      </a>
+      <a class="chapter-card" href="dp750_05_governance.html">
+        <span class="ch-num">Kapitola 05</span>
+        <span class="ch-title">Governance objektů Unity Catalogu</span>
+        <span class="ch-topics">Table definitions · ABAC · Retence a VACUUM · Lineage · Audit · Delta Sharing · Lab 5</span>
+      </a>
+      <a class="chapter-card" href="dp750_06_datove_modelovani.html">
+        <span class="ch-num">Kapitola 06</span>
+        <span class="ch-title">Datové modelování v Unity Catalogu</span>
+        <span class="ch-topics">Ingesční nástroje · Formáty · Partitioning · SCD Type 2 · Temporal tabulky · Granularita · Liquid clustering · Lab 6</span>
+      </a>
+      <a class="chapter-card" href="dp750_07_ingest.html">
+        <span class="ch-num">Kapitola 07</span>
+        <span class="ch-title">Ingest dat do Unity Catalogu</span>
+        <span class="ch-topics">Lakeflow Connect · COPY INTO a CTAS · CDC · Structured Streaming · Auto Loader · Deklarativní pipelines · Lab 7</span>
+      </a>
+      <a class="chapter-card" href="dp750_08_transformace.html">
+        <span class="ch-num">Kapitola 08</span>
+        <span class="ch-title">Čištění, transformace a load dat</span>
+        <span class="ch-topics">Profiling · Datové typy · Duplicity a NULL · Filtry a agregace · Joins · Pivot · MERGE · Lab 8</span>
+      </a>
+      <a class="chapter-card" href="dp750_09_data_quality.html">
+        <span class="ch-num">Kapitola 09</span>
+        <span class="ch-title">Data quality constraints</span>
+        <span class="ch-topics">Validace · Type checks · Schema drift · Expectations · Lab 9</span>
+      </a>
+      <a class="chapter-card" href="dp750_10_pipelines.html">
+        <span class="ch-num">Kapitola 10</span>
+        <span class="ch-title">Návrh a implementace datových pipelines</span>
+        <span class="ch-topics">Pořadí operací · Notebook vs. pipeline · Logika jobů · Error handling · Lab 10</span>
+      </a>
+      <a class="chapter-card" href="dp750_11_lakeflow_jobs.html">
+        <span class="ch-num">Kapitola 11</span>
+        <span class="ch-title">Lakeflow Jobs</span>
+        <span class="ch-topics">Setup jobu · Triggery · Plánování · Alerty · Restarty · Lab 11</span>
+      </a>
+      <a class="chapter-card" href="dp750_12_dev_lifecycle.html">
+        <span class="ch-num">Kapitola 12</span>
+        <span class="ch-title">Vývojový lifecycle v Azure Databricks</span>
+        <span class="ch-topics">Git · Branching a PR · Testování · Automation Bundles · Databricks CLI · Lab 12</span>
+      </a>
+      <a class="chapter-card" href="dp750_13_monitoring.html">
+        <span class="ch-num">Kapitola 13</span>
+        <span class="ch-title">Monitoring, troubleshooting a optimalizace</span>
+        <span class="ch-topics">Spotřeba clusterů · Oprava jobů · Spark UI · Skew a shuffle · Log Analytics · Lab 13</span>
+      </a>
+    </div>
+  </div>
+
+<div class="course-section">
+    <div class="course-section-header">
+      <span class="course-badge badge-ex">Příprava</span>
+      <h2>Zkouška DP-750 a co potřebujete</h2>
+    </div>
+    <div class="how-to" style="margin-bottom:0">
+      <ul>
+        <li><strong>Prostředí pro laby:</strong> Azure Databricks workspace (Premium) v Azure subscription, případně <a href="https://www.databricks.com/try-databricks" target="_blank" rel="noopener">Databricks Free Edition</a> pro samostudium. Přesné požadavky uvádí každý lab v úvodu.</li>
+        <li><strong>Oficiální laby:</strong> <a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/" target="_blank" rel="noopener">microsoftlearning.github.io — DP-750T00</a> (anglicky, krokové návody).</li>
+        <li><strong>Learn kolekce kurzu:</strong> každá kapitola odkazuje na příslušný modul na Microsoft Learn — vhodné pro opakování po kurzu.</li>
+        <li><strong>Zkouška DP-750</strong> (<a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-750" target="_blank" rel="noopener">study guide</a>) má čtyři domény: Set up and configure an Azure Databricks environment (15–20 %) · Secure and govern Unity Catalog objects (15–20 %) · Prepare and process data (30–35 %) · Deploy and maintain data pipelines and workloads (30–35 %).</li>
+        <li><strong>Kam dál:</strong> na kurz navazuje <a href="https://learn.microsoft.com/training/courses/dp-600t00" target="_blank" rel="noopener">DP-600 — Microsoft Fabric Analytics Engineer</a>; ochutnávku Fabricu najdete v kapitolách pod čarou.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?'🙈 Skrýt nápovědu':'💡 Zobrazit nápovědu'})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent='✓ Zkopírováno';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopírovat';btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent='Ctrl+C';setTimeout(()=>{btn.textContent='Kopírovat'},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent='☰ Kapitoly'}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent='✕ Zavřít'}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-orig',m==='orig');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Data quality constraints — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+[data-view="orig"]{display:none}
+html.mode-orig [data-view="orig"]{display:revert}
+html.mode-orig [data-view="custom"]{display:none}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="orig")document.documentElement.className="mode-orig"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Data quality constraints</span>
+  </div>
+  <div class="nav-links">
+    <button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_10_pipelines.html" class="next">Datové pipelines →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-vrstvy-obrany" class="toc-item active" data-section="sec-vrstvy-obrany">Vrstvy obrany kvality dat</a>
+    <a href="#sec-validacni-kontroly" class="toc-item" data-section="sec-validacni-kontroly">Validační kontroly: constraints na Delta tabulkách</a>
+    <a href="#sec-datove-typy" class="toc-item" data-section="sec-datove-typy">Kontroly datových typů: cast a try_cast</a>
+    <a href="#sec-schema-drift" class="toc-item" data-section="sec-schema-drift">Detekce a řízení schema drift</a>
+    <a href="#sec-expectations" class="toc-item" data-section="sec-expectations">Data quality přes pipeline expectations</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 9: Implement and Manage Data Quality Constraints in Unity Catalog (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 9</div>
+      <h1>Data quality constraints</h1>
+      <div class="hero-subtitle">Validační kontroly, kontroly datových typů, schema drift a pipeline expectations</div>
+      <div class="hero-meta"><span>🗂 Plnění dat do Unity Catalogu, ETL a Pipelines</span><span data-view="custom">⚠️ Mimo osnovu zkráceného kurzu</span></div>
+    </div>
+<div class="callout info" data-view="custom"><div class="callout-icon">ℹ️</div><div><strong>Mimo osnovu zkráceného kurzu:</strong> tento modul je součástí oficiálního čtyřdenního kurzu DP-750. Ve zkrácené třídenní verzi ho na kurzu neprobíráme — kapitola slouží k samostudiu a odkazovaný lab k ní zůstává plně k dispozici.</div></div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Implementovat validační kontroly na Delta tabulkách — <strong>NOT NULL</strong>, <strong>CHECK constraints</strong> a informativní PK/FK.</li>
+    <li>Ošetřit datové typy pomocí <code class="inline">cast()</code> a <code class="inline">try_cast()</code> a oddělit nevalidní záznamy do karantény.</li>
+    <li>Detekovat a řídit <strong>schema drift</strong> pomocí schema evolution módů Auto Loaderu a rescued data column.</li>
+    <li>Definovat <strong>expectations</strong> v Lakeflow Spark Declarative Pipelines s akcemi warn / drop / fail.</li>
+    <li>Monitorovat kvalitu dat přes záložku Data quality a event log pipeline.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-vrstvy-obrany">
+  <div class="section-header">
+    <div class="section-num">9.1</div>
+    <h2>Vrstvy obrany kvality dat</h2>
+  </div>
+  <p>Nekvalitní data se chovají jako kontaminace — jakmile projdou do silver a gold vrstvy, šíří se do reportů, ML modelů a rozhodnutí. Dokumentace to formuluje přímo: nevalidní data <em>„can derail analytics projects, corrupt business reports, and erode confidence in your data platform"</em>. Proto se kvalita dat nehlídá na jednom místě, ale ve <strong>vrstvách</strong> — každá vrstva chytá jiný typ problému a co proklouzne jednou, zachytí další.</p>
+  <p>Azure Databricks nabízí čtyři vestavěné mechanismy: <strong>schema enforcement</strong> (Delta Lake automaticky validuje strukturu a typy při zápisu), <strong>table constraints</strong> (pravidla přímo na tabulce, odmítnou zápis nevalidního řádku), <strong>pipeline expectations</strong> (deklarativní pravidla v Lakeflow pipelines s volitelnou reakcí) a <strong>monitoring</strong> (metriky kvality v UI a event logu). Kombinace všech čtyř se v dokumentaci označuje jako „defense in depth".</p>
+  <figure class="figure">
+    <svg viewBox="0 0 820 260" role="img" aria-label="Diagram čtyř vrstev obrany kvality dat. Záznam prochází zleva doprava přes schema enforcement, table constraints a pipeline expectations do cílové tabulky; nad celým tokem dohlíží vrstva monitoringu. Každá vrstva zachytává jiný typ chyby.">
+      <defs>
+        <marker id="arr9a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="10" y="20" width="800" height="46" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="410" y="40" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Monitoring — Data quality tab, event log, alerty</text>
+      <text x="410" y="57" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">průběžně sleduje všechny vrstvy pod sebou</text>
+      <rect x="10" y="120" width="110" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="65" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Příchozí</text>
+      <text x="65" y="167" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">záznam</text>
+      <rect x="170" y="110" width="170" height="90" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="255" y="135" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">1. Schema enforcement</text>
+      <text x="255" y="155" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">struktura + typy sloupců</text>
+      <text x="255" y="172" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">chybný typ → zápis selže</text>
+      <rect x="390" y="110" width="170" height="90" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="475" y="135" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">2. Table constraints</text>
+      <text x="475" y="155" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">NOT NULL, CHECK</text>
+      <text x="475" y="172" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">porušení → zápis selže</text>
+      <rect x="610" y="110" width="170" height="90" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="695" y="135" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">3. Expectations</text>
+      <text x="695" y="155" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">byznys pravidla v pipeline</text>
+      <text x="695" y="172" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">warn / drop / fail</text>
+      <line x1="120" y1="155" x2="164" y2="155" stroke="#6b7280" stroke-width="2" marker-end="url(#arr9a)"/>
+      <line x1="340" y1="155" x2="384" y2="155" stroke="#6b7280" stroke-width="2" marker-end="url(#arr9a)"/>
+      <line x1="560" y1="155" x2="604" y2="155" stroke="#6b7280" stroke-width="2" marker-end="url(#arr9a)"/>
+      <line x1="255" y1="104" x2="255" y2="72" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <line x1="475" y1="104" x2="475" y2="72" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <line x1="695" y1="104" x2="695" y2="72" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="410" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Co proklouzne jednou vrstvou, zachytí další — „defense in depth"</text>
+    </svg>
+    <figcaption>Čtyři vrstvy obrany kvality dat: schema enforcement a constraints brání zápisu nevalidních dat, expectations řídí tok v pipeline, monitoring hlídá trendy.</figcaption>
+  </figure>
+  <table>
+    <tr><th>Mechanismus</th><th>Kde působí</th><th>Reakce na porušení</th><th>Typické použití</th></tr>
+    <tr><td>Schema enforcement</td><td>každý zápis do Delta tabulky</td><td>zápis selže</td><td>automaticky, vždy zapnuto</td></tr>
+    <tr><td>NOT NULL / CHECK constraint</td><td>zápis do konkrétní tabulky</td><td>transakce selže</td><td>batch, tvrdé garance integrity</td></tr>
+    <tr><td>PK / FK constraint</td><td>metadata Unity Catalogu</td><td>nic — informativní</td><td>dokumentace modelu, BI nástroje</td></tr>
+    <tr><td>Pipeline expectations</td><td>deklarativní pipeline</td><td>warn / drop / fail dle volby</td><td>streaming i batch v pipeline</td></tr>
+  </table>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> constraints a expectations nejsou konkurenti, ale doplňky. Constraint je poslední pojistka na tabulce (chrání ji před <em>každým</em> zapisovatelem, i mimo pipeline), expectation je flexibilní filtr uvnitř pipeline s metrikami. V praxi chcete obojí.</div></div>
+</div>
+
+<div class="section" id="sec-validacni-kontroly">
+  <div class="section-header">
+    <div class="section-num">9.2</div>
+    <h2>Validační kontroly: constraints na Delta tabulkách</h2>
+  </div>
+  <p>Nejjednodušší validace je <strong>NOT NULL constraint</strong> — deklaruje se přímo v definici sloupce nebo se doplní později přes <code class="inline">ALTER TABLE</code>. Delta Lake pak odmítne každou transakci, která by do sloupce zapsala NULL.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- NOT NULL primo v definici tabulky</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">main.silver.customers</span> (
+    <span class="col">customer_id</span> INT <span class="kw">NOT NULL</span>,
+    <span class="col">email</span> STRING <span class="kw">NOT NULL</span>,
+    <span class="col">first_name</span> STRING,
+    <span class="col">last_name</span> STRING
+);
+
+<span class="cm">-- dodatecne pridani na existujici tabulku</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">main.silver.customers</span> <span class="kw">ALTER COLUMN</span> <span class="col">email</span> <span class="kw">SET NOT NULL</span>;</pre>
+  </div>
+  <p>Složitější byznys pravidla — rozsahy hodnot, formáty, kombinace sloupců — pokrývá <strong>CHECK constraint</strong>. Je to libovolný booleovský SQL výraz vyhodnocovaný při každém INSERT i UPDATE; porušení znamená selhání celé transakce.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">ALTER TABLE</span> <span class="tbl">main.silver.employees</span>
+  <span class="kw">ADD CONSTRAINT</span> valid_age <span class="kw">CHECK</span> (<span class="col">age</span> <span class="op">&gt;=</span> <span class="num">18</span> <span class="kw">AND</span> <span class="col">age</span> <span class="op">&lt;=</span> <span class="num">120</span>);
+
+<span class="kw">ALTER TABLE</span> <span class="tbl">main.silver.transactions</span>
+  <span class="kw">ADD CONSTRAINT</span> positive_amount <span class="kw">CHECK</span> (<span class="col">amount</span> <span class="op">&gt;</span> <span class="num">0</span>);</pre>
+  </div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> <strong>PRIMARY KEY a FOREIGN KEY constraints v Unity Catalogu jsou informativní (informational) — nejsou vynucované.</strong> Delta Lake vám klidně dovolí vložit duplicitní hodnotu primárního klíče. PK/FK slouží jako dokumentace datového modelu pro lidi a BI nástroje (a optimalizátor je může využít), ale unikátnost si musíte hlídat sami — např. přes expectations nebo deduplikaci v pipeline.</div></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- PK je jen metadata, unikatnost NEvynucuje</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">main.silver.orders</span> (
+    <span class="col">order_id</span> INT <span class="kw">NOT NULL</span>,
+    <span class="col">customer_id</span> INT,
+    <span class="col">order_date</span> DATE,
+    <span class="kw">CONSTRAINT</span> orders_pk <span class="kw">PRIMARY KEY</span> (<span class="col">order_id</span>)
+);
+
+<span class="cm">-- realnou kontrolu duplicit resi napr. materialized view</span>
+<span class="kw">CREATE OR REFRESH MATERIALIZED VIEW</span> <span class="tbl">order_validation</span> <span class="kw">AS</span>
+<span class="kw">SELECT</span> <span class="col">order_id</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="col">occurrence_count</span>
+<span class="kw">FROM</span> <span class="tbl">orders</span>
+<span class="kw">GROUP BY</span> <span class="col">order_id</span>
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) <span class="op">&gt;</span> <span class="num">1</span>;</pre>
+  </div>
+  <div class="collapsible">
+    <div class="collapsible-header">Co když přidávám constraint na tabulku, kde už nevalidní data leží?<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><code class="inline">ALTER TABLE … ADD CONSTRAINT</code> nejdřív ověří, že <em>všechna existující data</em> pravidlo splňují — pokud ne, příkaz selže. To je záměr: constraint garantuje stav celé tabulky, ne jen budoucích zápisů. Prakticky to znamená: nejdřív data vyčistit (nebo nevalidní řádky přesunout do karanténní tabulky), teprve pak constraint přidat. Přesné chování pro konkrétní typ constraintu ověřte v dokumentaci Delta Lake.</p>
+    </div>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> kdo přichází z klasických databází, čeká, že CHECK constraint nevalidní řádek prostě „odmítne" a ostatní projdou. V Delta Lake selže <em>celá transakce</em> — jeden špatný řádek shodí celý batch zápis. Proto se constraints hodí jako tvrdá pojistka, ale filtrování špatných řádků řešte výš v pipeline.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/2-implement-validation-checks#validate-data-cardinality" target="_blank" rel="noopener">Validate data cardinality</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/2-implement-validation-checks#apply-range-checking" target="_blank" rel="noopener">Apply range checking</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-datove-typy">
+  <div class="section-header">
+    <div class="section-num">9.3</div>
+    <h2>Kontroly datových typů: cast a try_cast</h2>
+  </div>
+  <p>Řetězec tam, kde má být číslo, rozbije agregace a výpočty. První obrannou linií je opět <strong>schema enforcement</strong>: Delta Lake při zápisu porovnává typy příchozích sloupců se schématem cílové tabulky. Dokumentace: <em>„All inserted columns must exist in the target table"</em> a typy musí sedět nebo být bezpečně převoditelné. Zápis hodnoty <code class="inline">'fifty'</code> do INT sloupce tedy selže sám od sebe.</p>
+  <p>Jenže bronze vrstva bývá plná řetězců (CSV, JSON) a převod na správné typy je vaše práce. K tomu slouží dvojice funkcí s zásadně odlišným chováním:</p>
+  <table>
+    <tr><th>Funkce</th><th>Při úspěchu</th><th>Při selhání převodu</th><th>Kdy použít</th></tr>
+    <tr><td><code class="inline">cast()</code></td><td>převedená hodnota</td><td>chyba, dotaz selže</td><td>tvrdá validace — chci o problému vědět hned</td></tr>
+    <tr><td><code class="inline">try_cast()</code></td><td>převedená hodnota</td><td>vrátí <code class="inline">NULL</code></td><td>měkká validace — chci nevalidní řádky odfiltrovat či označit</td></tr>
+  </table>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- try_cast: selhani prevodu = NULL, ktery umim detekovat</span>
+<span class="kw">SELECT</span>
+    <span class="col">raw_amount</span>,
+    <span class="fn">try_cast</span>(<span class="col">raw_amount</span> <span class="kw">AS</span> DECIMAL(10,2)) <span class="kw">AS</span> <span class="col">validated_amount</span>,
+    <span class="kw">CASE WHEN</span> <span class="fn">try_cast</span>(<span class="col">raw_amount</span> <span class="kw">AS</span> DECIMAL(10,2)) <span class="kw">IS NULL</span>
+         <span class="kw">THEN</span> <span class="str">'Invalid amount format'</span> <span class="kw">ELSE</span> <span class="str">'Valid'</span> <span class="kw">END</span> <span class="kw">AS</span> <span class="col">validation_status</span>
+<span class="kw">FROM</span> <span class="tbl">staging_data</span>;</pre>
+  </div>
+  <p>Na tomto vzoru stojí praktický <strong>karanténní pattern</strong>: validní řádky přetypované do silver tabulky, nevalidní do karanténní tabulky s časovou značkou a důvodem. Nic se neztratí a datový tým má co reklamovat u zdroje.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- validni zaznamy do silver</span>
+<span class="kw">INSERT INTO</span> <span class="tbl">silver_transactions</span>
+<span class="kw">SELECT</span> <span class="col">transaction_id</span>,
+       <span class="fn">cast</span>(<span class="col">amount</span> <span class="kw">AS</span> DECIMAL(10,2)) <span class="kw">AS</span> <span class="col">amount</span>,
+       <span class="fn">cast</span>(<span class="col">transaction_date</span> <span class="kw">AS</span> DATE) <span class="kw">AS</span> <span class="col">transaction_date</span>
+<span class="kw">FROM</span> <span class="tbl">bronze_transactions</span>
+<span class="kw">WHERE</span> <span class="fn">try_cast</span>(<span class="col">amount</span> <span class="kw">AS</span> DECIMAL(10,2)) <span class="kw">IS NOT NULL</span>
+  <span class="kw">AND</span> <span class="fn">try_cast</span>(<span class="col">transaction_date</span> <span class="kw">AS</span> DATE) <span class="kw">IS NOT NULL</span>;
+
+<span class="cm">-- nevalidni do karanteny s duvodem</span>
+<span class="kw">INSERT INTO</span> <span class="tbl">quarantine_transactions</span>
+<span class="kw">SELECT</span> <span class="col">transaction_id</span>, <span class="col">amount</span> <span class="kw">AS</span> <span class="col">raw_amount</span>, <span class="col">transaction_date</span> <span class="kw">AS</span> <span class="col">raw_date</span>,
+       <span class="fn">current_timestamp</span>() <span class="kw">AS</span> <span class="col">quarantined_at</span>,
+       <span class="str">'Type validation failed'</span> <span class="kw">AS</span> <span class="col">reason</span>
+<span class="kw">FROM</span> <span class="tbl">bronze_transactions</span>
+<span class="kw">WHERE</span> <span class="fn">try_cast</span>(<span class="col">amount</span> <span class="kw">AS</span> DECIMAL(10,2)) <span class="kw">IS NULL</span>
+   <span class="kw">OR</span> <span class="fn">try_cast</span>(<span class="col">transaction_date</span> <span class="kw">AS</span> DATE) <span class="kw">IS NULL</span>;</pre>
+  </div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> <code class="inline">try_cast</code> se dá zkombinovat i s CHECK constraintem — např. <code class="inline">CHECK (try_cast(event_date_str AS DATE) IS NOT NULL)</code> vynutí, že řetězcový sloupec je vždy parsovatelné datum, aniž byste měnili jeho typ.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/3-implement-data-type-checks#use-explicit-type-casting" target="_blank" rel="noopener">Use explicit type casting</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/3-implement-data-type-checks#handle-type-mismatches-in-pipelines" target="_blank" rel="noopener">Handle type mismatches in pipelines</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-schema-drift">
+  <div class="section-header">
+    <div class="section-num">9.4</div>
+    <h2>Detekce a řízení schema drift</h2>
+  </div>
+  <p><strong>Schema drift</strong> je jiný problém než špatné hodnoty: mění se samotná <em>struktura</em> dat. Zdrojový systém přidá sloupec, přejmenuje pole, změní typ — a pipeline, která to nečeká, buď spadne, nebo hůř: data potichu ztratí. Výchozí chování Delta Lake je konzervativní: zápis s neznámými sloupci selže. To je bezpečné, ale u živých zdrojů potřebujete strategii.</p>
+  <p><strong>Auto Loader</strong> nabízí pět režimů přes volbu <code class="inline">cloudFiles.schemaEvolutionMode</code>:</p>
+  <table>
+    <tr><th>Režim</th><th>Chování při novém sloupci</th></tr>
+    <tr><td><code class="inline">addNewColumns</code></td><td>stream se zastaví; po restartu se nové sloupce přidají do schématu (výchozí, pokud není zadané schéma)</td></tr>
+    <tr><td><code class="inline">rescue</code></td><td>stream běží dál; neočekávaná data se ukládají do rescued data column</td></tr>
+    <tr><td><code class="inline">failOnNewColumns</code></td><td>stream se zastaví a čeká na ruční zásah — nejpřísnější varianta</td></tr>
+    <tr><td><code class="inline">none</code></td><td>nové sloupce tiše ignoruje</td></tr>
+    <tr><td><code class="inline">addNewColumnsWithTypeWidening</code></td><td>jako addNewColumns + rozšíření kompatibilních typů (INT → LONG)</td></tr>
+  </table>
+  <p>Nejužitečnější kompromis pro produkci je režim <strong>rescue</strong>: pipeline nikdy nespadne kvůli struktuře a nic se neztratí. Vše, co neodpovídá očekávanému schématu, přistane jako JSON ve sloupci <code class="inline">_rescued_data</code>, který můžete periodicky vyhodnocovat.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre>(spark.readStream
+    .<span class="fn">format</span>(<span class="str">"cloudFiles"</span>)
+    .<span class="fn">option</span>(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
+    .<span class="fn">option</span>(<span class="str">"cloudFiles.schemaLocation"</span>, <span class="str">"/Volumes/main/raw/schema"</span>)
+    .<span class="fn">option</span>(<span class="str">"cloudFiles.schemaEvolutionMode"</span>, <span class="str">"rescue"</span>)
+    .<span class="fn">option</span>(<span class="str">"rescuedDataColumn"</span>, <span class="str">"_rescued_data"</span>)
+    .<span class="fn">load</span>(<span class="str">"/Volumes/main/raw/claims"</span>)
+    .writeStream
+    .<span class="fn">option</span>(<span class="str">"checkpointLocation"</span>, <span class="str">"/Volumes/main/raw/checkpoint"</span>)
+    .<span class="fn">toTable</span>(<span class="str">"main.bronze.claims"</span>)
+)</pre>
+  </div>
+  <p>Pro batch zápisy a MERGE existují protějšky: <code class="inline">.option("mergeSchema", "true")</code> u zápisu DataFramu a syntaxe <code class="inline">MERGE WITH SCHEMA EVOLUTION INTO</code> v SQL — obě automaticky přidají nové sloupce do cílové tabulky.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">MERGE WITH SCHEMA EVOLUTION INTO</span> <span class="tbl">target_table</span> t
+<span class="kw">USING</span> <span class="tbl">source_data</span> s
+<span class="kw">ON</span> t.<span class="col">customer_id</span> <span class="op">=</span> s.<span class="col">customer_id</span>
+<span class="kw">WHEN MATCHED THEN UPDATE SET</span> *
+<span class="kw">WHEN NOT MATCHED THEN INSERT</span> *</pre>
+  </div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> režim <code class="inline">none</code> vypadá lákavě („nic nespadne"), ale nové sloupce <em>tiše zahazuje</em> — o změně zdroje se nedozvíte. Pokud drift chcete přežít bez ztráty dat, patří do produkce <code class="inline">rescue</code>; pokud chcete o driftu vědět a rozhodovat ručně, <code class="inline">failOnNewColumns</code>.</div></div>
+  <div class="collapsible">
+    <div class="collapsible-header">Provozní praxe: jak drift řídit organizačně<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Dokumentace doporučuje: <em>„Document your expected schemas explicitly. Store schema definitions in version control alongside your pipeline code."</em> K tomu přidejte alerting na výskyt neprázdného <code class="inline">_rescued_data</code> (stačí jednoduchý dotaz v jobu) a dohodu se zdrojovými týmy o oznamování změn. Schema drift je z 80 % komunikační problém a jen z 20 % technický.</p>
+    </div>
+  </div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/4-detect-manage-schema-drift#choose-a-schema-evolution-mode" target="_blank" rel="noopener">Choose a schema evolution mode</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/4-detect-manage-schema-drift#apply-best-practices-for-schema-management" target="_blank" rel="noopener">Apply best practices for schema management</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-expectations">
+  <div class="section-header">
+    <div class="section-num">9.5</div>
+    <h2>Data quality přes pipeline expectations</h2>
+  </div>
+  <p><strong>Expectations</strong> v deklarativních pipelines jsou pravidla kvality, která se vyhodnocují nad každým záznamem procházejícím pipeline. Každá expectation má tři části: <strong>jméno</strong> (identifikuje pravidlo v monitoringu — používejte popisná jména jako <code class="inline">valid_customer_age</code>), <strong>constraint</strong> (booleovský SQL výraz nad záznamem) a <strong>akci</strong> při porušení. Ve výrazu smíte použít literály, identifikátory sloupců a deterministické vestavěné SQL funkce a operátory; zakázané jsou subquery, agregační funkce, analytické a ranking window funkce a table-valued generator funkce.</p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> materialized view s expectations se vždy refreshuje plně — inkrementální refresh v kombinaci s expectations podporovaný není. U velkých agregací s tím počítejte při návrhu; přesný aktuální stav ověřte v dokumentaci.</div></div>
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="Diagram toku záznamu přes expectation. Záznam vstupuje do vyhodnocení constraintu; při splnění pokračuje do cílové tabulky. Při porušení se podle zvolené akce buď zapíše s varováním (warn), zahodí (drop), nebo se zastaví celý flow (fail). Metriky ze všech větví tečou do monitoringu.">
+      <defs>
+        <marker id="arr9b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+        <marker id="arr9g" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#22c55e"/></marker>
+        <marker id="arr9r" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#ef4444"/></marker>
+        <marker id="arr9o" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <rect x="15" y="120" width="130" height="60" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="80" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Záznam</text>
+      <text x="80" y="163" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">z upstream flow</text>
+      <rect x="200" y="105" width="200" height="90" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="300" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Expectation</text>
+      <text x="300" y="152" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">CONSTRAINT valid_amount</text>
+      <text x="300" y="169" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">EXPECT (amount &gt; 0)</text>
+      <line x1="145" y1="150" x2="194" y2="150" stroke="#6b7280" stroke-width="2" marker-end="url(#arr9b)"/>
+      <rect x="620" y="30" width="180" height="56" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="710" y="53" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">✓ splněno → zápis</text>
+      <text x="710" y="71" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">záznam jde do cílové tabulky</text>
+      <rect x="470" y="120" width="150" height="46" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="545" y="139" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">warn (výchozí)</text>
+      <text x="545" y="156" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">zapíše se + metrika</text>
+      <rect x="470" y="180" width="150" height="46" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="545" y="199" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">drop</text>
+      <text x="545" y="216" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">záznam se zahodí</text>
+      <rect x="470" y="240" width="150" height="46" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
+      <text x="545" y="259" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">fail</text>
+      <text x="545" y="276" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">flow se zastaví, rollback</text>
+      <line x1="400" y1="120" x2="614" y2="62" stroke="#22c55e" stroke-width="2" marker-end="url(#arr9g)"/>
+      <text x="490" y="82" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">pass</text>
+      <line x1="400" y1="160" x2="464" y2="145" stroke="#e8721c" stroke-width="2" marker-end="url(#arr9o)"/>
+      <line x1="400" y1="180" x2="464" y2="200" stroke="#e8721c" stroke-width="2" marker-end="url(#arr9o)"/>
+      <line x1="400" y1="195" x2="464" y2="260" stroke="#ef4444" stroke-width="2" marker-end="url(#arr9r)"/>
+      <text x="424" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">violation</text>
+      <rect x="660" y="150" width="140" height="130" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="730" y="177" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Monitoring</text>
+      <text x="730" y="198" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Data quality tab</text>
+      <text x="730" y="216" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">event log</text>
+      <text x="730" y="234" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">metriky pass/fail</text>
+      <line x1="620" y1="215" x2="654" y2="215" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr9b)"/>
+      <text x="410" y="318" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Všechny tři akce zapisují metriky — liší se jen osudem nevalidního záznamu</text>
+    </svg>
+    <figcaption>Tok záznamu přes expectation: splněný constraint pouští záznam dál, porušení řeší zvolená akce — warn (zapsat a evidovat), drop (zahodit), fail (zastavit flow).</figcaption>
+  </figure>
+  <table>
+    <tr><th>Akce</th><th>Python</th><th>SQL</th><th>Osud nevalidního záznamu</th></tr>
+    <tr><td>Warn (výchozí)</td><td><code class="inline">@dp.expect</code></td><td><code class="inline">EXPECT (…)</code></td><td>zapíše se, poruší se jen metrika</td></tr>
+    <tr><td>Drop</td><td><code class="inline">@dp.expect_or_drop</code></td><td><code class="inline">ON VIOLATION DROP ROW</code></td><td>odstraní se před zápisem</td></tr>
+    <tr><td>Fail</td><td><code class="inline">@dp.expect_or_fail</code></td><td><code class="inline">ON VIOLATION FAIL UPDATE</code></td><td>flow se zastaví, transakce se odvolá</td></tr>
+  </table>
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-09-py"><span class="tab-icon">🐍</span>Python</button>
+      <button class="tab-btn" data-tab="tab-09-sql"><span class="tab-icon">🗄️</span>SQL</button>
+    </div>
+    <div class="tab-panel" id="tab-09-py">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="kw">from</span> pyspark <span class="kw">import</span> pipelines <span class="kw">as</span> dp
+
+<span class="cm"># dekoratory lze vrstvit — kazde pravidlo ma vlastni akci</span>
+@dp.table
+@dp.<span class="fn">expect</span>(<span class="str">"has_phone"</span>, <span class="str">"phone_number IS NOT NULL"</span>)
+@dp.<span class="fn">expect_or_drop</span>(<span class="str">"valid_price"</span>, <span class="str">"price &gt;= 0 AND price &lt;= 10000"</span>)
+@dp.<span class="fn">expect_or_fail</span>(<span class="str">"required_customer_id"</span>, <span class="str">"customer_id IS NOT NULL"</span>)
+<span class="kw">def</span> <span class="fn">validated_orders</span>():
+    <span class="kw">return</span> spark.readStream.<span class="fn">table</span>(<span class="str">"raw.orders"</span>)</pre>
+      </div>
+    </div>
+    <div class="tab-panel" id="tab-09-sql">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">validated_orders</span>(
+    <span class="kw">CONSTRAINT</span> has_phone <span class="kw">EXPECT</span> (<span class="col">phone_number</span> <span class="kw">IS NOT NULL</span>),
+    <span class="kw">CONSTRAINT</span> valid_price <span class="kw">EXPECT</span> (<span class="col">price</span> <span class="kw">BETWEEN</span> <span class="num">0</span> <span class="kw">AND</span> <span class="num">10000</span>) <span class="kw">ON VIOLATION DROP ROW</span>,
+    <span class="kw">CONSTRAINT</span> required_customer_id <span class="kw">EXPECT</span> (<span class="col">customer_id</span> <span class="kw">IS NOT NULL</span>) <span class="kw">ON VIOLATION FAIL UPDATE</span>
+) <span class="kw">AS SELECT</span> * <span class="kw">FROM STREAM</span>(<span class="tbl">raw.orders</span>);</pre>
+      </div>
+    </div>
+  </div>
+  <p>Pravidla nemusíte psát ke každé tabulce zvlášť. Python API umí přijmout celý slovník pravidel (<code class="inline">@dp.expect_all_or_drop(rules)</code>) — a ten slovník může pocházet z <strong>centrální governance tabulky v Unity Catalogu</strong>. Jedna sada pravidel označkovaná tagy, sdílená napříč pipelines:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">from</span> pyspark <span class="kw">import</span> pipelines <span class="kw">as</span> dp
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col
+
+<span class="kw">def</span> <span class="fn">get_rules</span>(tag):
+    <span class="cm"># nacte pravidla z governance tabulky podle tagu</span>
+    df = spark.read.<span class="fn">table</span>(<span class="str">"governance.data_quality.rules"</span>).<span class="fn">filter</span>(<span class="fn">col</span>(<span class="str">"tag"</span>) <span class="op">==</span> tag).<span class="fn">collect</span>()
+    <span class="kw">return</span> {row[<span class="str">"name"</span>]: row[<span class="str">"constraint"</span>] <span class="kw">for</span> row <span class="kw">in</span> df}
+
+@dp.table
+@dp.<span class="fn">expect_all_or_drop</span>(<span class="fn">get_rules</span>(<span class="str">"financial"</span>))
+<span class="kw">def</span> <span class="fn">validated_payments</span>():
+    <span class="kw">return</span> spark.readStream.<span class="fn">table</span>(<span class="str">"raw.payments"</span>)</pre>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> co se zastaví, když vystřelí fail expectation, závisí na režimu pipeline. V <strong>triggered</strong> pipeline se zastaví <em>pouze daný flow</em> — ostatní paralelní flows běží dál. V <strong>continuous</strong> pipeline se zastaví daný flow <em>i všechny flows na něm závislé</em> a pipeline oznámí důvod zastavení. Chybová hláška v event logu obsahuje i vzorek vstupních dat, která pravidlo porušila, takže diagnostika je rychlá.</div></div>
+  <p>Výsledky sledujete v UI: <strong>Jobs &amp; Pipelines</strong> → vybrat pipeline → dataset s expectations → záložka <strong>Data quality</strong>. Metriky (počet prošlých a poručených záznamů na pravidlo) jdou také dotazovat programově z event logu — základ pro vlastní dashboardy a alerty.</p>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> constraints chrání tabulku, expectations řídí tok v pipeline, <code class="inline">try_cast</code> překlenuje typový chaos bronze vrstvy a rescue mód Auto Loaderu přežije schema drift bez ztráty dat. Dohromady tvoří vrstvenou obranu — žádná z nich sama nestačí.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/5-manage-data-quality-pipeline-expectations#store-rules-in-a-unity-catalog-table" target="_blank" rel="noopener">Store rules in a Unity Catalog table</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/5-manage-data-quality-pipeline-expectations#monitor-expectation-results" target="_blank" rel="noopener">Monitor expectation results</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">9.6</div>
+    <h2>Lab 9: Implement and Manage Data Quality Constraints in Unity Catalog (45 minut)</h2>
+  </div>
+  <p>V roli data engineera pojišťovny <strong>ClearCover</strong> postavíte deklarativní pipeline nad denními dávkami pojistných událostí plnými chyb: NULL identifikátory, neparsovatelná data a částky, záporné hodnoty i nečekané sloupce. Přidáte expectations na nullability a rozsahy, přetypování přes <code class="inline">col().cast()</code> a Auto Loader s rescued data column — aby špatný záznam nikdy nedotekl k aktuárským modelům.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/09-implement-manage-data-quality-constraints-unity-catalog.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/implement-manage-data-quality-constraints-unity-catalog/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Jaký je rozdíl mezi chováním <code class="inline">@dp.expect</code> a <code class="inline">@dp.expect_or_drop</code> při porušení pravidla? <strong>2)</strong> Proč PRIMARY KEY constraint v Unity Catalogu nezabrání duplicitám a čím unikátnost pohlídáte? <strong>3)</strong> Kam se v režimu <code class="inline">rescue</code> ukládají data z nečekaných sloupců a jak zjistíte, že tam něco přibylo?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_08_transformace.html">← Čištění a transformace dat</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 9 z 16</span>
+      <a href="dp750_10_pipelines.html" style="margin-left:auto">Datové pipelines →</a>
+    </div>
+  </main>
+</div>
+
+<script>function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?'🙈 Skrýt nápovědu':'💡 Zobrazit nápovědu'})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent='✓ Zkopírováno';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopírovat';btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent='Ctrl+C';setTimeout(()=>{btn.textContent='Kopírovat'},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent='☰ Kapitoly'}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent='✕ Zavřít'}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-orig',m==='orig');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

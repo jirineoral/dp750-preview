@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Governance objektů Unity Catalogu — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+[data-view="orig"]{display:none}
+html.mode-orig [data-view="orig"]{display:revert}
+html.mode-orig [data-view="custom"]{display:none}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="orig")document.documentElement.className="mode-orig"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Governance objektů Unity Catalogu</span>
+  </div>
+  <div class="nav-links">
+    <button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_06_datove_modelovani.html" class="next">Datové modelování →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-dokumentace-tabulek" class="toc-item active" data-section="sec-dokumentace-tabulek">Table definitions: komentáře, tagy a discovery</a>
+    <a href="#sec-abac-tagy-policies" class="toc-item" data-section="sec-abac-tagy-policies">ABAC: governed tagy a centrální policies</a>
+    <a href="#sec-retencni-politiky" class="toc-item" data-section="sec-retencni-politiky">Retenční politiky: Delta retention, VACUUM a predictive optimization</a>
+    <a href="#sec-data-lineage" class="toc-item" data-section="sec-data-lineage">Data lineage: odkud data tečou a kam</a>
+    <a href="#sec-audit-logging" class="toc-item" data-section="sec-audit-logging">Audit logging přes system tables</a>
+    <a href="#sec-delta-sharing" class="toc-item" data-section="sec-delta-sharing">Návrh Delta Sharing strategie</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 5: Govern Unity Catalog Objects (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 5</div>
+      <h1>Governance objektů Unity Catalogu</h1>
+      <div class="hero-subtitle">Tagy a ABAC, retence a VACUUM, lineage, audit logging a Delta Sharing</div>
+      <div class="hero-meta"><span>🗂 Zabezpečení a governance</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Vytvářet a udržovat dokumentaci tabulek pomocí komentářů a tagů pro data discovery.</li>
+    <li>Nakonfigurovat attribute-based access control (ABAC) s governed tagy a centrálními policies.</li>
+    <li>Nastavit retenční politiky Delta tabulek, bezpečně spouštět VACUUM a automatizovat údržbu přes predictive optimization.</li>
+    <li>Sledovat data lineage a auditní události přes Catalog Explorer a system tables.</li>
+    <li>Navrhnout bezpečnou Delta Sharing strategii pro sdílení dat mimo organizaci.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-dokumentace-tabulek">
+  <div class="section-header">
+    <div class="section-num">5.1</div>
+    <h2>Table definitions: komentáře, tagy a discovery</h2>
+  </div>
+  <p>Governance nezačíná u oprávnění, ale u <strong>metadat</strong>. Dobře popsané tabulky a sloupce jsou to, co odděluje důvěryhodný data estate od skládky parquet souborů — a s nástupem AI-driven discovery nástrojů (např. <strong>AI/BI Genie</strong>) platí přímá úměra: kvalita komentářů a tagů určuje kvalitu odpovědí, které nad vašimi daty AI vygeneruje.</p>
+  <p><strong>Komentáře</strong> jsou volný popisný text — lze je přidat na katalog, schema, tabulku, view i jednotlivé sloupce, a to už při vytvoření tabulky nebo dodatečně. Podporují i markdown:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- komentare primo v definici tabulky</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">sales.customers.profiles</span> (
+    <span class="col">customer_id</span>  BIGINT <span class="kw">COMMENT</span> <span class="str">'Unique identifier for each customer'</span>,
+    <span class="col">email</span>        STRING <span class="kw">COMMENT</span> <span class="str">'Customer primary email address'</span>,
+    <span class="col">created_date</span> DATE   <span class="kw">COMMENT</span> <span class="str">'Date when customer account was created'</span>
+);
+
+<span class="cm">-- dodatecne pridani / uprava komentare</span>
+<span class="kw">COMMENT ON TABLE</span> <span class="tbl">sales.customers.profiles</span>
+<span class="kw">IS</span> <span class="str">'Contains customer profile information including contact details'</span>;
+
+<span class="kw">ALTER TABLE</span> <span class="tbl">sales.customers.profiles</span>
+<span class="kw">ALTER COLUMN</span> <span class="col">email</span> <span class="kw">COMMENT</span> <span class="str">'Primary email address used for notifications'</span>;</pre>
+  </div>
+  <p><strong>Tagy</strong> jsou key-value páry pro strukturovanou klasifikaci — na rozdíl od komentářů se podle nich dá vyhledávat a stavět na nich politiky:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- tagy na tabulce a na sloupci</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">sales.customers.profiles</span>
+<span class="kw">SET TAGS</span> (<span class="str">'domain'</span> <span class="op">=</span> <span class="str">'sales'</span>, <span class="str">'data_classification'</span> <span class="op">=</span> <span class="str">'internal'</span>);
+
+<span class="kw">ALTER TABLE</span> <span class="tbl">sales.customers.profiles</span>
+<span class="kw">ALTER COLUMN</span> <span class="col">email</span>
+<span class="kw">SET TAGS</span> (<span class="str">'pii'</span> <span class="op">=</span> <span class="str">'email'</span>, <span class="str">'sensitivity'</span> <span class="op">=</span> <span class="str">'high'</span>);
+
+<span class="cm">-- odebrani tagu</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">sales.customers.profiles</span> <span class="kw">UNSET TAGS</span> (<span class="str">'domain'</span>);</pre>
+  </div>
+  <p>Limity: max. 50 tagů na objekt, 1 000 column tagů na tabulku, klíč i hodnota max. 256 znaků; klíče jsou case-sensitive. A protože se tagy ukládají jako plain text, <strong>nikdy do nich nedávejte citlivé hodnoty</strong>.</p>
+  <p>K průzkumu slouží <strong>Catalog Explorer</strong> (záložky Columns, Sample Data, Details, History, Insights) nebo SQL:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">SHOW CATALOGS</span>;
+<span class="kw">SHOW SCHEMAS IN</span> <span class="tbl">sales</span>;
+<span class="kw">SHOW TABLES IN</span> <span class="tbl">sales.customers</span> <span class="kw">LIKE</span> <span class="str">'profiles_*'</span>;
+<span class="kw">DESCRIBE TABLE EXTENDED</span> <span class="tbl">sales.customers.profiles</span>;
+<span class="kw">SHOW TBLPROPERTIES</span> <span class="tbl">sales.customers.profiles</span>;</pre>
+  </div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Catalog Explorer umí komentáře <strong>generovat pomocí AI</strong> (tlačítko AI generate). Návrhy ale vždy zkontrolujte — vznikají analýzou schématu a názvů sloupců a mohou být nepřesné. Nespoléhejte na ně při klasifikaci PII.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> k editaci komentářů potřebujete ownership objektu, nebo <code class="inline">MODIFY</code> + <code class="inline">SELECT</code> na tabulce (plus <code class="inline">USE CATALOG</code> / <code class="inline">USE SCHEMA</code> na rodičích). Číst je může každý s privilegiem <code class="inline">BROWSE</code>.</div></div>
+</div>
+
+<div class="section" id="sec-abac-tagy-policies">
+  <div class="section-header">
+    <div class="section-num">5.2</div>
+    <h2>ABAC: governed tagy a centrální policies</h2>
+  </div>
+  <p>Row filtry a masky z kapitoly 4 (sekce 4.4) mají jednu slabinu: konfigurují se <strong>tabulku po tabulce</strong>. <strong>Attribute-based access control (ABAC)</strong> tento problém obrací — místo oprávnění pro každou kombinaci tabulka × uživatel definujete <strong>policy navázanou na tag</strong>. Otagujete-li novou tabulku, politika se na ni aplikuje automaticky, bez další konfigurace.</p>
+  <p>Základem jsou <strong>governed tagy</strong> — na rozdíl od standardních tagů mají centrálně definované klíče a povolené hodnoty a přiřazovat je smí jen uživatelé s oprávněním <code class="inline">ASSIGN</code>:</p>
+  <table>
+    <tr><th>Aspekt</th><th>Standardní tagy</th><th>Governed tagy</th></tr>
+    <tr><td>Rozsah</td><td>libovolný key-value pár</td><td>předdefinované klíče a hodnoty</td></tr>
+    <tr><td>Kontrola</td><td>kdokoli s <code class="inline">APPLY TAG</code></td><td>jen uživatelé s <code class="inline">ASSIGN</code></td></tr>
+    <tr><td>Účel</td><td>organizace a discovery</td><td>vynucování politik, compliance</td></tr>
+    <tr><td>Indikátor v UI</td><td>—</td><td>ikona zámku v Catalog Exploreru</td></tr>
+  </table>
+  <p>Governed tag vytvoříte v UI: <strong>Catalog → Governance → Governed Tags</strong> — např. klíč <code class="inline">pii</code> s povolenými hodnotami <code class="inline">ssn</code>, <code class="inline">email</code>, <code class="inline">address</code>. Tagy na katalogu a schématu se dědí na všechny objekty uvnitř; tagy na sloupcích se nedědí.</p>
+  <p>Policy pak spojuje UDF funkci, cílovou skupinu a podmínku na tag:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- maskovaci funkce (deterministicka, bez externich volani)</span>
+<span class="kw">CREATE OR REPLACE FUNCTION</span> <span class="fn">mask_ssn</span>(<span class="col">ssn</span> STRING)
+<span class="kw">RETURNS</span> STRING
+<span class="kw">DETERMINISTIC</span>
+<span class="kw">RETURN</span> <span class="str">'***-**-****'</span>;
+
+<span class="cm">-- centralni policy: maskuj kazdy sloupec s tagem pii=ssn v celem schematu</span>
+<span class="kw">CREATE POLICY</span> <span class="fn">mask_sensitive_ssn</span>
+<span class="kw">ON SCHEMA</span> <span class="tbl">sales.customers</span>
+<span class="kw">COLUMN MASK</span> <span class="fn">mask_ssn</span>
+<span class="kw">TO</span> `all_users`
+<span class="kw">EXCEPT</span> `compliance_team`
+<span class="kw">FOR TABLES</span>
+<span class="kw">MATCH COLUMNS</span>
+    <span class="fn">has_tag_value</span>(<span class="str">'pii'</span>, <span class="str">'ssn'</span>) <span class="kw">AS</span> <span class="col">ssn_col</span>
+<span class="kw">ON COLUMN</span> <span class="col">ssn_col</span>;</pre>
+  </div>
+  <p>Analogicky funguje <code class="inline">ROW FILTER</code> policy na úrovni katalogu či schématu — jeden příkaz pokryje všechny tabulky, které mají sloupec s daným tagem. Policies se dědí: politika na katalogu platí pro všechna schémata a tabulky uvnitř. Na jednu tabulku se smí uplatnit jen jeden row filter a na sloupec jedna maska — kolize policies vede k zablokování přístupu s chybou.</p>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> UDF v ABAC policy běží při <em>každém</em> dotazu na chráněné tabulky. Držte logiku jednoduchou a deterministickou, bez subquery, joinů a volání <code class="inline">is_account_group_member()</code> uvnitř funkce — rozhodnutí „pro koho" patří do policy (<code class="inline">TO</code>/<code class="inline">EXCEPT</code>), funkce řeší jen „jak transformovat". Výkon otestujte aspoň na milionu řádků.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> pro přístup k tabulkám chráněným ABAC je podle dokumentace potřeba Databricks Runtime 16.4+ nebo serverless compute. Kvóty: 100 policies na katalog i schema, 50 na tabulku, 10 000 na metastore. ABAC row filter a column mask policies, governed tagy i automatická data classification jsou v Unity Catalogu <strong>generally available</strong> (od dubna 2026); kvóty a detaily chování ověřte v dokumentaci.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> per-table filtry a masky (kapitola 4) pro jednotlivé výjimky; ABAC pro plošná pravidla typu „všechna PII pole maskovat všem kromě compliance". Otagování nové tabulky ji okamžitě dostane pod existující ochranu.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/3-configure-attribute-based-access-control-tags-policies#understand-policy-inheritance-and-scope" target="_blank" rel="noopener">Understand policy inheritance and scope</a> · <a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/3-configure-attribute-based-access-control-tags-policies#follow-udf-best-practices" target="_blank" rel="noopener">Follow UDF best practices</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-retencni-politiky">
+  <div class="section-header">
+    <div class="section-num">5.3</div>
+    <h2>Retenční politiky: Delta retention, VACUUM a predictive optimization</h2>
+  </div>
+  <p>Delta Lake si uchovává historii — transakční log a staré verze datových souborů. To umožňuje <strong>time travel</strong>, ale také to znamená, že smazaná data fyzicky nezmizí, dokud je neodstraní <strong>VACUUM</strong>. Retenci řídí dvě vlastnosti tabulky:</p>
+  <table>
+    <tr><th>Vlastnost</th><th>Výchozí hodnota</th><th>Účel</th></tr>
+    <tr><td><code class="inline">delta.logRetentionDuration</code></td><td>30 dní</td><td>jak dlouho se drží historie transakčního logu</td></tr>
+    <tr><td><code class="inline">delta.deletedFileRetentionDuration</code></td><td>7 dní</td><td>od kdy smí VACUUM odstranit nereferencované soubory</td></tr>
+  </table>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 340" role="img" aria-label="Diagram životního cyklu dat Delta tabulky. Zápisy vytvářejí verze tabulky; okno time travel je vymezené retencí transakčního logu 30 dní a retencí smazaných souborů 7 dní. VACUUM odstraňuje nereferencované soubory starší než práh a predictive optimization spouští VACUUM, OPTIMIZE a ANALYZE automaticky.">
+      <defs>
+        <marker id="arr5a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1a3a6b"/></marker>
+        <marker id="arr5b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#ef4444"/></marker>
+      </defs>
+      <!-- timeline -->
+      <line x1="40" y1="120" x2="780" y2="120" stroke="#6b7280" stroke-width="2" marker-end="url(#arr5a)"/>
+      <text x="770" y="138" text-anchor="end" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">čas → dnes</text>
+      <!-- versions -->
+      <circle cx="120" cy="120" r="7" fill="#e2e8f0" stroke="#6b7280" stroke-width="2"/>
+      <circle cx="260" cy="120" r="7" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <circle cx="420" cy="120" r="7" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <circle cx="570" cy="120" r="7" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <circle cx="700" cy="120" r="8" fill="#1a3a6b" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="120" y="98" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">v12</text>
+      <text x="260" y="98" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">v13</text>
+      <text x="420" y="98" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">v14</text>
+      <text x="570" y="98" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">v15</text>
+      <text x="700" y="98" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">aktuální verze</text>
+      <!-- time travel window -->
+      <rect x="220" y="145" width="560" height="40" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1"/>
+      <text x="500" y="170" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">okno time travel — delta.logRetentionDuration (default 30 dní)</text>
+      <!-- vacuum zone -->
+      <rect x="40" y="145" width="160" height="40" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1"/>
+      <text x="120" y="170" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#ef4444">starší než práh</text>
+      <!-- vacuum box -->
+      <rect x="40" y="230" width="300" height="80" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
+      <text x="190" y="256" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ef4444">VACUUM</text>
+      <text x="190" y="276" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">trvale maže nereferencované soubory</text>
+      <text x="190" y="294" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">starší než deletedFileRetentionDuration (7 dní)</text>
+      <line x1="150" y1="228" x2="120" y2="190" stroke="#ef4444" stroke-width="2" marker-end="url(#arr5b)"/>
+      <!-- predictive optimization -->
+      <rect x="440" y="230" width="340" height="80" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="610" y="256" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Predictive optimization</text>
+      <text x="610" y="276" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">automaticky spouští VACUUM + OPTIMIZE + ANALYZE</text>
+      <text x="610" y="294" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">pro managed tabulky — bez ručního plánování</text>
+      <line x1="440" y1="270" x2="345" y2="270" stroke="#e8721c" stroke-width="2" marker-end="url(#arr5b)"/>
+    </svg>
+    <figcaption>Životní cyklus dat Delta tabulky: retenční vlastnosti vymezují okno time travel, VACUUM trvale odstraňuje soubory za prahem a predictive optimization celou údržbu automatizuje.</figcaption>
+  </figure>
+
+  <p>Obě vlastnosti pracují společně — chcete-li 30 dní historie i u tabulek s častým VACUUM, nastavte obě:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">ALTER TABLE</span> <span class="tbl">sales.customers.transactions</span>
+<span class="kw">SET TBLPROPERTIES</span> (
+    <span class="str">'delta.logRetentionDuration'</span> <span class="op">=</span> <span class="str">'interval 30 days'</span>,
+    <span class="str">'delta.deletedFileRetentionDuration'</span> <span class="op">=</span> <span class="str">'interval 30 days'</span>
+);
+
+<span class="cm">-- VACUUM: default prah 7 dni, nebo explicitne</span>
+<span class="kw">VACUUM</span> <span class="tbl">sales.customers.transactions</span>;
+<span class="kw">VACUUM</span> <span class="tbl">sales.customers.transactions</span> <span class="kw">RETAIN</span> <span class="num">168</span> <span class="kw">HOURS</span>;</pre>
+  </div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> po VACUUM přestanou fungovat time travel dotazy na odstraněné verze — data fyzicky neexistují. A u tabulek se zapnutými <strong>deletion vectors</strong> samotný VACUUM nestačí: řádky označené k smazání odstraní až <code class="inline">REORG TABLE … APPLY (PURGE)</code>.</div></div>
+  <p>Retence úzce souvisí s GDPR „právem být zapomenut": <code class="inline">DELETE</code> záznam pouze označí v nové verzi tabulky, fyzické odstranění zajistí až VACUUM. Mazání navíc musíte propagovat vrstvami medallionu — materialized views se srovnají při refreshi, ale streaming tables očekávají append-only zdroj a upstream delete je rozbije; řešením je <code class="inline">skipChangeCommits</code>:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># stream ignoruje upstream delety a updaty</span>
+spark.readStream.<span class="fn">option</span>(<span class="str">'skipChangeCommits'</span>, <span class="str">'true'</span>).<span class="fn">table</span>(<span class="str">"bronze.users"</span>)</pre>
+  </div>
+  <p>Ruční plánování VACUUM/OPTIMIZE přes stovky tabulek je přesně ta práce, kterou nechcete dělat. <strong>Predictive optimization</strong> ji pro managed tabulky automatizuje — spouští <code class="inline">VACUUM</code>, <code class="inline">OPTIMIZE</code> i <code class="inline">ANALYZE</code> podle skutečného využití tabulek:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">ALTER SCHEMA</span> <span class="tbl">sales.customers</span> <span class="kw">ENABLE PREDICTIVE OPTIMIZATION</span>;
+
+<span class="cm">-- monitoring probehle udrzby vcetne nakladu</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">system.storage.predictive_optimization_operations_history</span>;</pre>
+  </div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> než predictive optimization zapnete, nastavte na tabulkách s delšími compliance požadavky <code class="inline">delta.deletedFileRetentionDuration</code> — automatický VACUUM jinak pojede s výchozími 7 dny. U účtů založených po 11. listopadu 2024 je predictive optimization zapnutá by default.</div></div>
+  <div class="collapsible">
+    <div class="collapsible-header">Archivace do cool/archive tieru: na co si dát pozor<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Delta retenci lze doplnit <strong>Azure Storage lifecycle policies</strong> (přesun starých blobů do cool/archive tieru). Háček: operace jako <code class="inline">UPDATE</code>, <code class="inline">MERGE</code> nebo <code class="inline">OPTIMIZE</code> přepisují parquet soubory, čímž resetují jejich creation time a archivaci odkládají. Dotaz na soubor v offline archive tieru navíc selže, dokud se soubor neobnoví.</p>
+      <p>Doporučená strategie: partitionujte podle data, nastavte <code class="inline">delta.timeUntilArchived</code> tak, aby odpovídal lifecycle pravidlům, přístup ke „starým" datům omezte view s datumovým filtrem a maintenance příkazy spouštějte s predikáty (<code class="inline">OPTIMIZE … WHERE ingestion_date &gt;= …</code>), aby se nedotýkaly archivovaných partitions.</p>
+    </div>
+  </div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/4-apply-data-retention-policies#handle-compliance-deletion-requests" target="_blank" rel="noopener">Handle compliance deletion requests</a> · <a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/4-apply-data-retention-policies#integrate-with-azure-storage-lifecycle-policies" target="_blank" rel="noopener">Integrate with Azure Storage lifecycle policies</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-data-lineage">
+  <div class="section-header">
+    <div class="section-num">5.4</div>
+    <h2>Data lineage: odkud data tečou a kam</h2>
+  </div>
+  <p>Unity Catalog zachytává <strong>runtime data lineage automaticky</strong> — pro všechny jazyky, až na <strong>úroveň sloupců</strong>, včetně vazeb na notebooky, joby a dashboardy. Nemusíte nic instrumentovat: stačí, aby dotazy běžely na <strong>Unity Catalog-enabled compute</strong> a tabulky se referencovaly třívrstvým jménem <code class="inline">catalog.schema.table</code> (přístup přes přímou cestu k souborům lineage negeneruje).</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Ukázkový lineage graf platformy pro connected vehicles. Raw telemetrie teče do bronze tabulky vehicle_telemetry, přes silver telemetry_clean do gold tabulky fleet_daily, ze které čte dashboard i naplánovaný job. Vyznačená je i column-level vazba mezi sloupci speed a avg_speed.">
+      <defs>
+        <marker id="arr5c" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1a3a6b"/></marker>
+        <marker id="arr5d" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <!-- raw -->
+      <rect x="20" y="110" width="140" height="70" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+      <text x="90" y="138" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#6b7280">raw telemetrie</text>
+      <text x="90" y="156" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">volume / soubory</text>
+      <!-- bronze -->
+      <rect x="210" y="110" width="160" height="70" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="290" y="134" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">bronze.vehicle_telemetry</text>
+      <text x="290" y="154" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">speed</text>
+      <!-- silver -->
+      <rect x="420" y="110" width="160" height="70" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="500" y="134" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">silver.telemetry_clean</text>
+      <text x="500" y="154" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">speed</text>
+      <!-- gold -->
+      <rect x="630" y="110" width="160" height="70" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="710" y="134" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">gold.fleet_daily</text>
+      <text x="710" y="154" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">avg_speed</text>
+      <!-- consumers -->
+      <rect x="540" y="220" width="120" height="56" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="600" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">Dashboard</text>
+      <text x="600" y="263" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">downstream</text>
+      <rect x="690" y="220" width="110" height="56" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="745" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">Job</text>
+      <text x="745" y="263" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">downstream</text>
+      <!-- arrows -->
+      <line x1="160" y1="145" x2="205" y2="145" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr5c)"/>
+      <line x1="370" y1="145" x2="415" y2="145" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr5c)"/>
+      <line x1="580" y1="145" x2="625" y2="145" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr5c)"/>
+      <line x1="690" y1="180" x2="620" y2="216" stroke="#22c55e" stroke-width="2" marker-end="url(#arr5c)"/>
+      <line x1="725" y1="180" x2="740" y2="216" stroke="#22c55e" stroke-width="2" marker-end="url(#arr5c)"/>
+      <!-- column lineage -->
+      <path d="M 320 158 C 400 195, 600 195, 685 158" fill="none" stroke="#e8721c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr5d)"/>
+      <text x="500" y="212" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">column-level lineage: speed → avg_speed</text>
+      <!-- caption note -->
+      <text x="20" y="40" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Lineage graf (Catalog Explorer → záložka Lineage → See Lineage Graph)</text>
+      <text x="20" y="60" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">zachytává se automaticky na UC-enabled compute, napříč workspaces sdílejícími metastore</text>
+    </svg>
+    <figcaption>Lineage graf sleduje tok dat od raw souborů přes vrstvy medallionu až po dashboardy a joby — včetně vazeb mezi jednotlivými sloupci.</figcaption>
+  </figure>
+
+  <p>V <strong>Catalog Exploreru</strong> otevřete u tabulky záložku <strong>Lineage</strong> a tlačítkem <strong>See Lineage Graph</strong> interaktivní vizualizaci: uzly jsou tabulky, šipky směr toku, ikonou <strong>+</strong> rozbalujete další úrovně upstream/downstream. Kliknutím na hranu zobrazíte, který notebook či job vazbu vytvořil; záložky Jobs a Dashboards ukážou konzumenty tabulky — ideální pro <strong>impact analysis</strong> před změnou schématu.</p>
+  <p>Pro reporting slouží dvě system tables:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- nejcasteji dotazovane tabulky za posledni tyden</span>
+<span class="kw">SELECT</span>
+  <span class="col">source_table_full_name</span>,
+  <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> <span class="col">event_id</span>) <span class="kw">AS</span> <span class="col">query_count</span>
+<span class="kw">FROM</span> <span class="tbl">system.access.table_lineage</span>
+<span class="kw">WHERE</span> <span class="col">event_date</span> <span class="op">&gt;</span> <span class="fn">CURRENT_DATE</span>() <span class="op">-</span> <span class="kw">INTERVAL</span> <span class="num">7</span> <span class="kw">DAYS</span>
+  <span class="kw">AND</span> <span class="col">source_table_full_name</span> <span class="kw">IS NOT NULL</span>
+<span class="kw">GROUP BY</span> <span class="col">source_table_full_name</span>
+<span class="kw">ORDER BY</span> <span class="col">query_count</span> <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">10</span>;</pre>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> system tables <code class="inline">system.access.table_lineage</code> a <code class="inline">system.access.column_lineage</code> drží klouzavé okno <strong>1 rok</strong>; Catalog Explorer a lineage API uchovávají události zachycené po 1. září 2024 bez časového omezení. Historii verzí tabulky doplní <code class="inline">DESCRIBE HISTORY</code>.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor na limity:</strong> lineage se neuchovává při přejmenování objektu, tabulky čtené cestou (<code class="inline">delta.`abfss://…`</code>) se zobrazují jen jako cesta a některé UDF mohou column-level mapování zakrýt. Uzly, na které uživatel nemá aspoň <code class="inline">BROWSE</code>, se v grafu zobrazují maskované.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/5-manage-data-lineage-tracking#query-lineage-data-programmatically" target="_blank" rel="noopener">Query lineage data programmatically</a> · <a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/5-manage-data-lineage-tracking#understand-lineage-limitations" target="_blank" rel="noopener">Understand lineage limitations</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-audit-logging">
+  <div class="section-header">
+    <div class="section-num">5.5</div>
+    <h2>Audit logging přes system tables</h2>
+  </div>
+  <p>Kdo, kdy a k čemu přistoupil — na to odpovídá <strong>audit log system table</strong> <code class="inline">system.access.audit</code>. Konfiguruje se na úrovni accountu, pokrývá všechny workspaces připojené k metastoru a z compliance šetření dělá obyčejný SQL dotaz místo prohledávání log souborů.</p>
+  <p>Klíčové sloupce: <code class="inline">event_time</code>, <code class="inline">user_identity</code>, <code class="inline">workspace_id</code> (0 = account-level událost), <code class="inline">service_name</code> (např. <code class="inline">unityCatalog</code>, <code class="inline">notebook</code>, <code class="inline">clusters</code>), <code class="inline">action_name</code> (např. <code class="inline">getTable</code>, <code class="inline">updatePermissions</code>), <code class="inline">request_params</code>, <code class="inline">response</code> a <code class="inline">source_ip_address</code>.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- kdo pristoupil ke konkretni tabulce za poslednich 7 dni</span>
+<span class="kw">SELECT</span>
+  <span class="col">user_identity.email</span> <span class="kw">AS</span> <span class="col">user_email</span>,
+  <span class="col">action_name</span> <span class="kw">AS</span> <span class="col">access_type</span>,
+  <span class="col">event_time</span>
+<span class="kw">FROM</span> <span class="tbl">system.access.audit</span>
+<span class="kw">WHERE</span> <span class="col">request_params.full_name_arg</span> <span class="op">=</span> <span class="str">'catalog.schema.table_name'</span>
+  <span class="kw">AND</span> <span class="col">action_name</span> <span class="kw">IN</span> (<span class="str">'getTable'</span>, <span class="str">'createTable'</span>, <span class="str">'deleteTable'</span>)
+  <span class="kw">AND</span> <span class="col">event_date</span> <span class="op">&gt;</span> <span class="fn">CURRENT_DATE</span>() <span class="op">-</span> <span class="kw">INTERVAL</span> <span class="num">7</span> <span class="kw">DAYS</span>
+<span class="kw">ORDER BY</span> <span class="col">event_time</span> <span class="kw">DESC</span>;
+
+<span class="cm">-- audit zmen opravneni v metastoru</span>
+<span class="kw">SELECT</span> <span class="col">event_time</span>, <span class="col">user_identity.email</span>, <span class="col">request_params.securable_full_name</span>, <span class="col">request_params.changes</span>
+<span class="kw">FROM</span> <span class="tbl">system.access.audit</span>
+<span class="kw">WHERE</span> <span class="col">service_name</span> <span class="op">=</span> <span class="str">'unityCatalog'</span> <span class="kw">AND</span> <span class="col">action_name</span> <span class="op">=</span> <span class="str">'updatePermissions'</span>
+<span class="kw">ORDER BY</span> <span class="col">event_time</span> <span class="kw">DESC</span>;</pre>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> system tables musí nejprve povolit account admin; tabulka <code class="inline">system.access.audit</code> byla v době psaní modulu v Public Preview — aktuální stav ověřte v dokumentaci. Audit logy se uchovávají až <strong>1 rok</strong>; delší retenci řešte exportem.</div></div>
+  <p>Výchozí logování nezachytává plný text spouštěných příkazů. Pro detailní forenzní stopu zapněte <strong>verbose audit logs</strong> (Admin Settings → Advanced) — přibudou události <code class="inline">runCommand</code> (notebooky, joby) a <code class="inline">commandSubmit</code> (Databricks SQL). Samotné zapnutí/vypnutí verbose logování je auditovaná událost.</p>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> verbose logy obsahují text příkazů — tedy potenciálně i parametry dotazů či natvrdo zapsané hodnoty. Počítejte s tím v bezpečnostních politikách.</div></div>
+  <p>Pro centrální monitoring lze logy přes <strong>Azure diagnostic settings</strong> doručovat do <strong>Log Analytics</strong> (KQL dotazy, dashboardy, typická latence ~15 minut), <strong>Storage accountu</strong> (levná dlouhodobá archivace) nebo <strong>Event Hubs</strong> (real-time streaming do SIEM). Kombinace „system table pro ad-hoc šetření + SIEM pro kontinuální monitoring" pokryje obě potřeby.</p>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/6-configure-audit-logging#identify-tracked-events-and-services" target="_blank" rel="noopener">Identify tracked events and services</a> · <a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/6-configure-audit-logging#configure-log-delivery-to-external-systems" target="_blank" rel="noopener">Configure log delivery to external systems</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-delta-sharing">
+  <div class="section-header">
+    <div class="section-num">5.6</div>
+    <h2>Návrh Delta Sharing strategie</h2>
+  </div>
+  <p><strong>Delta Sharing</strong> umožňuje sdílet živá data s partnery a jinými organizacemi <strong>bez kopírování</strong> — příjemce čte přímo z vašich dat, vy si držíte plnou kontrolu nad tím, kdo vidí co. Strategické rozhodnutí číslo jedna je volba protokolu:</p>
+  <table>
+    <tr><th>Faktor</th><th>Databricks-to-Databricks</th><th>Open sharing</th></tr>
+    <tr><td>Platforma příjemce</td><td>Databricks s Unity Catalogem</td><td>libovolná (pandas, Spark, BI…)</td></tr>
+    <tr><td>Autentizace</td><td>spravovaná platformou (sharing identifier)</td><td>bearer token nebo OIDC federace</td></tr>
+    <tr><td>Sdílené assety</td><td>tabulky, views, volumes, notebooky, modely</td><td>jen tabulky</td></tr>
+    <tr><td>Správa tokenů</td><td>není potřeba</td><td>expirace + rotace nutná</td></tr>
+  </table>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="Diagram toku Delta Sharing od providera k příjemcům. Provider má v metastoru share obsahující tabulky a views. Databricks-to-Databricks větev se autentizuje sharing identifierem příjemce, open sharing větev bearer tokenem nebo OIDC. Vpravo jsou příjemci: Databricks workspace a externí nástroje.">
+      <defs>
+        <marker id="arr5e" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1a3a6b"/></marker>
+        <marker id="arr5f" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <!-- provider -->
+      <rect x="20" y="60" width="220" height="210" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="130" y="88" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Provider</text>
+      <text x="130" y="106" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Unity Catalog metastore</text>
+      <rect x="40" y="122" width="180" height="126" rx="6" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1"/>
+      <text x="130" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">SHARE partner_analytics</text>
+      <text x="130" y="166" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">tabulky (i WITH HISTORY)</text>
+      <text x="130" y="186" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">dynamic views (filtrace)</text>
+      <text x="130" y="206" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">volumes, notebooky, modely</text>
+      <text x="130" y="226" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">GRANT SELECT → RECIPIENT</text>
+      <!-- d2d lane -->
+      <rect x="310" y="60" width="230" height="90" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="425" y="88" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Databricks-to-Databricks</text>
+      <text x="425" y="108" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">sharing identifier příjemce</text>
+      <text x="425" y="126" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">autentizace řeší platforma</text>
+      <!-- open lane -->
+      <rect x="310" y="180" width="230" height="90" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="425" y="208" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">Open sharing</text>
+      <text x="425" y="228" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">bearer token / OIDC federace</text>
+      <text x="425" y="246" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">expirace, IP access lists</text>
+      <!-- recipients -->
+      <rect x="610" y="60" width="190" height="90" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="705" y="92" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">Recipient: Databricks</text>
+      <text x="705" y="112" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">workspace s Unity Catalogem</text>
+      <text x="705" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">share jako katalog</text>
+      <rect x="610" y="180" width="190" height="90" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="705" y="212" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">Recipient: jiná platforma</text>
+      <text x="705" y="232" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">pandas, Spark, Power BI…</text>
+      <text x="705" y="250" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">credential file z aktivace</text>
+      <!-- arrows -->
+      <line x1="240" y1="105" x2="305" y2="105" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr5e)"/>
+      <line x1="540" y1="105" x2="605" y2="105" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr5e)"/>
+      <line x1="240" y1="225" x2="305" y2="225" stroke="#e8721c" stroke-width="2" marker-end="url(#arr5f)"/>
+      <line x1="540" y1="225" x2="605" y2="225" stroke="#e8721c" stroke-width="2" marker-end="url(#arr5f)"/>
+      <text x="410" y="40" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">živá data bez kopírování — audit v system.access.audit</text>
+    </svg>
+    <figcaption>Delta Sharing: provider publikuje share, příjemci se připojují buď platformně spravovanou Databricks-to-Databricks cestou, nebo open sharing protokolem s tokenem či OIDC.</figcaption>
+  </figure>
+
+  <p><strong>Share</strong> je securable objekt — kolekce sdílených assetů. <strong>Recipient</strong> reprezentuje příjemce. Celý životní cyklus zvládnete v SQL:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">CREATE SHARE IF NOT EXISTS</span> <span class="tbl">partner_analytics</span>
+<span class="kw">COMMENT</span> <span class="str">'Sales analytics data for partner integration'</span>;
+
+<span class="kw">ALTER SHARE</span> <span class="tbl">partner_analytics</span> <span class="kw">ADD TABLE</span> <span class="tbl">catalog.schema.sales_summary</span>;
+<span class="kw">ALTER SHARE</span> <span class="tbl">partner_analytics</span> <span class="kw">ADD TABLE</span> <span class="tbl">catalog.schema.transactions</span> <span class="kw">WITH HISTORY</span>;
+
+<span class="cm">-- D2D recipient pres sharing identifier (prijemce jej zjisti: SELECT CURRENT_METASTORE())</span>
+<span class="kw">CREATE RECIPIENT IF NOT EXISTS</span> <span class="tbl">contoso_analytics</span>
+<span class="kw">USING ID</span> <span class="str">'azure:westeurope:a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>;
+
+<span class="kw">GRANT SELECT ON SHARE</span> <span class="tbl">partner_analytics</span> <span class="kw">TO RECIPIENT</span> <span class="tbl">contoso_analytics</span>;
+
+<span class="cm">-- prehled a odebirani</span>
+<span class="kw">SHOW SHARES</span>;
+<span class="kw">SHOW ALL IN SHARE</span> <span class="tbl">partner_analytics</span>;
+<span class="kw">REVOKE SELECT ON SHARE</span> <span class="tbl">partner_analytics</span> <span class="kw">FROM RECIPIENT</span> <span class="tbl">contoso_analytics</span>;</pre>
+  </div>
+  <p>Když různí příjemci mají vidět různé výseky dat, nesdílejte celou tabulku — použijte <strong>dynamic view</strong> s funkcí <code class="inline">CURRENT_RECIPIENT()</code> nad custom properties příjemce:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">ALTER RECIPIENT</span> <span class="tbl">regional_partner</span> <span class="kw">SET PROPERTIES</span> (<span class="str">'country_region'</span> <span class="op">=</span> <span class="str">'US'</span>);
+
+<span class="kw">CREATE VIEW</span> <span class="tbl">catalog.schema.regional_sales</span> <span class="kw">AS</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">catalog.schema.all_sales</span>
+<span class="kw">WHERE</span> <span class="col">region</span> <span class="op">=</span> <span class="fn">CURRENT_RECIPIENT</span>(<span class="str">'country_region'</span>);</pre>
+  </div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> u open sharing nastavte <strong>expiraci tokenů</strong> na úrovni metastoru a citlivé shares omezte <strong>IP access listy</strong> (až 100 IP/CIDR hodnot na recipienta). Dlouhodobě lepší než rotace tokenů je <strong>OIDC federace</strong> — krátkodobé OAuth tokeny výměnou za JWT z identity providera příjemce.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> sdílení celého schématu (<code class="inline">ADD SCHEMA</code>) automaticky zahrne i <strong>budoucí tabulky</strong> v něm. Pohodlné, ale nebezpečné — nová interní tabulka ve schématu odteče partnerovi bez dalšího schválení. Sdílejte jen nezbytné minimum.</div></div>
+  <p>Aktivitu sledujte v auditu: událost <code class="inline">deltaSharingQueriedTable</code> (open sharing) a <code class="inline">generateTemporaryTableCredential</code> (D2D). Zavedete-li měsíční revizi aktivních recipientů, kontrolu obsahu shares a sledování neúspěšných přístupů, máte governance smyčku uzavřenou. Delegujte správu přes specifická privilegia (<code class="inline">CREATE SHARE</code>, <code class="inline">CREATE RECIPIENT</code>, <code class="inline">SET SHARE PERMISSION</code>) skupinám data stewardů — ne plošným metastore adminům.</p>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/7-secure-delta-sharing-strategy#design-authentication-and-access-controls" target="_blank" rel="noopener">Design authentication and access controls</a> · <a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/7-secure-delta-sharing-strategy#apply-security-best-practices" target="_blank" rel="noopener">Apply security best practices</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">5.7</div>
+    <h2>Lab 5: Govern Unity Catalog Objects (45 minut)</h2>
+  </div>
+  <p>Automobilka <strong>AutoSphere AG</strong> buduje platformu pro connected vehicles: ingestuje telemetrii z milionů vozů a spravuje servisní záznamy. V labu vytvoříte tabulky <code class="inline">vehicle_telemetry</code> a <code class="inline">service_records</code>, opatříte je komentáři a PII tagy, nastavíte Delta retenci a spustíte VACUUM, prozkoumáte lineage graf v Catalog Exploreru a nakonec budete lineage i audit události dotazovat programově přes system tables.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/05-govern-unity-catalog-objects.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/govern-unity-catalog-objects/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Které dvě vlastnosti tabulky musíte nastavit, aby time travel spolehlivě fungoval 30 dní zpět, a co s okny historie udělá VACUUM? <strong>2)</strong> Čím se governed tag liší od standardního a proč je předpokladem pro ABAC policies? <strong>3)</strong> Ve které system table zjistíte, kdo v posledním týdnu četl tabulku <code class="inline">vehicle_telemetry</code>, a ve které její downstream závislosti?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_04_zabezpeceni.html">← Zabezpečení Unity Catalogu</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 5 z 16</span>
+      <a href="dp750_06_datove_modelovani.html" style="margin-left:auto">Datové modelování →</a>
+    </div>
+  </main>
+</div>
+
+<script>function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?'🙈 Skrýt nápovědu':'💡 Zobrazit nápovědu'})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent='✓ Zkopírováno';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopírovat';btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent='Ctrl+C';setTimeout(()=>{btn.textContent='Kopírovat'},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent='☰ Kapitoly'}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent='✕ Zavřít'}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-orig',m==='orig');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

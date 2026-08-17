@@ -1,0 +1,25 @@
+# Pojistka proti nechtenemu commitu do verejneho repa.
+# Oficialni MOC courseware Microsoftu se NESMI verejne redistribuovat.
+*.pptx
+*.ppt
+*.docx
+*.doc
+*.pdf
+Official PPTX/
+Lektorske_materialy/
+
+# Zdroje a build artefakty (repo obsahuje jen vygenerovany web)
+web-src/
+__pycache__/
+*.pyc
+_svgcheck.html
+
+# Lokalni smeti
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+*~
+.vscode/
+.idea/

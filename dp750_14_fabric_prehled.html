@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Průřez Microsoft Fabric — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+[data-view="orig"]{display:none}
+html.mode-orig [data-view="orig"]{display:revert}
+html.mode-orig [data-view="custom"]{display:none}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="orig")document.documentElement.className="mode-orig"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Průřez Microsoft Fabric</span>
+  </div>
+  <div class="nav-links">
+    <button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_15_pbi_fabric_databricks.html" class="next">Power BI + Fabric + Databricks →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-co-je-fabric" class="toc-item active" data-section="sec-co-je-fabric">Co je Microsoft Fabric</a>
+    <a href="#sec-capacity-cu" class="toc-item" data-section="sec-capacity-cu">Capacity a Capacity Units — jak se ve Fabricu platí</a>
+    <a href="#sec-onelake" class="toc-item" data-section="sec-onelake">OneLake — jeden logický lake a shortcuts</a>
+    <a href="#sec-workloady-items" class="toc-item" data-section="sec-workloady-items">Workloady a items — co v krabici najdete</a>
+    <a href="#sec-mapovani-pojmu" class="toc-item" data-section="sec-mapovani-pojmu">Mapování pojmů: Fabric ↔ Azure Databricks</a>
+    <a href="#sec-zasadni-odlisnosti" class="toc-item" data-section="sec-zasadni-odlisnosti">Zásadní odlišnosti — kde se světy rozcházejí</a>
+    <a href="#sec-kdy-co" class="toc-item" data-section="sec-kdy-co">Kdy Fabric, kdy Databricks, kdy kombinace</a>
+    <a href="#sec-shrnuti-zdroje" class="toc-item" data-section="sec-shrnuti-zdroje">Shrnutí a zdroje</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 14</div>
+      <h1>Průřez Microsoft Fabric</h1>
+      <div class="hero-subtitle">Základní pojmy, architektura SaaS, OneLake, workloady a odlišnosti od Azure Databricks</div>
+      <div class="hero-meta"><span>🗂 Pod čarou — mimo MOC</span><span>➕ Vlastní modul mimo oficiální MOC</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Popsat, co je Microsoft Fabric a jak se liší jeho SaaS model od PaaS modelu Azure Databricks</li>
+    <li>Vysvětlit model kapacity (F-SKU, Capacity Units) včetně smoothingu a throttlingu</li>
+    <li>Vysvětlit roli OneLake a shortcuts — a jak se z Fabricu dostat k datům v Databricks (a naopak)</li>
+    <li>Zmapovat pojmy Fabricu na pojmy Databricks, které už znáte z kapitol 1–13</li>
+    <li>Rozhodnout, kdy dává smysl Fabric, kdy Databricks a kdy jejich kombinace</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-co-je-fabric">
+  <div class="section-header">
+    <div class="section-num">14.1</div>
+    <h2>Co je Microsoft Fabric</h2>
+  </div>
+
+  <p><strong>Microsoft Fabric</strong> je analytická platforma dodávaná jako <strong>SaaS</strong> — jedna služba, která pokrývá celý datový životní cyklus: ingest, transformace, warehouse, streaming, data science i reporting. Nekupujete a nespravujete jednotlivé Azure resources (storage account, Spark cluster, SQL pool) — kupujete jednu <strong>capacity</strong> a v ní dostanete všechno. Žádné resource groups, žádný ARM, žádné VNETy. Dokonce nepotřebujete ani Azure subscription pro práci — jen pro platbu kapacity.</p>
+
+  <p>Pro vás jako Databricks inženýry je nejrychlejší mentální model tento: <em>Fabric je to, co vznikne, když vezmete Power BI service a přistavíte k němu lakehouse, warehouse, pipelines, Spark a streaming — všechno nad jedním sdíleným úložištěm.</em> Fabric totiž skutečně vyrostl z Power BI: portál, workspaces, sdílení, tenant administrace — to vše je evoluce Power BI service, ne nový produkt postavený na zelené louce.</p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Kdo čeká, že Fabric je „Microsoft verze Databricks", bude zmatený. Fabric je primárně <em>konsolidace</em> — Power BI + Synapse + Data Factory + Azure Data Explorer sbalené do jednoho SaaS balíku. Databricks je <em>engine-first</em> platforma; Fabric je <em>integration-first</em> platforma. Z toho plyne většina rozdílů v této kapitole.</div></div>
+
+  <p>Architektura má tři vrstvy: dole <strong>OneLake</strong> (jeden logický data lake pro celý tenant), uprostřed platformní služby (governance přes <strong>Purview</strong>, Copilot, security), nahoře <strong>workloady</strong> — jednotlivé „zkušenosti" pro různé role. Všechno běží z jedné předplacené kapacity:</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 370" role="img" aria-label="Architektura Microsoft Fabric: nahoře capacity F-SKU jako sdílený fond výpočetního výkonu, pod ní dva workspaces s items (lakehouse, notebook, pipeline, report, warehouse, semantic model, eventhouse), dole vrstva OneLake jako jeden logický data lake ve formátu Delta Parquet.">
+      <defs>
+        <marker id="ar14a" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="295" y="14" width="230" height="58" rx="8" fill="#1a3a6b"/>
+      <text x="410" y="38" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">Capacity (F-SKU, např. F64)</text>
+      <text x="410" y="58" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">sdílený fond Capacity Units pro vše níže</text>
+
+      <line x1="350" y1="72" x2="245" y2="118" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14a)"/>
+      <line x1="470" y1="72" x2="575" y2="118" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14a)"/>
+
+      <rect x="90" y="122" width="310" height="150" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+      <text x="245" y="145" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Workspace „Prodej"</text>
+      <rect x="108" y="160" width="130" height="30" rx="8" fill="#e8f0fb"/>
+      <text x="173" y="179" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">Lakehouse</text>
+      <rect x="250" y="160" width="130" height="30" rx="8" fill="#e8f0fb"/>
+      <text x="315" y="179" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">Notebook (Spark)</text>
+      <rect x="108" y="198" width="130" height="30" rx="8" fill="#e8f0fb"/>
+      <text x="173" y="217" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">Pipeline</text>
+      <rect x="250" y="198" width="130" height="30" rx="8" fill="#e8f0fb"/>
+      <text x="315" y="217" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">Power BI report</text>
+      <text x="245" y="256" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">items = vše, co ve workspace vytvoříte</text>
+
+      <rect x="420" y="122" width="310" height="150" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+      <text x="575" y="145" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Workspace „Finance"</text>
+      <rect x="438" y="160" width="130" height="30" rx="8" fill="#e8f0fb"/>
+      <text x="503" y="179" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">Warehouse</text>
+      <rect x="580" y="160" width="130" height="30" rx="8" fill="#e8f0fb"/>
+      <text x="645" y="179" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">Semantic model</text>
+      <rect x="438" y="198" width="130" height="30" rx="8" fill="#e8f0fb"/>
+      <text x="503" y="217" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">Eventhouse (KQL)</text>
+      <rect x="580" y="198" width="130" height="30" rx="8" fill="#e8f0fb"/>
+      <text x="645" y="217" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">Dataflow Gen2</text>
+
+      <line x1="245" y1="272" x2="245" y2="300" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14a)"/>
+      <line x1="575" y1="272" x2="575" y2="300" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14a)"/>
+
+      <rect x="40" y="304" width="740" height="52" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="326" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" fill="#1a3a6b" text-anchor="middle" font-weight="bold">OneLake — jeden logický data lake pro celý tenant</text>
+      <text x="410" y="345" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">postaveno na ADLS Gen2, tabulky ve formátu Delta Parquet</text>
+    </svg>
+    <figcaption>Základní stavebnice Fabricu: capacity platí za výpočty, workspaces organizují items, OneLake drží všechna data v Delta formátu.</figcaption>
+  </figure>
+
+  <p>Klíčová slova, se kterými budeme celou kapitolu pracovat: <strong>tenant</strong> (jedna organizace, jeden OneLake), <strong>capacity</strong> (předplacený výpočetní výkon), <strong>workspace</strong> (kontejner na práci, přiřazený ke kapacitě) a <strong>item</strong> (cokoli, co ve workspace vytvoříte — lakehouse, notebook, report…).</p>
+</div>
+
+<div class="section" id="sec-capacity-cu">
+  <div class="section-header">
+    <div class="section-num">14.2</div>
+    <h2>Capacity a Capacity Units — jak se ve Fabricu platí</h2>
+  </div>
+
+  <p>V Databricks platíte <strong>DBU</strong> za konkrétní běžící compute — cluster, SQL warehouse, serverless job. Když nic neběží, neplatíte (kromě storage). Fabric to má obráceně: kupujete <strong>capacity</strong> v F-SKU velikostech (F2 až F8192) a ta představuje <strong>sdílený fond Capacity Units (CU)</strong>, ze kterého čerpají <em>všechny</em> operace všech workloadů — notebook, pipeline, SQL dotaz, refresh reportu. Kapacita běží (a účtuje se) nepřetržitě, dokud ji nepozastavíte.</p>
+
+  <table>
+    <tr><th>F-SKU</th><th>CU</th><th>Orientační cena (PAYG)</th><th>Poznámka</th></tr>
+    <tr><td>F2</td><td>2</td><td>~260 USD/měsíc</td><td>dev/test, sandbox — ne produkce</td></tr>
+    <tr><td>F8</td><td>8</td><td>~1 050 USD/měsíc</td><td>malý tým, menší data</td></tr>
+    <tr><td>F64</td><td>64</td><td>~8 400 USD/měsíc</td><td>ekvivalent bývalého Power BI Premium P1</td></tr>
+    <tr><td>F128–F8192</td><td>128–8192</td><td>lineárně výš</td><td>enterprise, násobky P2/P3 a výš</td></tr>
+  </table>
+
+  <p>Ceny berte jako řádové — stav k srpnu 2026, přesné částky ověřte v <a href="https://azure.microsoft.com/pricing/details/microsoft-fabric/" target="_blank" rel="noopener">ceníku Azure</a>. Roční reservation dává zhruba 40% slevu. Důležitá licenční hranice: od <strong>F64 výš</strong> mohou uživatelé s Free licencí konzumovat Power BI obsah; pod F64 potřebuje každý čtenář reportu Power BI Pro licenci.</p>
+
+  <h3>Smoothing a throttling</h3>
+
+  <p>Jak může F2 se 2 CU utáhnout Spark job, který v peaku potřebuje mnohem víc? Přes dva mechanismy. <strong>Bursting</strong> dovolí operaci krátkodobě přesáhnout base výkon kapacity. <strong>Smoothing</strong> pak spotřebu účetně rozprostře do delšího okna (u background operací 24 hodin) — špička se „splácí" z klidnějších hodin. Teprve když kumulovaný dluh přeroste možnosti kapacity, nastupuje <strong>throttling</strong> — a to postupně, ne skokově:</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 230" role="img" aria-label="Fáze throttlingu ve Fabricu podle objemu vypůjčené budoucí kapacity, vyjádřeného v minutách spotřeby: do 10 minut overage protection bez dopadu, nad 10 minut zpoždění interaktivních operací o 20 sekund, nad 60 minut odmítání interaktivních operací, nad 24 hodin odmítání i background operací.">
+      <defs>
+        <marker id="ar14b" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <text x="410" y="28" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Objem vypůjčené budoucí kapacity (v minutách spotřeby) →</text>
+      <line x1="30" y1="150" x2="800" y2="150" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14b)"/>
+
+      <rect x="40" y="60" width="170" height="70" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="125" y="85" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Overage protection</text>
+      <text x="125" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">vše běží normálně,</text>
+      <text x="125" y="118" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">dluh se rozprostírá</text>
+      <text x="125" y="170" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e" text-anchor="middle">≤ 10 min</text>
+
+      <rect x="230" y="60" width="170" height="70" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="315" y="85" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Interactive Delay</text>
+      <text x="315" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">dotazy a reporty čekají</text>
+      <text x="315" y="118" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">20 s při submitu</text>
+      <text x="315" y="170" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">&gt; 10 min</text>
+
+      <rect x="420" y="60" width="170" height="70" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
+      <text x="505" y="85" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Interactive Rejection</text>
+      <text x="505" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">interaktivní operace</text>
+      <text x="505" y="118" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">jsou odmítány</text>
+      <text x="505" y="170" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444" text-anchor="middle">&gt; 60 min</text>
+
+      <rect x="610" y="60" width="170" height="70" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
+      <text x="695" y="85" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Background Rejection</text>
+      <text x="695" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">i pipelines a refreshe</text>
+      <text x="695" y="118" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">jsou odmítány</text>
+      <text x="695" y="170" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444" text-anchor="middle">&gt; 24 h</text>
+
+      <text x="410" y="205" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">Throttling přichází postupně — je čas reagovat (scale-up, pauza jobů), ne náraz do zdi.</text>
+    </svg>
+    <figcaption>Fáze throttlingu podle objemu nasčítaného CU dluhu, vyjádřeného v minutách budoucí spotřeby kapacity: nejdřív overage protection, pak zpoždění interaktivních operací o 20 s, jejich odmítání a nakonec odmítání všeho.</figcaption>
+  </figure>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka k prahům:</strong> hodnoty na ose nejsou doba, po kterou je kapacita přetížená, ale <strong>objem už vypůjčené budoucí kapacity</strong> — kolik minut své vlastní budoucí spotřeby capacity utratila dopředu. Jediný nenažraný job proto může kapacitu poslat do <em>Interactive rejection</em> během pár minut. Dokumentace ten sloupec nazývá jednoduše <em>Usage</em>.</div></div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> mentální past pro Databricks inženýry — throttling ve Fabricu je <em>capacity-wide</em>. Jeden nenažraný Spark notebook může zpomalit reporty finančnímu řediteli, protože všichni čerpají ze stejného fondu CU. V Databricks je exploze nákladů izolovaná na cluster/warehouse, tady je izolace jen přes oddělené kapacity.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> kapacitu lze <strong>pozastavit</strong> (UI nebo API) a po dobu pauzy se neúčtuje. Dev kapacita běžící jen v pracovní době stojí zlomek ceny. Hlavní a nejrychleji dostupný nástroj na monitoring spotřeby je free <strong>Fabric Capacity Metrics app</strong> (podrobněji jde jít přes workspace monitoring nebo Azure Monitor) — počítejte s latencí dat v řádu jednotek až desítek minut.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Jak se počítá spotřeba: CU-seconds a proč je Spark „drahý"<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Každá operace spálí <code class="inline">CU × sekundy běhu</code>. F2 má denní rozpočet 2 × 86 400 = 172 800 CU-seconds. Z měření na kurzech DP-600: stejný ingest ~50 MB CSV stojí řádově 50–150 CU-s přes Pipeline Copy, 200–500 CU-s přes Dataflow Gen2, ale 800–1 500 CU-s přes PySpark notebook — cold start Spark session dominuje. Pro malá data je ve Fabricu často levnější „pure Python" notebook (Polars/DuckDB, bez Spark clusteru) — koncept, který v Databricks nemá přímou obdobu. Řády se mění s verzemi runtime, berte jako ilustraci.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-onelake">
+  <div class="section-header">
+    <div class="section-num">14.3</div>
+    <h2>OneLake — jeden logický lake a shortcuts</h2>
+  </div>
+
+  <p><strong>OneLake</strong> je automaticky přítomné úložiště každého Fabric tenantu — postavené na ADLS Gen2, ale plně spravované: žádné storage accounty, žádné kontejnery k zakládání. Dokumentace: <em>„Every Microsoft Fabric tenant automatically includes OneLake… You can't delete OneLake or create multiple OneLakes."</em> Analogie, která na kurzech funguje: OneLake je „OneDrive pro data" — jeden namespace pro celou organizaci, workspaces jsou v něm složky.</p>
+
+  <p>Podstatné pro vás: tabulky v OneLake jsou <strong>Delta Parquet</strong> — stejný formát, jaký používáte v Databricks. Všechny Fabric enginy (Spark, T-SQL warehouse, KQL, Analysis Services pro Power BI) čtou a zapisují tutéž kopii dat; Power BI umí přes <strong>Direct Lake</strong> mode číst Delta soubory přímo, bez importu do vlastního úložiště. OneLake navíc podporuje interoperabilitu s <strong>Apache Iceberg</strong> přes virtualizaci metadat a je přístupný přes standardní ADLS Gen2 API — takže se k němu dostanete i z Databricks.</p>
+
+  <h3>Shortcuts — zero-copy přístup k cizím datům</h3>
+
+  <p><strong>Shortcut</strong> je reference na data ležící jinde — v jiném workspace, v ADLS Gen2, Amazon S3, Google Cloud Storage, Dataverse i v S3-kompatibilních úložištích. Data se nekopírují; ve stromě lakehouse se tváří jako lokální tabulka či složka. Vedle shortcuts existuje <strong>Mirroring</strong> — kontinuální replikace databází (Azure SQL, Cosmos DB, Snowflake, a také <strong>Azure Databricks Unity Catalog</strong>) do OneLake v Delta formátu.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="OneLake shortcuts: lakehouse ve Fabricu obsahuje lokální tabulku orders a tři shortcuty, které bez kopírování odkazují na data v ADLS Gen2, Amazon S3 a na Delta tabulky Azure Databricks spravované Unity Catalogem. Opačným směrem může Databricks číst OneLake přes ADLS Gen2 API.">
+      <defs>
+        <marker id="ar14c" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e8721c"/></marker>
+        <marker id="ar14d" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="30" y="30" width="220" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+      <text x="140" y="52" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">ADLS Gen2</text>
+      <text x="140" y="70" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">existující Azure data lake</text>
+
+      <rect x="30" y="102" width="220" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+      <text x="140" y="124" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Amazon S3</text>
+      <text x="140" y="142" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">bucket v AWS</text>
+
+      <rect x="30" y="174" width="220" height="52" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="140" y="196" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Azure Databricks</text>
+      <text x="140" y="214" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">Delta tabulky pod Unity Catalog</text>
+
+      <rect x="440" y="24" width="350" height="230" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="615" y="48" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" fill="#1a3a6b" text-anchor="middle" font-weight="bold">OneLake · Lakehouse „Analytika"</text>
+      <rect x="460" y="62" width="310" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="474" y="83" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Tables/orders   (lokální Delta)</text>
+      <rect x="460" y="104" width="310" height="34" rx="8" fill="#ffffff" stroke="#e8721c" stroke-dasharray="5,3"/>
+      <text x="474" y="125" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8721c">Files/raw_archiv   ⤳ shortcut ADLS</text>
+      <rect x="460" y="146" width="310" height="34" rx="8" fill="#ffffff" stroke="#e8721c" stroke-dasharray="5,3"/>
+      <text x="474" y="167" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8721c">Files/clickstream   ⤳ shortcut S3</text>
+      <rect x="460" y="188" width="310" height="34" rx="8" fill="#ffffff" stroke="#e8721c" stroke-dasharray="5,3"/>
+      <text x="474" y="209" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8721c">Tables/gold_sales   ⤳ mirroring z UC</text>
+      <text x="615" y="243" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">vše čitelné každým Fabric enginem vč. Direct Lake</text>
+
+      <line x1="250" y1="56" x2="456" y2="118" stroke="#e8721c" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar14c)"/>
+      <line x1="250" y1="128" x2="456" y2="160" stroke="#e8721c" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar14c)"/>
+      <line x1="250" y1="200" x2="456" y2="203" stroke="#e8721c" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar14c)"/>
+      <text x="345" y="100" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">zero-copy</text>
+
+      <line x1="500" y1="254" x2="180" y2="290" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14d)"/>
+      <text x="360" y="298" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">opačný směr: Databricks čte OneLake přes ADLS Gen2 API (abfss://)</text>
+    </svg>
+    <figcaption>Shortcuts a mirroring dělají z OneLake virtuální vrstvu nad více úložišti — včetně Delta tabulek spravovaných Databricks Unity Catalogem.</figcaption>
+  </figure>
+
+  <p>Integrace funguje i obráceně — OneLake se z Databricks chová jako běžný ADLS Gen2 endpoint:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># Databricks notebook: cteni Delta tabulky ulozene ve Fabric OneLake</span>
+<span class="cm"># format: abfss://&lt;workspace&gt;@onelake.dfs.fabric.microsoft.com/&lt;item&gt;.&lt;itemtype&gt;/</span>
+<span class="cm"># workspace se chova jako kontejner, lakehouse jako slozka</span>
+df = spark.read.format(<span class="str">"delta"</span>).load(
+    <span class="str">"abfss://Prodej@onelake.dfs.fabric.microsoft.com/Analytika.lakehouse/Tables/orders"</span>
+)
+display(df.limit(<span class="num">10</span>))</pre>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> shortcut je nejlevnější „ingest" ve Fabricu — nespotřebuje žádné CU za kopírování, platíte jen dotazy nad daty. Pokud už máte medallion vrstvy v ADLS Gen2 spravované Databricks, shortcut na gold vrstvu je typicky první a nejrychlejší krok integrace s Fabricem.</div></div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> shortcut obchází governance zdroje jen zdánlivě — přístup se vyhodnocuje přes credentials uložené u shortcutu. Kdo má přístup k lakehouse, vidí data shortcutu bez ohledu na to, co říká Unity Catalog na straně Databricks. Přesné chování security modelu (OneLake security, propagace oprávnění) se stále vyvíjí — stav k srpnu 2026 ověřte v dokumentaci.</div></div>
+</div>
+
+<div class="section" id="sec-workloady-items">
+  <div class="section-header">
+    <div class="section-num">14.4</div>
+    <h2>Workloady a items — co v krabici najdete</h2>
+  </div>
+
+  <p>Fabric organizuje funkce do <strong>workloadů</strong> („experiences") — sad nástrojů pro určitou roli. Každý workload produkuje <strong>items</strong> ve workspace. Přehled toho podstatného (stav k srpnu 2026 — seznam se rozšiřuje, ověřte v dokumentaci):</p>
+
+  <table>
+    <tr><th>Workload</th><th>Klíčové items</th><th>Databricks paralela</th></tr>
+    <tr><td><strong>Data Engineering</strong></td><td>Lakehouse, Notebook, Spark Job Definition, Environment</td><td>notebooky + clusters + Delta</td></tr>
+    <tr><td><strong>Data Factory</strong></td><td>Pipeline, Dataflow Gen2, Copy job</td><td>Lakeflow Jobs / ADF</td></tr>
+    <tr><td><strong>Data Warehouse</strong></td><td>Warehouse (plný T-SQL vč. DML)</td><td>Databricks SQL warehouse</td></tr>
+    <tr><td><strong>Real-Time Intelligence</strong></td><td>Eventstream, Eventhouse (KQL DB), Activator</td><td>Structured Streaming + alerting</td></tr>
+    <tr><td><strong>Data Science</strong></td><td>ML Model, Experiment (MLflow uvnitř)</td><td>MLflow, Mosaic AI</td></tr>
+    <tr><td><strong>Power BI</strong></td><td>Semantic model, Report, Dashboard</td><td>AI/BI Dashboards (mnohem slabší)</td></tr>
+    <tr><td><strong>Databases</strong></td><td>SQL database, Mirrored database</td><td>Lakebase / mirroring zdrojů</td></tr>
+    <tr><td><strong>Fabric IQ</strong></td><td>Ontology, data agent, Fabric Graph (preview)</td><td>Genie / agentní vrstva</td></tr>
+  </table>
+
+  <p>Dvě věci, které Databricks inženýra překvapí. Zaprvé <strong>lakehouse má dva endpointy</strong>: Spark vidí Tables i Files, a automaticky vzniklý <strong>SQL analytics endpoint</strong> nabízí T-SQL čtení týchž Delta tabulek — ale <em>read-only</em>. Kdo chce plný T-SQL s INSERT/UPDATE, potřebuje item Warehouse. Zadruhé nad každým lakehousem i warehousem automaticky vzniká <strong>default semantic model</strong> pro Power BI — dobrý na prototyp, na produkci se staví explicitní model.</p>
+
+  <p>Enginy se liší, data ne — takže T-SQL umí spojit items v rámci jednoho workspace obyčejným three-part naming:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- Fabric warehouse: join pres lakehouse a warehouse v jednom workspace</span>
+<span class="kw">SELECT</span> o.<span class="col">order_id</span>, o.<span class="col">amount_eur</span> <span class="op">*</span> fx.<span class="col">rate</span> <span class="kw">AS</span> <span class="col">amount_czk</span>
+<span class="kw">FROM</span> <span class="tbl">lakehouse_prodej.dbo.orders</span> <span class="kw">AS</span> o
+<span class="kw">JOIN</span> <span class="tbl">warehouse_finance.dbo.fx_rates</span> <span class="kw">AS</span> fx
+  <span class="kw">ON</span> o.<span class="col">currency</span> <span class="op">=</span> fx.<span class="col">currency</span>;</pre>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> cross-database dotazy fungují jen v rámci <strong>aktuálního workspace</strong> — dokumentace to říká výslovně: <em>„You can write cross database queries to warehouses and databases in the current active workspace."</em> Přes hranici workspace three-part naming nefunguje; cílovou tabulku si nejdřív zpřístupněte shortcutem do lakehouse ve svém workspace.</div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Fabric přidává workloady tempem několika za rok (naposledy Databases a Fabric IQ, ten je k srpnu 2026 v preview). Na certifikaci ani v architektuře se nespoléhejte na zapamatovaný seznam — ověřte aktuální stav v dokumentaci.</div></div>
+</div>
+
+<div class="section" id="sec-mapovani-pojmu">
+  <div class="section-header">
+    <div class="section-num">14.5</div>
+    <h2>Mapování pojmů: Fabric ↔ Azure Databricks</h2>
+  </div>
+
+  <p>Nejrychlejší cesta, jak se ve Fabricu zorientovat, je přeložit si jeho pojmy do těch, které znáte z kapitol 1–13. Pozor — některá slova (workspace, lakehouse) existují v obou světech, ale znamenají něco jiného:</p>
+
+  <table>
+    <tr><th>Koncept</th><th>Microsoft Fabric</th><th>Azure Databricks</th></tr>
+    <tr><td>Nejvyšší jednotka</td><td>tenant (1 na organizaci)</td><td>account (+ metastore per region)</td></tr>
+    <tr><td>Workspace</td><td>složka items, přiřazená ke capacity</td><td>samostatný Azure resource s vlastním compute</td></tr>
+    <tr><td>Úložiště</td><td>OneLake — spravované, jedno pro tenant</td><td>váš ADLS Gen2 / S3 — plná kontrola</td></tr>
+    <tr><td>Lakehouse</td><td>konkrétní item (Tables + Files)</td><td>architektonický vzor (Delta + Unity Catalog)</td></tr>
+    <tr><td>Formát tabulek</td><td>Delta Parquet (+ Iceberg virtualizace)</td><td>Delta Lake (+ Iceberg přes UniForm)</td></tr>
+    <tr><td>Notebook + Spark</td><td>Fabric notebook, starter pools z CU</td><td>notebook, clusters/serverless za DBU</td></tr>
+    <tr><td>SQL vrstva</td><td>Warehouse / SQL analytics endpoint</td><td>Databricks SQL warehouse</td></tr>
+    <tr><td>Orchestrace</td><td>Data Factory pipelines</td><td>Lakeflow Jobs</td></tr>
+    <tr><td>Streaming</td><td>Eventstream + Eventhouse (KQL)</td><td>Structured Streaming, Lakeflow Spark Declarative Pipelines</td></tr>
+    <tr><td>Katalog &amp; governance</td><td>OneLake catalog + Purview</td><td>Unity Catalog</td></tr>
+    <tr><td>BI</td><td>Power BI (nativní součást)</td><td>AI/BI Dashboards, konektor na Power BI</td></tr>
+    <tr><td>Jednotka útraty</td><td>CU (kapacita běží pořád)</td><td>DBU (platí se běžící compute)</td></tr>
+  </table>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> největší falešný přítel je <strong>lakehouse</strong>. V Databricks je to filozofie celé platformy; ve Fabricu je to jeden konkrétní typ itemu — v podstatě „spravovaná složka" s Tables a Files. Druhý je <strong>workspace</strong>: ve Fabricu je to lehká složka (klidně desítky na tenant), v Databricks těžký resource s vlastní správou.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Časté omyly při prvním kontaktu s Fabricem<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><strong>„SQL analytics endpoint je warehouse."</strong> Není — je read-only. SQL vývojáři se pravidelně diví, proč nejde UPDATE; zápis do lakehouse tabulek patří Sparku (Delta immutability + zápis přes engine), plný T-SQL DML má jen item Warehouse.</p>
+      <p><strong>„Purview = Unity Catalog."</strong> Jen zhruba. Unity Catalog je jeden konzistentní model oprávnění vynucovaný enginem (GRANT na katalog/schéma/tabulku, lineage, audit). Ve Fabricu se governance skládá z více vrstev: workspace role, item permissions, OneLake security a nad tím Purview pro labels, katalogizaci a compliance. Silnější na compliance a M365 integraci, roztříštěnější na data-level ACL.</p>
+      <p><strong>„Direct Lake = Import mode bez refreshů zadarmo."</strong> Direct Lake čte Delta soubory přímo do paměti Analysis Services (tzv. framing, bez kopie), ale při nevhodných datech (velká kardinalita, mnoho malých souborů, DAX nad nepodporovanou konstrukcí) padá do DirectQuery fallbacku. V-Order optimalizace Parquetu tomu výrazně pomáhá.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-zasadni-odlisnosti">
+  <div class="section-header">
+    <div class="section-num">14.6</div>
+    <h2>Zásadní odlišnosti — kde se světy rozcházejí</h2>
+  </div>
+
+  <p><strong>SaaS vs. PaaS.</strong> Fabric vám bere infrastrukturní rozhodnutí z rukou: žádné volby instance typů, runtime verzí per cluster, VNET injection, spot instancí. To je úleva pro týmy bez platformních inženýrů — a frustrace pro ty, kdo jsou zvyklí compute ladit. V Databricks si vyberete node type, autoscaling, Photon; ve Fabricu dostanete „nějaký" Spark ze starter poolu a hlavní páka je velikost kapacity.</p>
+
+  <p><strong>Billing model.</strong> Databricks = platíte, když něco běží; náklady rostou s workloadem a dají se přičíst konkrétnímu jobu. Fabric = platíte kapacitu nepřetržitě; náklady jsou předvídatelné (fixní měsíční částka), ale sdílené — a když se do kapacity nevejdete, řešíte throttling nebo scale-up celé kapacity. FinOps disciplína se přesouvá z „vypínej clustery" na „hlídej Capacity Metrics a izoluj hlučné workloady do vlastních kapacit".</p>
+
+  <p><strong>Governance.</strong> Unity Catalog je jednotný, engine-vynucovaný model. Fabric má vrstvený model (workspace role → item permissions → OneLake security) plus vestavěný Purview pro sensitivity labels, katalog a audit — silná integrace na Microsoft 365 a compliance procesy, ale více míst, kde se oprávnění definují.</p>
+
+  <p><strong>Otevřenost.</strong> Obě platformy stojí na Delta/Parquet a obě dnes mluví i Iceberg (Fabric přes metadata virtualizaci, Databricks přes UniForm) — data tedy nejsou zamčená ani v jednom světě. Rozdíl je v enginech a ekosystému: Databricks staví na open-source jádru (Spark, Delta, MLflow) a běží na třech cloudech; Fabric enginy (Warehouse, KQL, Analysis Services) jsou proprietární a platforma existuje jen jako Microsoft SaaS.</p>
+
+  <table>
+    <tr><th></th><th>Microsoft Fabric</th><th>Azure Databricks</th></tr>
+    <tr><td>Model služby</td><td>SaaS — vše spravované</td><td>PaaS — infrastrukturu ovlivňujete</td></tr>
+    <tr><td>Náklady</td><td>fixní kapacita, sdílený fond</td><td>pay-per-use, per-workload</td></tr>
+    <tr><td>Ladění výkonu</td><td>omezené (velikost SKU, V-Order)</td><td>hluboké (cluster config, Photon, tuning)</td></tr>
+    <tr><td>Cílová persona</td><td>BI tým, citizen developer, „vše v jednom"</td><td>data engineering / ML tým, code-first</td></tr>
+    <tr><td>Multi-cloud</td><td>ne (Azure SaaS)</td><td>Azure, AWS, GCP</td></tr>
+    <tr><td>BI</td><td>Power BI nativně, Direct Lake</td><td>přes konektory / AI-BI Dashboards</td></tr>
+  </table>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> srovnání „který je lepší" je špatná otázka — platformy míří na jiné těžiště. Fabric optimalizuje čas-do-reportu a šířku záběru pro celou organizaci; Databricks optimalizuje výkon, škálu a inženýrskou kontrolu. Proto je v praxi tak častá kombinace obou (viz další sekce).</div></div>
+</div>
+
+<div class="section" id="sec-kdy-co">
+  <div class="section-header">
+    <div class="section-num">14.7</div>
+    <h2>Kdy Fabric, kdy Databricks, kdy kombinace</h2>
+  </div>
+
+  <p>Rozhodnutí málokdy zní „všechno přepneme". Typické vodítko podle charakteru týmu a workloadu:</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 400" role="img" aria-label="Rozhodovací diagram volby platformy. Z výchozí otázky vedou tři větve: převažuje-li BI a self-service s Microsoft ekosystémem, vede větev k volbě Fabric; převažuje-li náročný data engineering, ML a multi-cloud, vede větev k volbě Databricks; pokud organizace potřebuje obojí, vede větev ke kombinaci, kde Databricks zpracovává data do gold vrstvy a Fabric je servíruje přes Direct Lake do Power BI.">
+      <defs>
+        <marker id="ar14e" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="270" y="16" width="280" height="56" rx="8" fill="#1a3a6b"/>
+      <text x="410" y="40" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">Co ve vaší organizaci převažuje?</text>
+      <text x="410" y="60" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">workloady · týmy · skills · cloud strategie</text>
+
+      <line x1="320" y1="72" x2="152" y2="120" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14e)"/>
+      <line x1="410" y1="72" x2="411" y2="120" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14e)"/>
+      <line x1="500" y1="72" x2="670" y2="120" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar14e)"/>
+
+      <text x="185" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">BI &amp; self-service</text>
+      <text x="410" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">obojí naplno</text>
+      <text x="640" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">engineering &amp; ML</text>
+
+      <rect x="30" y="126" width="244" height="180" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="152" y="150" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Spíš Fabric</text>
+      <text x="44" y="176" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• těžiště = Power BI a reporting</text>
+      <text x="44" y="196" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• menší DE tým, low-code preference</text>
+      <text x="44" y="216" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• Microsoft 365 / Azure-only</text>
+      <text x="44" y="236" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• predikovatelný fixní rozpočet</text>
+      <text x="44" y="256" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• jedna platforma pro vše stačí</text>
+      <text x="44" y="284" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" font-weight="bold">→ capacity + OneLake, end-to-end</text>
+
+      <rect x="289" y="126" width="244" height="180" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="411" y="150" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" fill="#22c55e" text-anchor="middle" font-weight="bold">Kombinace</text>
+      <text x="303" y="176" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• DE/ML tým už jede na Databricks</text>
+      <text x="303" y="196" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• byznys chce Power BI self-service</text>
+      <text x="303" y="216" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• Databricks: bronze → silver → gold</text>
+      <text x="303" y="236" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• shortcut / mirroring gold do OneLake</text>
+      <text x="303" y="256" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• Power BI Direct Lake nad gold</text>
+      <text x="303" y="284" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e" font-weight="bold">→ nejčastější enterprise vzor 2026</text>
+
+      <rect x="548" y="126" width="244" height="180" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="670" y="150" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" fill="#e8721c" text-anchor="middle" font-weight="bold">Spíš Databricks</text>
+      <text x="562" y="176" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• masivní ETL, streaming, ML/GenAI</text>
+      <text x="562" y="196" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• code-first tým, CI/CD, IaC</text>
+      <text x="562" y="216" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• potřeba ladit výkon a náklady</text>
+      <text x="562" y="236" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• multi-cloud / exit strategie</text>
+      <text x="562" y="256" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">• jednotná governance (Unity Catalog)</text>
+      <text x="562" y="284" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" font-weight="bold">→ BI přes konektor / export</text>
+
+      <rect x="180" y="332" width="460" height="48" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="410" y="352" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Sdílený jmenovatel: Delta/Parquet v otevřeném úložišti</text>
+      <text x="410" y="370" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">dobře navržený lake umožňuje rozhodnutí později změnit bez migrace dat</text>
+    </svg>
+    <figcaption>Rozhodovací vodítko: čistý Fabric pro BI-first organizace, čistý Databricks pro engineering-first týmy, kombinace jako nejčastější enterprise vzor.</figcaption>
+  </figure>
+
+  <p>Kombinovaný vzor stojí za rozvedení, protože se s ním potkáte nejčastěji: <strong>Databricks vlastní zpracování</strong> (ingest, kvalita, medallion až po gold, ML features), gold vrstva leží jako Delta v ADLS Gen2 nebo přímo v Unity Catalogu, a <strong>Fabric vlastní konzumaci</strong> — shortcut či mirroring zpřístupní gold v OneLake a Power BI nad ním jede v Direct Lake módu bez kopírování a bez refresh oken. Každý tým zůstává v nástroji, který umí.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> v kombinovaném scénáři si pohlídejte dvě věci: <strong>1)</strong> V-Order — Parquet zapsaný z Databricks není V-Ordered. Pozor ale, že V-Order je dnes <strong>defaultně vypnutý i pro nově zakládané Fabric workspaces</strong> (<code class="inline">spark.sql.parquet.vorder.default = false</code>, kvůli výkonu zápisu), takže rozdíl proti Fabricu není automatický. Zapněte ho vědomě tam, kde nad tabulkou stojí Direct Lake a čte se z ní podstatně častěji, než se do ní zapisuje; <strong>2)</strong> dvojí governance — dohodněte, že zdrojem pravdy pro přístupy ke gold vrstvě je jedna strana (typicky Unity Catalog), a Fabric přístup řešte na úrovni workspace/items.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">A co cena kombinace? Nezaplatím dvakrát?<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Částečně ano — platíte DBU za zpracování a k tomu Fabric kapacitu za servírování. Prakticky ale BI-only kapacita vychází relativně malá: shortcuts nestojí CU, Direct Lake eliminuje refresh náklady a interaktivní dotazy jsou smoothed. Rozhodující je licenční hranice F64 pro free čtenáře reportů — pod ní platíte Power BI Pro per user, což u stovek konzumentů převáží cenu kapacity. Spočítejte obě varianty; ceny a pravidla k srpnu 2026 ověřte v aktuálním ceníku.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-shrnuti-zdroje">
+  <div class="section-header">
+    <div class="section-num">14.8</div>
+    <h2>Shrnutí a zdroje</h2>
+  </div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> Fabric je SaaS analytická platforma vyrostlá z Power BI: jedna capacity (F-SKU, sdílený fond CU se smoothingem a postupným throttlingem), jeden OneLake (Delta Parquet, shortcuts a mirroring pro zero-copy přístup — i do Databricks) a sada workloadů od Data Factory po Power BI. Proti Databricks stojí jinak: SaaS místo PaaS, fixní kapacita místo pay-per-use, vrstvená governance s Purview místo Unity Catalogu, integrace místo inženýrské kontroly. V praxi nejčastěji vítězí kombinace: Databricks zpracovává do gold, Fabric přes Direct Lake servíruje do Power BI — a díky společnému Delta formátu se obě strany potkávají nad jednou kopií dat.</div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Fabric se mění rychleji než cokoli, co jsme v kurzu probírali — workloady, preview funkce, SKU i licenční pravidla. Vše v této kapitole odpovídá stavu k srpnu 2026; než začnete architektonicky rozhodovat, projděte aktuální dokumentaci a release notes.</div></div>
+
+  <h3>Kurátorované zdroje</h3>
+  <ul>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/fundamentals/microsoft-fabric-overview" target="_blank" rel="noopener">What is Microsoft Fabric?</a> — přehledová stránka platformy a workloadů</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/onelake/onelake-overview" target="_blank" rel="noopener">OneLake overview</a> — jeden logický lake, shortcuts, Iceberg interoperabilita</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/enterprise/licenses" target="_blank" rel="noopener">Fabric licenses and capacity</a> — F-SKU, CU, licenční pravidla (vč. hranice F64)</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/enterprise/throttling" target="_blank" rel="noopener">Capacity throttling</a> a <a href="https://learn.microsoft.com/en-us/fabric/enterprise/metrics-app" target="_blank" rel="noopener">Capacity Metrics app</a> — smoothing, fáze throttlingu, monitoring spotřeby</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/onelake/onelake-shortcuts" target="_blank" rel="noopener">OneLake shortcuts</a> a <a href="https://learn.microsoft.com/en-us/fabric/mirroring/overview" target="_blank" rel="noopener">Mirroring overview</a> — zero-copy integrace, vč. mirroringu Azure Databricks Unity Catalogu</li>
+    <li><a href="https://learn.microsoft.com/en-us/training/courses/dp-600t00" target="_blank" rel="noopener">Kurz DP-600: Implementing Analytics Solutions Using Microsoft Fabric</a> — navazující čtyřdenní kurz, pokud vás Fabric zaujal do hloubky</li>
+    <li><a href="https://learn.microsoft.com/en-us/training/paths/get-started-fabric/" target="_blank" rel="noopener">Learn path: Get started with Microsoft Fabric</a> — samoobslužné moduly s hands-on cvičeními zdarma</li>
+  </ul>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_13_monitoring.html">← Monitoring a optimalizace</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 14 z 16</span>
+      <a href="dp750_15_pbi_fabric_databricks.html" style="margin-left:auto">Power BI + Fabric + Databricks →</a>
+    </div>
+  </main>
+</div>
+
+<script>function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?'🙈 Skrýt nápovědu':'💡 Zobrazit nápovědu'})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent='✓ Zkopírováno';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopírovat';btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent='Ctrl+C';setTimeout(()=>{btn.textContent='Kopírovat'},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent='☰ Kapitoly'}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent='✕ Zavřít'}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-orig',m==='orig');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Ingest dat do Unity Catalogu — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+[data-view="orig"]{display:none}
+html.mode-orig [data-view="orig"]{display:revert}
+html.mode-orig [data-view="custom"]{display:none}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="orig")document.documentElement.className="mode-orig"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Ingest dat do Unity Catalogu</span>
+  </div>
+  <div class="nav-links">
+    <button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_08_transformace.html" class="next">Čištění a transformace dat →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-lakeflow-connect" class="toc-item active" data-section="sec-lakeflow-connect">Lakeflow Connect: managed konektory</a>
+    <a href="#sec-notebook-ingest" class="toc-item" data-section="sec-notebook-ingest">Ingest v notebooku: spark.read a DataFrame API</a>
+    <a href="#sec-sql-metody" class="toc-item" data-section="sec-sql-metody">SQL metody: CTAS, CREATE OR REPLACE a COPY INTO</a>
+    <a href="#sec-cdc-feed" class="toc-item" data-section="sec-cdc-feed">CDC feed a AUTO CDC API</a>
+    <a href="#sec-structured-streaming" class="toc-item" data-section="sec-structured-streaming">Spark Structured Streaming</a>
+    <a href="#sec-auto-loader" class="toc-item" data-section="sec-auto-loader">Auto Loader: cloudFiles a exactly-once</a>
+    <a href="#sec-deklarativni-pipelines" class="toc-item" data-section="sec-deklarativni-pipelines">Deklarativní pipelines jako rámec nad ingestem</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 7: Ingest Data into Unity Catalog (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 7</div>
+      <h1>Ingest dat do Unity Catalogu</h1>
+      <div class="hero-subtitle">Lakeflow Connect, notebooky, SQL metody, CDC, Structured Streaming, Auto Loader a deklarativní pipelines</div>
+      <div class="hero-meta"><span>🗂 Plnění dat do Unity Catalogu, ETL a Pipelines</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Vybrat vhodnou ingesční cestu do Unity Catalogu podle typu zdroje a požadované latence</li>
+    <li>Nakonfigurovat Lakeflow Connect s managed konektory pro SaaS aplikace a databáze</li>
+    <li>Načíst batch i streaming data v notebooku pomocí DataFrame API a zapsat je do Delta tabulek</li>
+    <li>Použít SQL příkazy COPY INTO a CTAS pro idempotentní načítání souborů</li>
+    <li>Nastavit Auto Loader s exactly-once sémantikou a automatickou inferencí schématu</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-lakeflow-connect">
+  <div class="section-header">
+    <div class="section-num">7.1</div>
+    <h2>Lakeflow Connect: managed konektory</h2>
+  </div>
+  <p>Než se pustíme do jednotlivých technik, podívejme se na celkovou mapu. Do <strong>Unity Catalogu</strong> vede několik ingesčních cest a každá má svůj sweet spot: managed konektory pro SaaS a databáze, notebook s vlastním kódem pro cokoli nestandardního, SQL příkazy pro jednorázové i opakované načítání souborů, Auto Loader pro průběžně přibývající soubory a Structured Streaming pro message busy. Všechny cesty končí ve stejném bodě — v Delta tabulkách bronze vrstvy spravovaných Unity Catalogem.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 340" role="img" aria-label="Mapa ingesčních cest do lakehouse. Vlevo čtyři typy zdrojů: SaaS aplikace, relační databáze, soubory v cloud storage a message bus. Uprostřed šest ingesčních metod, vpravo cílové Delta tabulky v bronze vrstvě Unity Catalogu.">
+      <defs>
+        <marker id="arr7a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <text x="110" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">ZDROJE</text>
+      <text x="420" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">INGESČNÍ METODY</text>
+      <text x="710" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">CÍL</text>
+
+      <rect x="20" y="40" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="110" y="58" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">SaaS aplikace</text>
+      <text x="110" y="74" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">Salesforce, Workday, Jira</text>
+
+      <rect x="20" y="104" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="110" y="122" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">Relační databáze</text>
+      <text x="110" y="138" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">SQL Server, MySQL, Postgres</text>
+
+      <rect x="20" y="180" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="110" y="198" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">Soubory v cloud storage</text>
+      <text x="110" y="214" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">CSV, JSON, Parquet, XML</text>
+
+      <rect x="20" y="262" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="110" y="280" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">Message bus</text>
+      <text x="110" y="296" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">Kafka, Event Hubs</text>
+
+      <rect x="310" y="40" width="220" height="32" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="420" y="60" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#e8721c" text-anchor="middle">Lakeflow Connect</text>
+      <rect x="310" y="82" width="220" height="32" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="420" y="102" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Notebook (spark.read, JDBC)</text>
+      <rect x="310" y="132" width="220" height="32" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="420" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">COPY INTO / CTAS</text>
+      <rect x="310" y="174" width="220" height="32" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="420" y="194" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#e8721c" text-anchor="middle">Auto Loader (cloudFiles)</text>
+      <rect x="310" y="224" width="220" height="32" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="420" y="244" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Structured Streaming</text>
+      <rect x="310" y="266" width="220" height="32" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="420" y="286" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Deklarativní pipelines</text>
+
+      <rect x="620" y="120" width="180" height="100" rx="8" fill="#1a3a6b"/>
+      <text x="710" y="158" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Unity Catalog</text>
+      <text x="710" y="178" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8f0fb" text-anchor="middle">bronze Delta tabulky</text>
+      <text x="710" y="196" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">catalog.schema.table</text>
+
+      <line x1="200" y1="62" x2="310" y2="56" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="200" y1="126" x2="310" y2="64" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="200" y1="126" x2="310" y2="98" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="200" y1="202" x2="310" y2="98" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="200" y1="202" x2="310" y2="148" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="200" y1="202" x2="310" y2="190" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="200" y1="284" x2="310" y2="240" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="200" y1="284" x2="310" y2="282" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="530" y1="56" x2="620" y2="140" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="530" y1="98" x2="620" y2="155" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="530" y1="148" x2="620" y2="165" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="530" y1="190" x2="620" y2="175" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="530" y1="240" x2="620" y2="185" stroke="#6b7280" marker-end="url(#arr7a)"/>
+      <line x1="530" y1="282" x2="620" y2="200" stroke="#6b7280" marker-end="url(#arr7a)"/>
+    </svg>
+    <figcaption>Mapa ingesčních cest: každý typ zdroje má jednu či více vhodných metod, všechny končí v Delta tabulkách bronze vrstvy pod správou Unity Catalogu.</figcaption>
+  </figure>
+
+  <p><strong>Lakeflow Connect</strong> je sada managed konektorů — místo psaní extrakčního kódu jen nakonfigurujete pipeline — přes UI, Asset Bundles (dnes Declarative Automation Bundles, viz sekce 12.4), notebook nebo CLI — a Databricks se stará o extrakci, staging i zápis do streaming tabulek. Konektory se dělí do tří kategorií:</p>
+
+  <table>
+    <tr><th>Typ konektoru</th><th>Zdroje</th><th>Mechanismus</th></tr>
+    <tr><td><strong>SaaS konektory</strong></td><td>Salesforce, HubSpot, Jira, Workday</td><td>extrakce přímo přes API zdroje</td></tr>
+    <tr><td><strong>Databázové (CDC)</strong></td><td>SQL Server, MySQL, PostgreSQL</td><td>ingestion gateway čte změny z transakčního logu (binlog)</td></tr>
+    <tr><td><strong>Query-based</strong></td><td>databáze bez CDC</td><td>plánované dotazy s cursor sloupcem (rostoucí timestamp/ID), bez gateway</td></tr>
+  </table>
+
+  <p>Každá ingesční pipeline se skládá ze tří komponent: <strong>connection</strong> (uložené přihlašovací údaje a endpoint — vytvoříte jednou, použijete opakovaně), <strong>ingestion definition</strong> (které tabulky a kam v Unity Catalogu) a <strong>schedule</strong>. U databázových konektorů vzniká navíc <strong>ingestion gateway</strong>, která průběžně vytahuje změny ze zdrojové databáze.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">YAML</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># ingestion definition v Declarative Automation Bundles (drive Asset Bundles)</span>
+resources:
+  pipelines:
+    pipeline_sqlserver:
+      name: customer-orders-pipeline
+      catalog: <span class="tbl">sales</span>
+      schema: <span class="tbl">bronze</span>
+      ingestion_definition:
+        <span class="cm"># connection_name odkazuje na UC connection se zdrojovymi udaji</span>
+        connection_name: sqlserver_prod_connection
+        <span class="cm"># u databazovych konektoru navic gateway pipeline se zmenami ze zdroje</span>
+        ingestion_gateway_id: <span class="str">${resources.pipelines.gateway_sqlserver.id}</span>
+        objects:
+          - table:
+              source_schema: dbo
+              source_table: orders
+              destination_catalog: <span class="tbl">sales</span>
+              destination_schema: <span class="tbl">bronze</span></pre>
+  </div>
+
+  <p>Klíčové volby při konfiguraci: <strong>SCD type 1</strong> (cíl vždy odráží aktuální stav zdroje — update přepíše řádek) vs. <strong>SCD type 2</strong> (historie se uchovává, tabulka dostane sloupce <code class="inline">__START_AT</code> a <code class="inline">__END_AT</code>). Dále výběr sloupců přes <code class="inline">include_columns</code> / <code class="inline">exclude_columns</code> a možnost <strong>full refresh</strong>, když se inkrementální zpracování nedokáže zotavit ze změny schématu.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> jedna pipeline umí zapisovat stejnou zdrojovou tabulku do více cílových katalogů a schémat — hodí se, když marketing i sales potřebují vlastní kopii dat pod vlastní governance. Nemusíte stavět druhou pipeline.</div></div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> s <code class="inline">include_columns</code> se nově přidané sloupce ve zdroji do cíle automaticky nedostanou. S <code class="inline">exclude_columns</code> je to naopak — nové sloupce se přidávají automaticky. Vyberte podle toho, jestli chcete schéma řídit, nebo nechat evolvovat. Nabídka konektorů se rychle rozšiřuje — aktuální seznam a stav (preview/GA) ověřte v dokumentaci.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/2-ingest-data-lakeflow-connect#control-data-extraction-behavior" target="_blank" rel="noopener">Control data extraction behavior</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/2-ingest-data-lakeflow-connect#optimize-column-selection-and-refresh-strategies" target="_blank" rel="noopener">Optimize column selection and refresh strategies</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-notebook-ingest">
+  <div class="section-header">
+    <div class="section-num">7.2</div>
+    <h2>Ingest v notebooku: spark.read a DataFrame API</h2>
+  </div>
+  <p>Když managed konektor neexistuje nebo potřebujete vlastní logiku, sáhnete po notebooku. Základem batch ingestu je <code class="inline">spark.read</code> — vrací <strong>DataFrame</strong>, distribuovanou kolekci dat organizovanou do pojmenovaných sloupců.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre>df = (spark.read
+    .<span class="fn">format</span>(<span class="str">"csv"</span>)
+    .<span class="fn">option</span>(<span class="str">"header"</span>, <span class="str">"true"</span>)
+    .<span class="fn">option</span>(<span class="str">"inferSchema"</span>, <span class="str">"true"</span>)
+    .<span class="fn">load</span>(<span class="str">"/Volumes/catalog/schema/volume/data.csv"</span>))
+
+<span class="cm"># zapis do Delta tabulky v Unity Catalogu</span>
+df.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>).<span class="fn">saveAsTable</span>(<span class="str">"catalog.schema.table_name"</span>)</pre>
+  </div>
+
+  <p>Stejným vzorem načtete JSON, Parquet i XML (tam je povinná option <code class="inline">rowTag</code>, která říká, který XML element odpovídá jednomu řádku). Zápis vždy končí v Delta formátu — ten je v Databricks výchozí a dává ACID transakce a time travel. Chování při existující tabulce řídí <code class="inline">mode()</code>:</p>
+
+  <table>
+    <tr><th>Mode</th><th>Chování</th></tr>
+    <tr><td><code class="inline">overwrite</code></td><td>kompletně nahradí obsah tabulky</td></tr>
+    <tr><td><code class="inline">append</code></td><td>přidá řádky k existujícím</td></tr>
+    <tr><td><code class="inline">ignore</code></td><td>pokud tabulka existuje, neudělá nic</td></tr>
+    <tr><td><code class="inline">error</code> (default)</td><td>pokud tabulka existuje, vyhodí výjimku</td></tr>
+  </table>
+
+  <p>Pro relační zdroje bez Lakeflow konektoru poslouží <strong>JDBC</strong>. Přihlašovací údaje nikdy nepište do notebooku — patří do Databricks secrets:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre>df_jdbc = (spark.read
+    .<span class="fn">format</span>(<span class="str">"jdbc"</span>)
+    .<span class="fn">option</span>(<span class="str">"url"</span>, <span class="str">"jdbc:sqlserver://server.database.windows.net:1433;database=mydb"</span>)
+    .<span class="fn">option</span>(<span class="str">"dbtable"</span>, <span class="str">"schema.tablename"</span>)
+    .<span class="fn">option</span>(<span class="str">"user"</span>, dbutils.secrets.<span class="fn">get</span>(scope=<span class="str">"jdbc"</span>, key=<span class="str">"username"</span>))
+    .<span class="fn">option</span>(<span class="str">"password"</span>, dbutils.secrets.<span class="fn">get</span>(scope=<span class="str">"jdbc"</span>, key=<span class="str">"password"</span>))
+    .<span class="fn">load</span>())</pre>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> do option <code class="inline">dbtable</code> lze místo názvu tabulky vložit subquery — filtr se pak vykoná na straně databáze (pushdown) a po síti tečou jen relevantní řádky. U velkých zdrojových tabulek to je rozdíl mezi minutami a hodinami.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Semi-strukturovaná data a typ VARIANT<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Když se schéma JSON záznamů mezi řádky liší nebo se vyvíjí v čase, nemusíte ho vynucovat při ingestu. Datový typ <strong>VARIANT</strong> uloží celou vnořenou strukturu a dotazovat se na konkrétní pole můžete až později:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> parse_json, variant_get, col
+
+df = spark.read.<span class="fn">text</span>(<span class="str">"/path/to/data.json"</span>)
+df_variant = df.<span class="fn">select</span>(<span class="fn">parse_json</span>(<span class="fn">col</span>(<span class="str">"value"</span>)).<span class="fn">alias</span>(<span class="str">"data"</span>))
+df_variant.<span class="fn">select</span>(<span class="fn">variant_get</span>(<span class="fn">col</span>(<span class="str">"data"</span>), <span class="str">"$.customer.name"</span>, <span class="str">"string"</span>)).<span class="fn">display</span>()</pre>
+      </div>
+      <p>To je přesně vzor „schema-on-read" pro bronze vrstvu: surová data dovnitř beze ztrát, strukturu řešíme až v silver.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/3-ingest-data-notebooks#handle-semi-structured-data" target="_blank" rel="noopener">Handle semi-structured data</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-sql-metody">
+  <div class="section-header">
+    <div class="section-num">7.3</div>
+    <h2>SQL metody: CTAS, CREATE OR REPLACE a COPY INTO</h2>
+  </div>
+  <p>Kdo preferuje deklarativní SQL před procedurálním kódem, má k dispozici tři příkazy. Liší se hlavně tím, co udělají s existující tabulkou — a to je přesně to, co si u nich musíte zapamatovat.</p>
+
+  <p><strong>CTAS</strong> (<code class="inline">CREATE TABLE AS SELECT</code>) spojí vytvoření tabulky a naplnění daty do jednoho kroku. Schéma se odvodí z výsledku dotazu. Pro čtení ze souborů se kombinuje s table-valued funkcí <code class="inline">read_files</code>:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">CREATE TABLE</span> <span class="tbl">catalog.schema.sales_data</span> <span class="kw">AS</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="fn">read_files</span>(
+    <span class="str">'/Volumes/catalog/schema/volume/sales/*.parquet'</span>,
+    format =&gt; <span class="str">'parquet'</span>
+);</pre>
+  </div>
+
+  <p><strong>CREATE OR REPLACE TABLE</strong> tabulku kompletně nahradí, ale na rozdíl od DROP + CREATE zachová historii tabulky, udělená oprávnění, row filters i column masks. Downstream konzumenti nic nepoznají. Hodí se na periodické full refreshe.</p>
+
+  <p><strong>COPY INTO</strong> je určeno pro opakované přiléhání souborů: načte soubory z cloud storage a <em>appenduje</em> je do existující tabulky. Jeho klíčová vlastnost je <strong>idempotence</strong> — už jednou načtené soubory automaticky přeskočí, i když příkaz spustíte znovu:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- cilova tabulka musi existovat predem</span>
+<span class="kw">CREATE TABLE IF NOT EXISTS</span> <span class="tbl">catalog.schema.events</span> (
+    <span class="col">event_id</span> STRING, <span class="col">event_type</span> STRING,
+    <span class="col">event_timestamp</span> TIMESTAMP, <span class="col">payload</span> STRING);
+
+<span class="kw">COPY INTO</span> <span class="tbl">catalog.schema.events</span>
+<span class="kw">FROM</span> <span class="str">'/Volumes/catalog/schema/volume/events/'</span>
+FILEFORMAT = JSON
+FORMAT_OPTIONS (<span class="str">'multiline'</span> = <span class="str">'true'</span>);</pre>
+  </div>
+
+  <p>Výběr souborů zúžíte přes <code class="inline">PATTERN</code> (glob) nebo <code class="inline">FILES</code> (konkrétní jména). Volba <code class="inline">COPY_OPTIONS ('mergeSchema' = 'true')</code> dovolí schématu tabulky evolvovat, a <code class="inline">VALIDATE ALL</code> zkontroluje parsovatelnost a shodu se schématem, aniž by cokoliv načetlo.</p>
+
+  <table>
+    <tr><th>Metoda</th><th>Nejlepší pro</th><th>Chování</th></tr>
+    <tr><td><strong>CTAS</strong></td><td>první load, jednorázové migrace</td><td>vytvoří novou tabulku; selže, pokud existuje</td></tr>
+    <tr><td><strong>CREATE OR REPLACE</strong></td><td>periodický full refresh</td><td>nahradí celou tabulku; zachová oprávnění</td></tr>
+    <tr><td><strong>COPY INTO</strong></td><td>průběžné přidávání souborů</td><td>append; načtené soubory přeskakuje</td></tr>
+  </table>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> <code class="inline">COPY INTO</code> škáluje dobře do řádu tisíců souborů. Pokud zdroj poroste do milionů souborů, dokumentace doporučuje Auto Loader (sekce 7.6) — objevuje soubory efektivněji a bez režie výpisu adresáře. Kdo čeká, že <code class="inline">CTAS ... IF NOT EXISTS</code> tabulku „doplní", bude překvapen: příkaz se prostě celý přeskočí.</div></div>
+</div>
+
+<div class="section" id="sec-cdc-feed">
+  <div class="section-header">
+    <div class="section-num">7.4</div>
+    <h2>CDC feed a AUTO CDC API</h2>
+  </div>
+  <p>Když zdrojový systém generuje miliony transakcí denně, plné reloady přestávají dávat smysl. <strong>Change data capture (CDC)</strong> přenáší jen změny — každý záznam feedu nese datové sloupce, <strong>typ operace</strong> (INSERT/UPDATE/DELETE) a <strong>sekvenční sloupec</strong> (timestamp nebo pořadové číslo), který určuje pořadí změn.</p>
+
+  <p>Ruční aplikace CDC feedu je plná záludností: out-of-order události, deduplikace, mazání. <strong>AUTO CDC API</strong> v Lakeflow Spark Declarative Pipelines tohle řeší za vás — vytvoříte cílovou streaming tabulku, definujete flow a zvolíte SCD typ:</p>
+
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-07-cdc-sql"><span class="tab-icon">🗄️</span>SQL</button>
+      <button class="tab-btn" data-tab="tab-07-cdc-py"><span class="tab-icon">🐍</span>Python</button>
+    </div>
+    <div class="tab-panel" id="tab-07-cdc-sql">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">employees</span>;
+
+<span class="kw">CREATE FLOW</span> employees_cdc_flow
+<span class="kw">AS AUTO CDC INTO</span> <span class="tbl">employees</span>
+<span class="kw">FROM</span> <span class="fn">stream</span>(<span class="tbl">bronze.employee_changes</span>)
+KEYS (<span class="col">employee_id</span>)
+APPLY AS DELETE WHEN <span class="col">operation</span> = <span class="str">'DELETE'</span>
+SEQUENCE BY <span class="col">sequence_num</span>
+COLUMNS * <span class="kw">EXCEPT</span> (<span class="col">operation</span>, <span class="col">sequence_num</span>)
+STORED AS SCD TYPE <span class="num">1</span>;</pre>
+      </div>
+    </div>
+    <div class="tab-panel" id="tab-07-cdc-py">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="kw">from</span> pyspark <span class="kw">import</span> pipelines <span class="kw">as</span> dp
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, expr
+
+dp.<span class="fn">create_streaming_table</span>(<span class="str">"employees"</span>)
+
+dp.<span class="fn">create_auto_cdc_flow</span>(
+    target=<span class="str">"employees"</span>,
+    source=<span class="str">"employees_cdf"</span>,
+    keys=[<span class="str">"employee_id"</span>],
+    sequence_by=<span class="fn">col</span>(<span class="str">"sequence_num"</span>),
+    apply_as_deletes=<span class="fn">expr</span>(<span class="str">"operation = 'DELETE'"</span>),
+    except_column_list=[<span class="str">"operation"</span>, <span class="str">"sequence_num"</span>],
+    stored_as_scd_type=<span class="num">1</span>
+)</pre>
+      </div>
+    </div>
+  </div>
+
+  <p>Volba SCD typu rozhoduje, co se stane s předchozí verzí záznamu:</p>
+  <ul>
+    <li><strong>SCD Type 1</strong> — update přepíše řádek; zaměstnanec se přestěhuje ze Seattlu do Portlandu a Seattle z tabulky zmizí.</li>
+    <li><strong>SCD Type 2</strong> — historie zůstává: záznam se Seattle dostane <code class="inline">__END_AT</code>, přibude nový řádek s Portlandem. Přes <code class="inline">TRACK HISTORY ON * EXCEPT (...)</code> lze určit, které sloupce novou historickou verzi vůbec vyvolají.</li>
+  </ul>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> pozdě dorazivší starší update (nižší hodnota v <code class="inline">SEQUENCE BY</code>) API automaticky ignoruje, pokud už je aplikován novější. Bez toho byste psali vlastní merge logiku s porovnáváním verzí. Pro zdroje posílající <em>partial updates</em> (jen změněné sloupce) existuje <code class="inline">IGNORE NULL UPDATES</code> — NULLy v příchozím záznamu pak nepřepíšou existující hodnoty.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/5-ingest-data-change-data-capture-feed#handle-out-of-order-events" target="_blank" rel="noopener">Handle out-of-order events</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-structured-streaming">
+  <div class="section-header">
+    <div class="section-num">7.5</div>
+    <h2>Spark Structured Streaming</h2>
+  </div>
+  <p><strong>Structured Streaming</strong> pracuje s příchozími daty jako s neohraničenou tabulkou, která neustále roste. API je stejné jako u batchů — jen místo <code class="inline">spark.read</code> píšete <code class="inline">spark.readStream</code> a místo <code class="inline">write</code> pak <code class="inline">writeStream</code>. O to, co už bylo zpracováno, se stará <strong>checkpoint</strong>.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Srovnání tří režimů zpracování. Batch načítá při každém běhu všechna data znovu. Inkrementální batch s triggerem availableNow zpracuje při každém plánovaném běhu jen nová data a skončí. Streaming zpracovává události průběžně v mikrodávkách.">
+      <defs>
+        <marker id="arr7b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <line x1="150" y1="40" x2="790" y2="40" stroke="#e2e8f0"/>
+      <text x="20" y="70" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b">Batch</text>
+      <text x="20" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">plny reload</text>
+      <rect x="180" y="55" width="120" height="34" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="240" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">vsechna data</text>
+      <rect x="400" y="55" width="120" height="34" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="460" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">vsechna data</text>
+      <rect x="620" y="55" width="120" height="34" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="680" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">vsechna data</text>
+
+      <text x="20" y="140" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b">Inkrementální</text>
+      <text x="20" y="156" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">trigger availableNow</text>
+      <rect x="180" y="125" width="90" height="34" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="225" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">jen nová data</text>
+      <rect x="400" y="125" width="70" height="34" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="435" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">nová</text>
+      <rect x="620" y="125" width="80" height="34" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="660" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">nová</text>
+      <text x="330" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">checkpoint →</text>
+      <text x="530" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">checkpoint →</text>
+
+      <text x="20" y="215" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b">Streaming</text>
+      <text x="20" y="231" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">kontinuálně</text>
+      <g fill="#22c55e">
+        <rect x="185" y="205" width="18" height="26" rx="4"/><rect x="245" y="205" width="18" height="26" rx="4"/>
+        <rect x="290" y="205" width="18" height="26" rx="4"/><rect x="360" y="205" width="18" height="26" rx="4"/>
+        <rect x="405" y="205" width="18" height="26" rx="4"/><rect x="470" y="205" width="18" height="26" rx="4"/>
+        <rect x="540" y="205" width="18" height="26" rx="4"/><rect x="585" y="205" width="18" height="26" rx="4"/>
+        <rect x="655" y="205" width="18" height="26" rx="4"/><rect x="720" y="205" width="18" height="26" rx="4"/>
+      </g>
+      <line x1="180" y1="250" x2="790" y2="250" stroke="#6b7280" marker-end="url(#arr7b)"/>
+      <text x="480" y="272" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">čas → mikrodávky zpracovávané průběžně, latence sekundy</text>
+    </svg>
+    <figcaption>Batch vs. inkrementální batch vs. streaming: inkrementální režim s triggerem availableNow kombinuje efektivitu streamingu (zpracuje jen nové) s předvídatelností plánovaných jobů.</figcaption>
+  </figure>
+
+  <p>Pro <strong>Azure Event Hubs</strong> je nejjednodušší cesta přes jeho Kafka-kompatibilní endpoint — stejný konektor jako pro Kafku, jen s SASL autentizací přes connection string ze secrets. Existuje i nativní konektor <code class="inline">eventhubs</code> (payload pak najdete ve sloupci <code class="inline">body</code> místo <code class="inline">value</code>).</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># cteni z Kafka topicu a zapis do Delta tabulky</span>
+df_stream = (spark.readStream
+    .<span class="fn">format</span>(<span class="str">"kafka"</span>)
+    .<span class="fn">option</span>(<span class="str">"kafka.bootstrap.servers"</span>, <span class="str">"broker-server:9092"</span>)
+    .<span class="fn">option</span>(<span class="str">"subscribe"</span>, <span class="str">"sensor-readings"</span>)
+    .<span class="fn">option</span>(<span class="str">"startingOffsets"</span>, <span class="str">"latest"</span>)
+    .<span class="fn">load</span>())
+
+(df_stream.writeStream
+    .<span class="fn">format</span>(<span class="str">"delta"</span>)
+    .<span class="fn">outputMode</span>(<span class="str">"append"</span>)
+    .<span class="fn">option</span>(<span class="str">"checkpointLocation"</span>, <span class="str">"/checkpoints/sensor-ingestion"</span>)
+    .<span class="fn">toTable</span>(<span class="str">"iot.bronze.sensor_readings"</span>))</pre>
+  </div>
+
+  <p>Kafka konektor vrací standardní schéma (<code class="inline">key</code>, <code class="inline">value</code>, <code class="inline">topic</code>, <code class="inline">partition</code>, <code class="inline">offset</code>, <code class="inline">timestamp</code>) — hodnoty jsou binární, takže je typicky castujete na string a parsujete přes <code class="inline">from_json</code>. Frekvenci zpracování řídí <strong>trigger</strong>: bez triggeru běží stream nepřetržitě, <code class="inline">processingTime="10 seconds"</code> zpracovává v intervalech a <code class="inline">availableNow=True</code> zpracuje vše dostupné a skončí — ideální pro plánované joby.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> každá streaming query musí mít <em>vlastní unikátní</em> checkpoint location. Sdílení checkpointu mezi dvěma streamy vede k chybám zpracování. A žádné lifecycle policy na checkpoint adresáře — smazání checkpointu znamená start od nuly.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Monitoring streaming queries<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Aktivní streamy vidíte ve Spark UI na záložce Structured Streaming. Programově: <code class="inline">query.isActive</code>, <code class="inline">query.status</code>, <code class="inline">query.recentProgress</code>. V produkci obalte <code class="inline">query.awaitTermination()</code> do try/except a nastavte alerting na zaostávání streamu (lag metriky v progress reportu). Časté nedorozumění: <code class="inline">startingOffsets</code> platí jen pro úplně první spuštění — jakmile existuje checkpoint, pokračuje se od něj a option se ignoruje.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/6-ingest-data-spark-structured-streaming#configure-checkpoint-locations" target="_blank" rel="noopener">Configure checkpoint locations</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/6-ingest-data-spark-structured-streaming#monitor-streaming-queries" target="_blank" rel="noopener">Monitor streaming queries</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-auto-loader">
+  <div class="section-header">
+    <div class="section-num">7.6</div>
+    <h2>Auto Loader: cloudFiles a exactly-once</h2>
+  </div>
+  <p><strong>Auto Loader</strong> je Structured Streaming source specializovaný na soubory: sleduje lokaci v cloud storage a inkrementálně zpracovává nově příchozí soubory. Stav o už zpracovaných souborech si drží sám, takže každý soubor je ingestován <strong>exactly-once</strong> — bez ručního trackování, bez duplicit při restartu.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="Mechanismus Auto Loaderu. Nové soubory v cloud storage detekuje buď directory listing, nebo file notifications. Auto Loader porovná soubory se stavem v checkpointu, zpracuje jen nové, uloží inferované schéma do schema location a zapíše data do Delta tabulky s garancí exactly-once.">
+      <defs>
+        <marker id="arr7c" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="20" y="60" width="190" height="150" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="115" y="85" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">Cloud storage</text>
+      <rect x="40" y="100" width="150" height="24" rx="4" fill="#fff" stroke="#e2e8f0"/>
+      <text x="115" y="116" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">orders_001.json ✓</text>
+      <rect x="40" y="132" width="150" height="24" rx="4" fill="#fff" stroke="#e2e8f0"/>
+      <text x="115" y="148" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">orders_002.json ✓</text>
+      <rect x="40" y="164" width="150" height="24" rx="4" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="115" y="180" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="600" fill="#e8721c" text-anchor="middle">orders_003.json NOVÝ</text>
+
+      <line x1="210" y1="135" x2="310" y2="135" stroke="#6b7280" marker-end="url(#arr7c)"/>
+      <text x="260" y="112" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">directory listing</text>
+      <text x="260" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">/ file notifications</text>
+
+      <rect x="310" y="85" width="220" height="100" rx="8" fill="#1a3a6b"/>
+      <text x="420" y="120" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">Auto Loader</text>
+      <text x="420" y="140" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">format("cloudFiles")</text>
+      <text x="420" y="158" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">zpracuje jen nové soubory</text>
+
+      <line x1="530" y1="135" x2="620" y2="135" stroke="#6b7280" marker-end="url(#arr7c)"/>
+      <text x="575" y="122" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e" font-weight="600" text-anchor="middle">exactly-once</text>
+
+      <rect x="620" y="100" width="180" height="70" rx="8" fill="#fff" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="710" y="130" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1a3a6b" text-anchor="middle">Delta tabulka</text>
+      <text x="710" y="150" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">sales.bronze.orders</text>
+
+      <rect x="310" y="230" width="150" height="56" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="385" y="253" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="600" fill="#1a3a6b" text-anchor="middle">checkpoint</text>
+      <text x="385" y="271" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">stav zpracovaných souborů</text>
+      <rect x="490" y="230" width="150" height="56" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="565" y="253" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="600" fill="#1a3a6b" text-anchor="middle">schema location</text>
+      <text x="565" y="271" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">inferované schéma + evoluce</text>
+      <line x1="395" y1="185" x2="385" y2="230" stroke="#6b7280" marker-end="url(#arr7c)"/>
+      <line x1="470" y1="185" x2="545" y2="230" stroke="#6b7280" marker-end="url(#arr7c)"/>
+    </svg>
+    <figcaption>Auto Loader detekuje nové soubory, stav si vede v checkpointu a inferované schéma ve schema location — každý soubor projde právě jednou.</figcaption>
+  </figure>
+
+  <p>Detekce nových souborů běží ve dvou režimech: <strong>directory listing</strong> (periodický výpis adresáře, funguje bez další konfigurace) a <strong>file notification</strong> (notifikace z cloudu při příchodu souboru — nižší latence a náklady na API u velkých workloadů; doporučeno s file events na external location v Unity Catalogu).</p>
+
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-07-al-py"><span class="tab-icon">🐍</span>Python (cloudFiles)</button>
+      <button class="tab-btn" data-tab="tab-07-al-sql"><span class="tab-icon">🗄️</span>SQL (read_files)</button>
+    </div>
+    <div class="tab-panel" id="tab-07-al-py">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+        <pre>(spark.readStream
+  .<span class="fn">format</span>(<span class="str">"cloudFiles"</span>)
+  .<span class="fn">option</span>(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
+  .<span class="fn">option</span>(<span class="str">"cloudFiles.schemaLocation"</span>, schema_path)
+  .<span class="fn">option</span>(<span class="str">"cloudFiles.inferColumnTypes"</span>, <span class="str">"true"</span>)
+  .<span class="fn">load</span>(<span class="str">"abfss://container@storage.dfs.core.windows.net/incoming/orders/"</span>)
+  .writeStream
+  .<span class="fn">option</span>(<span class="str">"checkpointLocation"</span>, checkpoint_path)
+  .<span class="fn">trigger</span>(availableNow=<span class="kw">True</span>)
+  .<span class="fn">toTable</span>(<span class="str">"sales.bronze.orders"</span>))</pre>
+      </div>
+    </div>
+    <div class="tab-panel" id="tab-07-al-sql">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm">-- streaming tabulka v deklarativni pipeline: STREAM zapina Auto Loader</span>
+<span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">bronze_orders</span>
+<span class="kw">AS SELECT</span> * <span class="kw">FROM</span> STREAM <span class="fn">read_files</span>(
+  <span class="str">'abfss://container@storage.dfs.core.windows.net/incoming/orders/'</span>,
+  format =&gt; <span class="str">'json'</span>,
+  schemaHints =&gt; <span class="str">'order_id INT, amount DECIMAL(10,2)'</span>
+)</pre>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>Schema inference</strong>: Auto Loader umí schéma odvodit sám a uložit do <code class="inline">schemaLocation</code>. U JSON a CSV inferuje defaultně vše jako string — automatické typy zapnete přes <code class="inline">cloudFiles.inferColumnTypes</code>, konkrétní sloupce vynutíte přes <code class="inline">cloudFiles.schemaHints</code>. Když se ve zdroji objeví nové sloupce, rozhoduje <code class="inline">cloudFiles.schemaEvolutionMode</code>:</p>
+
+  <table>
+    <tr><th>Mode</th><th>Chování</th></tr>
+    <tr><td><code class="inline">addNewColumns</code> (default bez schématu)</td><td>stream spadne, schéma se rozšíří, po restartu jede dál</td></tr>
+    <tr><td><code class="inline">rescue</code></td><td>schéma se nemění, nové sloupce padají do <code class="inline">_rescued_data</code>, stream nepadá</td></tr>
+    <tr><td><code class="inline">failOnNewColumns</code></td><td>stream spadne a nenaběhne, dokud schéma neupravíte</td></tr>
+    <tr><td><code class="inline">none</code> (default se schématem)</td><td>nové sloupce se ignorují</td></tr>
+    <tr><td><code class="inline">addNewColumnsWithTypeWidening</code></td><td>jako <code class="inline">addNewColumns</code> + rozšíření kompatibilních typů (INT → LONG)</td></tr>
+  </table>
+
+  <p>Sloupec <strong><code class="inline">_rescued_data</code></strong> je záchranná síť: zachytí data neodpovídající schématu (typové neshody, neočekávané sloupce), takže se nic tiše neztratí.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> stav ingestovaných souborů si můžete kdykoli vypsat: <code class="inline">SELECT * FROM cloud_files_state('/path/to/checkpoint')</code>. A přes skrytý sloupec <code class="inline">_metadata</code> získáte ke každému řádku <code class="inline">file_path</code>, <code class="inline">file_name</code> i <code class="inline">file_modification_time</code> — v bronze vrstvě velmi užitečné pro dohledatelnost původu.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Řízení propustnosti u velkých objemů<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Aby jedna mikrodávka nespolkla celý backlog, omezte ji: <code class="inline">cloudFiles.maxFilesPerTrigger</code> (např. 1000 souborů) nebo <code class="inline">cloudFiles.maxBytesPerTrigger</code> (např. 1g). Průběh sledujte přes metriky <code class="inline">numFilesOutstanding</code> a <code class="inline">numBytesOutstanding</code> ve streaming dashboardu. Schema location a checkpoint mohou být tentýž adresář, ale oddělení se vyplatí — můžete resetovat stream bez ztráty inferovaného schématu.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/7-ingest-data-auto-loader#handle-schema-inference-and-evolution" target="_blank" rel="noopener">Handle schema inference and evolution</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/7-ingest-data-auto-loader#monitor-and-optimize-auto-loader-streams" target="_blank" rel="noopener">Monitor and optimize Auto Loader streams</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-deklarativni-pipelines">
+  <div class="section-header">
+    <div class="section-num">7.7</div>
+    <h2>Deklarativní pipelines jako rámec nad ingestem</h2>
+  </div>
+  <p>Předchozí techniky jsou stavební kameny; <strong>deklarativní pipeline</strong> je rámec, který z nich složí celou pipeline. Deklarujete <em>co</em> chcete (tabulky a jejich zdroje v SQL nebo Pythonu) a framework řeší <em>jak</em>: pořadí spouštění, paralelismus, retry při selhání, checkpointy i inkrementální zpracování. Cílem ingestu je typicky <strong>streaming table</strong> — Delta tabulka s vestavěnou podporou streamingu a garancí exactly-once.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">from</span> pyspark <span class="kw">import</span> pipelines <span class="kw">as</span> dp
+
+<span class="cm"># streaming tabulka definovana dekoratorem; checkpointy resi pipeline</span>
+<span class="kw">@dp.table</span>
+<span class="kw">def</span> <span class="fn">orders_bronze</span>():
+    <span class="kw">return</span> (
+        spark.readStream.<span class="fn">format</span>(<span class="str">"cloudFiles"</span>)
+            .<span class="fn">option</span>(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
+            .<span class="fn">load</span>(<span class="str">"abfss://container@storage.dfs.core.windows.net/incoming/orders/"</span>)
+    )</pre>
+  </div>
+
+  <p>Kromě výchozího flow (vzniká automaticky s tabulkou) můžete definovat <strong>explicitní flows</strong> — třeba dva regionální zdroje tekoucí do jedné tabulky bez UNION. Nový zdroj pak přidáte novým flow, aniž byste sahali na existující nebo vyvolali full refresh:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">orders_us</span>;
+
+<span class="kw">CREATE FLOW</span> orders_west_flow
+<span class="kw">AS INSERT INTO</span> <span class="tbl">orders_us</span> BY NAME
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> STREAM(<span class="tbl">orders_west</span>);
+
+<span class="kw">CREATE FLOW</span> orders_east_flow
+<span class="kw">AS INSERT INTO</span> <span class="tbl">orders_us</span> BY NAME
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> STREAM(<span class="tbl">orders_east</span>);</pre>
+  </div>
+
+  <p>Pipelines umí číst i z message busů (<code class="inline">read_kafka</code>, Event Hubs přes Kafka rozhraní) a pro semi-strukturovaný JSON nabízejí <code class="inline">from_json</code> s automatickou inferencí a evolucí schématu (schéma <code class="inline">NULL</code> + <code class="inline">schemaLocationKey</code>). Monitoring poskytuje event log a DAG závislostí v Lakeflow Pipelines Editoru.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> jméno flow identifikuje streaming checkpoint. Přejmenujete-li flow, checkpoint se nepřenese a přejmenovaný flow začne zpracovávat od začátku jako nový. U velkých zdrojů to znamená kompletní re-ingest.</div></div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> Lakeflow Connect pro managed zdroje · notebook pro custom logiku · COPY INTO/CTAS pro SQL práci se soubory · AUTO CDC pro change feedy · Structured Streaming pro message busy · Auto Loader pro rostoucí adresáře souborů · deklarativní pipeline jako orchestrační rámec nad tím vším. Deklarativním pipelines se podrobně věnuje sekce 10.6.</div></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">7.8</div>
+    <h2>Lab 7: Ingest Data into Unity Catalog (45 minut)</h2>
+  </div>
+  <p>Ve fiktivní firmě <strong>Solaris Energy</strong> (solární farmy ve Španělsku a Německu, větrné turbíny v Nizozemsku a Dánsku) budujete centrální platformu pro měření výroby energie. Vytvoříte hierarchii katalog → schéma → volume, načtete CSV s odečty přes PySpark DataFrame, doplníte inkrementální load přes COPY INTO, souhrnnou tabulku přes CTAS a nakonec nastavíte Auto Loader s exactly-once sémantikou pro průběžně přibývající soubory.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/07-ingest-data-into-unity-catalog.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Proč COPY INTO nezpracuje stejný soubor dvakrát a co se stane, když ho spustíte opakovaně nad stejným adresářem? <strong>2)</strong> Jaký je rozdíl mezi CTAS a CREATE OR REPLACE TABLE z pohledu oprávnění a existující tabulky? <strong>3)</strong> Které dvě lokace Auto Loader potřebuje ke své práci a co se v každé z nich ukládá?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_06_datove_modelovani.html">← Datové modelování</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 7 z 16</span>
+      <a href="dp750_08_transformace.html" style="margin-left:auto">Čištění a transformace dat →</a>
+    </div>
+  </main>
+</div>
+
+<script>function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?'🙈 Skrýt nápovědu':'💡 Zobrazit nápovědu'})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent='✓ Zkopírováno';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopírovat';btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent='Ctrl+C';setTimeout(()=>{btn.textContent='Kopírovat'},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent='☰ Kapitoly'}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent='✕ Zavřít'}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-orig',m==='orig');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

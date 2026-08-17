@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Čištění, transformace a load dat — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+[data-view="orig"]{display:none}
+html.mode-orig [data-view="orig"]{display:revert}
+html.mode-orig [data-view="custom"]{display:none}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="orig")document.documentElement.className="mode-orig"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Čištění, transformace a load dat</span>
+  </div>
+  <div class="nav-links">
+    <button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_09_data_quality.html" class="next">Data quality constraints →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-profiling" class="toc-item active" data-section="sec-profiling">Profiling dat: nejdřív poznat, pak čistit</a>
+    <a href="#sec-datove-typy" class="toc-item" data-section="sec-datove-typy">Volba datových typů sloupců</a>
+    <a href="#sec-duplicity-null" class="toc-item" data-section="sec-duplicity-null">Řešení duplicit a NULL hodnot</a>
+    <a href="#sec-filtry-agregace" class="toc-item" data-section="sec-filtry-agregace">Transformace filtry a agregacemi</a>
+    <a href="#sec-joins-set" class="toc-item" data-section="sec-joins-set">Joins a set operátory</a>
+    <a href="#sec-denormalizace-pivoty" class="toc-item" data-section="sec-denormalizace-pivoty">Denormalizace a pivoty</a>
+    <a href="#sec-load-merge" class="toc-item" data-section="sec-load-merge">Load: INSERT, append a MERGE</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 8: Cleansing and Transforming Real Estate Data in Unity Catalog (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 8</div>
+      <h1>Čištění, transformace a load dat</h1>
+      <div class="hero-subtitle">Profiling, datové typy, duplicity a NULL, joins, denormalizace, pivoty a MERGE</div>
+      <div class="hero-meta"><span>🗂 Plnění dat do Unity Catalogu, ETL a Pipelines</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Profilovat data pomocí SQL příkazů, DataFrame API a data quality monitoringu v Unity Catalogu</li>
+    <li>Zvolit vhodné datové typy sloupců pro ceny, časová razítka a vnořené struktury</li>
+    <li>Identifikovat a vyřešit duplicity a NULL hodnoty v SQL i PySparku</li>
+    <li>Kombinovat datasety pomocí joinů, set operátorů a pivot/unpivot transformací</li>
+    <li>Načíst transformovaná data do cílových tabulek přes INSERT, MERGE a overwrite strategie</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-profiling">
+  <div class="section-header">
+    <div class="section-num">8.1</div>
+    <h2>Profiling dat: nejdřív poznat, pak čistit</h2>
+  </div>
+  <p>Cesta z bronze do silver vrstvy není jeden příkaz, ale sekvence kroků — a první z nich je <strong>profiling</strong>: zjistit, co v datech vlastně je, než začnete cokoliv měnit. Kolik je NULLů, jaké jsou rozsahy hodnot, kde jsou duplicity. Bez toho čistíte naslepo.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 240" role="img" aria-label="Tok čištění dat z bronze do silver vrstvy v pěti krocích: profiling, oprava datových typů, řešení duplicit a NULL hodnot, transformace pomocí filtrů, agregací a joinů, a nakonec load do silver tabulky přes MERGE nebo INSERT.">
+      <defs>
+        <marker id="arr8a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="20" y="80" width="100" height="80" rx="8" fill="#8b5a2b" opacity="0.85"/>
+      <text x="70" y="115" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">BRONZE</text>
+      <text x="70" y="135" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#fff" text-anchor="middle">surová data</text>
+
+      <rect x="150" y="80" width="120" height="80" rx="8" fill="#fff" stroke="#1a3a6b"/>
+      <text x="210" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">1. Profiling</text>
+      <text x="210" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">ANALYZE TABLE</text>
+      <text x="210" y="141" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">summarize, describe</text>
+
+      <rect x="300" y="80" width="120" height="80" rx="8" fill="#fff" stroke="#1a3a6b"/>
+      <text x="360" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">2. Typy</text>
+      <text x="360" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">CAST na DECIMAL,</text>
+      <text x="360" y="141" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">TIMESTAMP, DATE</text>
+
+      <rect x="450" y="80" width="120" height="80" rx="8" fill="#fff" stroke="#1a3a6b"/>
+      <text x="510" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">3. Dedup + NULL</text>
+      <text x="510" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">dropDuplicates,</text>
+      <text x="510" y="141" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">fillna, COALESCE</text>
+
+      <rect x="600" y="80" width="120" height="80" rx="8" fill="#fff" stroke="#1a3a6b"/>
+      <text x="660" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">4. Transformace</text>
+      <text x="660" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">filtr, agregace,</text>
+      <text x="660" y="141" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">join, pivot</text>
+
+      <rect x="700" y="185" width="100" height="45" rx="8" fill="#6b7280"/>
+      <text x="750" y="205" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">SILVER</text>
+      <text x="750" y="221" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#fff" text-anchor="middle">čistá data</text>
+
+      <line x1="120" y1="120" x2="150" y2="120" stroke="#6b7280" marker-end="url(#arr8a)"/>
+      <line x1="270" y1="120" x2="300" y2="120" stroke="#6b7280" marker-end="url(#arr8a)"/>
+      <line x1="420" y1="120" x2="450" y2="120" stroke="#6b7280" marker-end="url(#arr8a)"/>
+      <line x1="570" y1="120" x2="600" y2="120" stroke="#6b7280" marker-end="url(#arr8a)"/>
+      <line x1="680" y1="160" x2="735" y2="185" stroke="#e8721c" stroke-width="2" marker-end="url(#arr8a)"/>
+      <text x="640" y="180" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" font-weight="600">5. MERGE / INSERT</text>
+      <text x="410" y="40" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">Čištění a transformace: bronze → silver</text>
+    </svg>
+    <figcaption>Typický tok čištění dat: profiling odhalí problémy, kroky 2–4 je opraví a load přes MERGE nebo INSERT uloží výsledek do silver vrstvy.</figcaption>
+  </figure>
+
+  <p>Nejrychlejší nástroje máte přímo v SQL a DataFrame API. <code class="inline">ANALYZE TABLE</code> spočítá statistiky (počty řádků, min/max, počty NULLů, distinct counts) — mimochodem stejné statistiky, které používá query optimizer pro plánování dotazů:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- statistiky pro vsechny sloupce</span>
+<span class="kw">ANALYZE TABLE</span> <span class="tbl">sales.transactions</span> COMPUTE STATISTICS FOR ALL COLUMNS;
+
+<span class="cm">-- detail jednoho sloupce: min, max, pocet NULL, distinct count</span>
+<span class="kw">DESC EXTENDED</span> <span class="tbl">sales.transactions</span> <span class="col">amount</span>;</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre>df = spark.<span class="fn">table</span>(<span class="str">"sales.transactions"</span>)
+
+<span class="cm"># count, mean, stddev, min, max pro numericke sloupce</span>
+df.<span class="fn">describe</span>().<span class="fn">show</span>()
+
+<span class="cm"># interaktivni profil vsech sloupcu vcetne histogramu</span>
+dbutils.data.<span class="fn">summarize</span>(df)</pre>
+  </div>
+
+  <p>Utilita <code class="inline">dbutils.data.summarize</code> vykreslí interaktivní přehled distribucí, missing values a častých hodnot pro celý DataFrame — pro ad-hoc průzkum v notebooku je to nejrychlejší start.</p>
+
+  <p>Nad rámec příkazů nabízí Unity Catalog <strong>data quality monitoring</strong> se dvěma větvemi: <strong>anomaly detection</strong> (zapnete na úrovni schématu, automaticky hlídá freshness a completeness všech tabulek) a <strong>data profiling</strong> (hloubková per-table analýza distribucí, NULL procent a driftu, konfiguruje se pro jednotlivé tabulky přes záložku <em>Quality</em> v Catalog Exploreru nebo přes SDK). Profil generuje dvě metrické tabulky — profile metrics a drift metrics (KS test pro numerické, chi-kvadrát pro kategorické sloupce).</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> praktická dělba práce — anomaly detection jako plošný early-warning systém přes celé schéma, data profiling jen pro kritické tabulky, kde potřebujete historické trendy. U Unity Catalog managed tabulek navíc statistiky průběžně aktualizuje predictive optimization.</div></div>
+
+  <p>Na co se v profilu dívat: vysoká procenta NULL ve sloupcích, které mají být povinné; „unikátní" identifikátory, které unikátní nejsou; hodnoty mimo očekávané meze (záporné ceny); a změny distribucí v čase (data drift).</p>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/2-profile-data-summary-statistics#use-data-profiling-in-unity-catalog" target="_blank" rel="noopener">Use data profiling in Unity Catalog</a> · <a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/2-profile-data-summary-statistics#interpret-profiling-results" target="_blank" rel="noopener">Interpret profiling results</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-datove-typy">
+  <div class="section-header">
+    <div class="section-num">8.2</div>
+    <h2>Volba datových typů sloupců</h2>
+  </div>
+  <p>Špatný typ znamená ztrátu přesnosti, zbytečné úložiště nebo zablokované operace. Bronze vrstva často drží vše jako string — v silver je čas typy narovnat.</p>
+
+  <p>U celých čísel volte podle rozsahu hodnot: <code class="inline">TINYINT</code> (1 B, do 127) pro stavové kódy, <code class="inline">INT</code> (4 B) pro běžné identifikátory, <code class="inline">BIGINT</code> (8 B) pro velká ID. U desetinných čísel je rozhodnutí zásadnější:</p>
+
+  <table>
+    <tr><th>Typ</th><th>Charakter</th><th>Použití</th></tr>
+    <tr><td><code class="inline">DECIMAL(p,s)</code></td><td>exaktní přesnost (p číslic celkem, s za čárkou)</td><td><strong>finanční data, ceny</strong></td></tr>
+    <tr><td><code class="inline">DOUBLE</code> / <code class="inline">FLOAT</code></td><td>aproximace v binární reprezentaci</td><td>vědecké výpočty, senzory</td></tr>
+  </table>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> ceny nikdy do <code class="inline">DOUBLE</code>. Floating point ukládá hodnoty binárně a u desítkových čísel typu 0.1 zavádí zaokrouhlovací chyby — v účetnictví se pak nedopočítáte. <code class="inline">DECIMAL(10,2)</code> pokryje částky do 99 999 999,99 zcela přesně.</div></div>
+
+  <p>U časových údajů rozhoduje, zda potřebujete časovou zónu: <code class="inline">DATE</code> pro kalendářní data bez času, <code class="inline">TIMESTAMP</code> pro události napříč zónami (interně normalizuje do UTC a při čtení aplikuje session timezone) a <code class="inline">TIMESTAMP_NTZ</code>, když má čas zůstat přesně tak, jak byl zadán (např. lokální čas schůzky). Kdo čeká, že <code class="inline">TIMESTAMP</code> vrátí přesně to, co uložil, může být překvapen — s jinou session timezone uvidí jinou hodnotu téhož okamžiku.</p>
+
+  <p>Pro vnořená data slouží komplexní typy: <code class="inline">ARRAY&lt;STRING&gt;</code> (seznam hodnot stejného typu — tagy produktu), <code class="inline">MAP&lt;STRING, STRING&gt;</code> (dynamické klíč–hodnota páry) a <code class="inline">STRUCT</code> (pevná sada pojmenovaných polí — adresa). Šetří joiny, ale komplikují některé operace; rozhodujte podle dotazovacích vzorů.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- explicitni CAST hned pri loadu: chyby se projevi brzy, ne az v reportech</span>
+<span class="kw">INSERT INTO</span> <span class="tbl">silver.listings</span>
+<span class="kw">SELECT</span>
+    <span class="fn">CAST</span>(<span class="col">raw_id</span> <span class="kw">AS</span> INT) <span class="kw">AS</span> <span class="col">id</span>,
+    <span class="fn">CAST</span>(<span class="col">raw_price</span> <span class="kw">AS</span> DECIMAL(<span class="num">12</span>,<span class="num">2</span>)) <span class="kw">AS</span> <span class="col">price</span>,
+    <span class="fn">CAST</span>(<span class="col">raw_listed_at</span> <span class="kw">AS</span> TIMESTAMP) <span class="kw">AS</span> <span class="col">listed_at</span>
+<span class="kw">FROM</span> <span class="tbl">bronze.listings</span>;</pre>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> castujte explicitně a co nejdřív v pipeline. Implicitní konverze umí projít tiše i tam, kde se data ztrácejí. Explicitní <code class="inline">CAST</code> je zároveň dokumentace záměru — a typová chyba při loadu je levnější než špatné číslo v dashboardu.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/3-choose-appropriate-column-data-types#choose-temporal-types-correctly" target="_blank" rel="noopener">Choose temporal types correctly</a> · <a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/3-choose-appropriate-column-data-types#work-with-complex-types" target="_blank" rel="noopener">Work with complex types</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-duplicity-null">
+  <div class="section-header">
+    <div class="section-num">8.3</div>
+    <h2>Řešení duplicit a NULL hodnot</h2>
+  </div>
+  <p>Duplicity vznikají opakovaným ingestem, integračními chybami nebo souběžnými zápisy. Nejdřív je najděte — klasicky přes <code class="inline">GROUP BY ... HAVING COUNT(*) &gt; 1</code>, elegantněji přes <code class="inline">QUALIFY</code> s window funkcí, která vrátí rovnou celé duplicitní řádky:</p>
+
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-08-dup-sql"><span class="tab-icon">🗄️</span>SQL</button>
+      <button class="tab-btn" data-tab="tab-08-dup-py"><span class="tab-icon">🐍</span>Python</button>
+    </div>
+    <div class="tab-panel" id="tab-08-dup-sql">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm">-- najit duplicitni radky (vcetne vsech sloupcu)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tbl">sales.customers</span>
+QUALIFY <span class="fn">COUNT</span>(*) <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> <span class="col">customer_id</span>, <span class="col">email</span>) &gt; <span class="num">1</span>;
+
+<span class="cm">-- ponechat jen nejnovejsi verzi kazdeho zakaznika</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tbl">sales.customers</span>
+QUALIFY <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> <span class="col">customer_id</span> <span class="kw">ORDER BY</span> <span class="col">updated_at</span> <span class="kw">DESC</span>
+) = <span class="num">1</span>;</pre>
+      </div>
+    </div>
+    <div class="tab-panel" id="tab-08-dup-py">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm"># odstraneni duplicit podle klicovych sloupcu (necha prvni vyskyt)</span>
+df_clean = df.<span class="fn">dropDuplicates</span>([<span class="str">"customer_id"</span>, <span class="str">"email"</span>])
+
+<span class="cm"># uplna deduplicace pres vsechny sloupce</span>
+df_unique = df.<span class="fn">distinct</span>()
+
+<span class="cm"># zobrazit jen prebytecne duplicity: original minus deduplikovana verze</span>
+df_duplicates = df.<span class="fn">exceptAll</span>(df.<span class="fn">dropDuplicates</span>([<span class="str">"customer_id"</span>, <span class="str">"email"</span>]))</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> <code class="inline">dropDuplicates()</code> nechá „první" výskyt — ale který to je, není deterministické. Když záleží na tom, <em>která</em> verze přežije (typicky ta nejnovější), použijte vzor s <code class="inline">ROW_NUMBER() ... ORDER BY updated_at DESC</code>. Přesně tohle je rozdíl mezi „smazali jsme duplicity" a „nechali jsme si tu správnou".</div></div>
+
+  <p><strong>NULL hodnoty</strong> reprezentují chybějící data a strategie závisí na kontextu: NULLy v povinných polích (identifikátory) → řádek zahodit; NULLy v numerických polích pro agregace → doplnit nulou či průměrem; NULLy v nepovinných kategoriích → placeholder „Unknown".</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># zahodit radky s NULL v klicovych sloupcich</span>
+df_clean = df.<span class="fn">dropna</span>(subset=[<span class="str">"customer_id"</span>, <span class="str">"amount"</span>])
+
+<span class="cm"># doplnit ruzne defaulty pro ruzne sloupce</span>
+df_filled = df.<span class="fn">fillna</span>({
+    <span class="str">"amount"</span>: <span class="num">0</span>,
+    <span class="str">"status"</span>: <span class="str">"Unknown"</span>,
+    <span class="str">"quantity"</span>: <span class="num">1</span>
+})</pre>
+  </div>
+
+  <p>V SQL zajistí totéž <code class="inline">COALESCE(amount, 0)</code>. A jedna zrada navíc: v Pythonu nefiltrujte NULLy přes <code class="inline">!= None</code> — NULL porovnání v SQL sémantice nevrací true/false, ale zase NULL. Vždy <code class="inline">isNull()</code> / <code class="inline">isNotNull()</code>, v SQL <code class="inline">IS [NOT] NULL</code>.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">exceptAll vs. except — v čem je rozdíl<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><code class="inline">exceptAll()</code> je množinový rozdíl, který <em>zachovává násobnost</em>: pokud je záznam v originálu třikrát a v deduplikované verzi jednou, vrátí přesně dva přebytečné výskyty. Obyčejný <code class="inline">except()</code> by vrátil distinct výsledek — o počtech duplicit byste přišli. Proto se pro audit duplicit („kolik řádků deduplicace reálně odstraní?") hodí právě <code class="inline">exceptAll</code>.</p>
+      <p>Dokumentujte, co jste s NULLy a duplicitami udělali — budoucí analytik musí vědět, proč v datech vidí „Unknown" a kam zmizely řádky.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/4-resolve-duplicate-missing-null-values#remove-duplicate-records" target="_blank" rel="noopener">Remove duplicate records</a> · <a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/4-resolve-duplicate-missing-null-values#handle-null-and-missing-values" target="_blank" rel="noopener">Handle null and missing values</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-filtry-agregace">
+  <div class="section-header">
+    <div class="section-num">8.4</div>
+    <h2>Transformace filtry a agregacemi</h2>
+  </div>
+  <p>Filtrování, seskupování a agregace jsou základní trojice tvarování dat. V PySparku jsou <code class="inline">filter()</code> a <code class="inline">where()</code> identické metody; podmínky se skládají operátory <code class="inline">&amp;</code> a <code class="inline">|</code> — každou podmínku do závorek:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, count, sum, avg, max
+
+<span class="cm"># retezeni: filtr, seskupeni, agregace, razeni v jedne pipeline</span>
+df_result = (
+    df_order
+    .<span class="fn">filter</span>((<span class="fn">col</span>(<span class="str">"o_orderstatus"</span>) == <span class="str">"F"</span>) &amp; (<span class="fn">col</span>(<span class="str">"o_totalprice"</span>) &gt; <span class="num">50000</span>))
+    .<span class="fn">groupBy</span>(<span class="str">"o_orderpriority"</span>)
+    .<span class="fn">agg</span>(
+        <span class="fn">count</span>(<span class="str">"o_orderkey"</span>).<span class="fn">alias</span>(<span class="str">"n_orders"</span>),
+        <span class="fn">sum</span>(<span class="str">"o_totalprice"</span>).<span class="fn">alias</span>(<span class="str">"total_revenue"</span>),
+        <span class="fn">avg</span>(<span class="str">"o_totalprice"</span>).<span class="fn">alias</span>(<span class="str">"avg_order_value"</span>)
+    )
+    .<span class="fn">sort</span>(<span class="fn">col</span>(<span class="str">"n_orders"</span>).<span class="fn">desc</span>())
+)
+<span class="fn">display</span>(df_result)</pre>
+  </div>
+
+  <p>Díky lazy evaluation se celý řetězec vyhodnotí až při akci (<code class="inline">display()</code>, <code class="inline">show()</code>) a Spark si předtím celou sekvenci zoptimalizuje. SQL ekvivalent je klasika — <code class="inline">WHERE</code> pro řádky, <code class="inline">GROUP BY</code> pro skupiny, <code class="inline">HAVING</code> pro filtrování až po agregaci:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">SELECT</span> <span class="col">id</span>, <span class="fn">SUM</span>(<span class="col">quantity</span>) <span class="kw">AS</span> <span class="col">total_quantity</span>
+<span class="kw">FROM</span> <span class="tbl">dealer</span>
+<span class="kw">GROUP BY</span> <span class="col">id</span>
+<span class="kw">HAVING</span> <span class="fn">SUM</span>(<span class="col">quantity</span>) &gt; <span class="num">20</span>
+<span class="kw">ORDER BY</span> <span class="col">total_quantity</span> <span class="kw">DESC</span>;</pre>
+  </div>
+
+  <p>Pravidlo z <code class="inline">GROUP BY</code>: každý sloupec v <code class="inline">SELECT</code> musí být buď v <code class="inline">GROUP BY</code>, nebo obalený agregační funkcí. Běžné agregace: <code class="inline">count()</code>, <code class="inline">sum()</code>, <code class="inline">avg()</code>, <code class="inline">min()</code>, <code class="inline">max()</code>.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> filtry dávejte co nejdřív v řetězci — každá další operace pak zpracovává méně dat. Spark leccos přeuspořádá sám (predicate pushdown), ale čitelnosti a výkonu pomůžete, když pipeline logicky teče od redukce k agregaci.</div></div>
+</div>
+
+<div class="section" id="sec-joins-set">
+  <div class="section-header">
+    <div class="section-num">8.5</div>
+    <h2>Joins a set operátory</h2>
+  </div>
+  <p>Dvě rodiny kombinování datasetů: <strong>joiny</strong> spojují tabulky <em>horizontálně</em> (přidávají sloupce podle klíče), <strong>set operátory</strong> <em>vertikálně</em> (skládají řádky dotazů se stejným schématem).</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 400" role="img" aria-label="Vizualizace typů joinů pomocí překrývajících se kruhů: INNER vrací jen průnik, LEFT celou levou tabulku, FULL obě tabulky, ANTI jen levé řádky bez shody. Dole set operátory: UNION skládá řádky obou dotazů, INTERSECT vrací společné řádky, EXCEPT řádky prvního dotazu bez řádků druhého.">
+      <text x="410" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">JOINY — kombinace sloupců podle klíče</text>
+      <g>
+        <circle cx="80" cy="90" r="38" fill="none" stroke="#1a3a6b" stroke-width="1.5"/>
+        <circle cx="130" cy="90" r="38" fill="none" stroke="#e8721c" stroke-width="1.5"/>
+        <path d="M105,61 A38,38 0 0,1 105,119 A38,38 0 0,1 105,61 Z" fill="#e8721c" opacity="0.5"/>
+        <text x="105" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">INNER</text>
+        <text x="105" y="168" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">jen shody</text>
+      </g>
+      <g>
+        <circle cx="280" cy="90" r="38" fill="#1a3a6b" opacity="0.45"/>
+        <circle cx="330" cy="90" r="38" fill="none" stroke="#e8721c" stroke-width="1.5"/>
+        <path d="M305,61 A38,38 0 0,1 305,119 A38,38 0 0,1 305,61 Z" fill="#e8721c" opacity="0.5"/>
+        <text x="305" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">LEFT</text>
+        <text x="305" y="168" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">celá levá + NULLy</text>
+      </g>
+      <g>
+        <circle cx="480" cy="90" r="38" fill="#1a3a6b" opacity="0.45"/>
+        <circle cx="530" cy="90" r="38" fill="#e8721c" opacity="0.45"/>
+        <text x="505" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">FULL</text>
+        <text x="505" y="168" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">vše z obou stran</text>
+      </g>
+      <g>
+        <circle cx="680" cy="90" r="38" fill="#1a3a6b" opacity="0.45"/>
+        <circle cx="730" cy="90" r="38" fill="none" stroke="#e8721c" stroke-width="1.5"/>
+        <path d="M705,61 A38,38 0 0,1 705,119 A38,38 0 0,1 705,61 Z" fill="#fff"/>
+        <path d="M705,61 A38,38 0 0,1 705,119 A38,38 0 0,1 705,61 Z" fill="none" stroke="#1a3a6b" stroke-width="1"/>
+        <text x="705" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">ANTI</text>
+        <text x="705" y="168" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">levá bez shody</text>
+      </g>
+
+      <text x="410" y="215" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">SET OPERÁTORY — skládání řádků stejného schématu</text>
+      <g>
+        <rect x="90" y="240" width="120" height="34" rx="6" fill="#1a3a6b" opacity="0.45"/>
+        <rect x="90" y="280" width="120" height="34" rx="6" fill="#e8721c" opacity="0.45"/>
+        <text x="150" y="262" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">dotaz A</text>
+        <text x="150" y="302" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">dotaz B</text>
+        <text x="150" y="340" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">UNION [ALL]</text>
+        <text x="150" y="356" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">A + B (bez/s duplicitami)</text>
+      </g>
+      <g>
+        <rect x="350" y="240" width="120" height="34" rx="6" fill="#1a3a6b" opacity="0.25"/>
+        <rect x="350" y="280" width="120" height="34" rx="6" fill="#e8721c" opacity="0.25"/>
+        <rect x="380" y="260" width="60" height="34" rx="6" fill="#22c55e" opacity="0.7"/>
+        <text x="410" y="340" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">INTERSECT</text>
+        <text x="410" y="356" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">jen společné řádky</text>
+      </g>
+      <g>
+        <rect x="610" y="240" width="120" height="34" rx="6" fill="#1a3a6b" opacity="0.45"/>
+        <rect x="610" y="280" width="120" height="34" rx="6" fill="#e8721c" opacity="0.25"/>
+        <line x1="610" y1="297" x2="730" y2="297" stroke="#ef4444" stroke-width="2"/>
+        <text x="670" y="340" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">EXCEPT / MINUS</text>
+        <text x="670" y="356" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">A minus řádky z B</text>
+      </g>
+    </svg>
+    <figcaption>Joiny kombinují tabulky horizontálně podle klíče (zvýrazněná oblast = výsledek), set operátory pracují vertikálně nad celými výsledky dotazů.</figcaption>
+  </figure>
+
+  <table>
+    <tr><th>Join</th><th>Vrací</th><th>Typický případ</th></tr>
+    <tr><td><code class="inline">INNER</code></td><td>jen shodné řádky obou tabulek</td><td>objednávky s platným zákazníkem</td></tr>
+    <tr><td><code class="inline">LEFT</code></td><td>celou levou; NULL kde není shoda</td><td>všichni zákazníci, i bez objednávek</td></tr>
+    <tr><td><code class="inline">FULL</code></td><td>vše z obou; NULL na obou stranách</td><td>hledání děr na obou stranách</td></tr>
+    <tr><td><code class="inline">SEMI</code></td><td>levé řádky <em>se</em> shodou (bez sloupců pravé)</td><td>zákazníci, kteří objednali</td></tr>
+    <tr><td><code class="inline">ANTI</code></td><td>levé řádky <em>bez</em> shody</td><td>zákazníci, kteří nikdy neobjednali</td></tr>
+    <tr><td><code class="inline">CROSS</code></td><td>kartézský součin</td><td>generování všech kombinací</td></tr>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># left join; spolecny nazev klice jako string = bez duplicitniho sloupce</span>
+df_left = df_employee.<span class="fn">join</span>(df_department, on=<span class="str">"deptno"</span>, how=<span class="str">"left"</span>)
+
+<span class="cm"># anti join: zamestnanci bez existujiciho oddeleni (data quality check)</span>
+df_anti = df_employee.<span class="fn">join</span>(df_department, on=<span class="str">"deptno"</span>, how=<span class="str">"anti"</span>)</pre>
+  </div>
+
+  <p>Set operátory: <code class="inline">UNION</code> defaultně odstraňuje duplicity, <code class="inline">UNION ALL</code> je nechává (a je rychlejší — přeskočí deduplikaci). <code class="inline">INTERSECT</code> vrací společné řádky, <code class="inline">EXCEPT</code> (synonymum <code class="inline">MINUS</code>) řádky prvního dotazu bez druhého.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> PySpark metoda <code class="inline">union()</code> se chová jako SQL <code class="inline">UNION ALL</code> — duplicity <em>nechává</em>. Kdo čeká SQL sémantiku, musí doplnit <code class="inline">.distinct()</code>. A při řetězení set operací má <code class="inline">INTERSECT</code> vyšší prioritu než <code class="inline">UNION</code> a <code class="inline">EXCEPT</code> — závorky nejsou okrasa.</div></div>
+</div>
+
+<div class="section" id="sec-denormalizace-pivoty">
+  <div class="section-header">
+    <div class="section-num">8.6</div>
+    <h2>Denormalizace a pivoty</h2>
+  </div>
+  <p><strong>Denormalizace</strong> zplošťuje normalizované tabulky do širších celků: dimenze se předjoinují do faktové tabulky, takže dotazy na ni už žádné joiny nepotřebují. Typicky se dělá při stavbě gold vrstvy a datových martů — cena je vyšší úložiště a nutnost refreshovat při změně zdrojů.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> denormalizujte v gold vrstvě, kde vládne rychlost dotazů; v bronze a silver držte normalizované struktury kvůli flexibilitě. Viz medallion architektura v úvodních kapitolách.</div></div>
+
+  <p><strong>PIVOT</strong> otáčí unikátní hodnoty sloupce do samostatných sloupců („long" → „wide") — ideální pro křížové reporty. Vyžaduje agregační funkci, protože víc zdrojových řádků může mířit do téže buňky:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- kvartaly z radku do sloupcu</span>
+<span class="kw">SELECT</span> <span class="col">year</span>, <span class="col">region</span>, <span class="col">Q1</span>, <span class="col">Q2</span>, <span class="col">Q3</span>, <span class="col">Q4</span>
+<span class="kw">FROM</span> <span class="tbl">quarterly_sales</span>
+PIVOT (
+  <span class="fn">SUM</span>(<span class="col">revenue</span>)
+  <span class="kw">FOR</span> <span class="col">quarter</span> <span class="kw">IN</span> (<span class="num">1</span> <span class="kw">AS</span> Q1, <span class="num">2</span> <span class="kw">AS</span> Q2, <span class="num">3</span> <span class="kw">AS</span> Q3, <span class="num">4</span> <span class="kw">AS</span> Q4)
+);</pre>
+  </div>
+
+  <p>Výsledek: každý region má kvartální tržby vedle sebe v jednom řádku. V jednom pivotu lze použít i víc agregací najednou (<code class="inline">SUM(revenue) AS total, AVG(revenue) AS avg</code>) — vzniknou sloupce Q1_total, Q1_avg atd.</p>
+
+  <p><strong>UNPIVOT</strong> je opačný směr („wide" → „long"): měsíční sloupce se přetočí do párů název–hodnota, což je formát vhodný pro agregace a ML pipelines:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tbl">regional_targets</span>
+UNPIVOT (
+  <span class="col">target_amount</span> <span class="kw">FOR</span> <span class="col">month</span> <span class="kw">IN</span> (<span class="col">jan</span>, <span class="col">feb</span>, <span class="col">mar</span>, <span class="col">apr</span>)
+);</pre>
+  </div>
+
+  <p>Z každého měsíčního sloupce vznikne řádek s hodnotou <code class="inline">target_amount</code> a názvem měsíce ve sloupci <code class="inline">month</code>. NULL hodnoty se defaultně vynechávají — pokud je chcete, přidejte <code class="inline">UNPIVOT INCLUDE NULLS</code>. Sloupcům lze dát aliasy (<code class="inline">jan AS `January`</code>).</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Kdy který tvar dat<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Dlouhý (long) formát je přátelský k agregacím, window funkcím a strojovému učení — jeden fakt na řádek. Široký (wide) formát je přátelský k lidem — srovnání vedle sebe v reportu. V praxi pipeline často unpivotuje zdrojová „excelová" data do dlouhého formátu, transformuje je, a na konci pivotuje výsledek pro prezentaci. <code class="inline">UNPIVOT</code> klauzule vyžaduje Databricks Runtime 12.2 LTS+ — na aktuálních runtimech to není omezení, ale u starých clusterů to ověřte.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/7-transform-data-flatten-pivot-unpivot#understand-denormalization" target="_blank" rel="noopener">Understand denormalization</a> · <a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/7-transform-data-flatten-pivot-unpivot#choose-the-right-transformation" target="_blank" rel="noopener">Choose the right transformation</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-load-merge">
+  <div class="section-header">
+    <div class="section-num">8.7</div>
+    <h2>Load: INSERT, append a MERGE</h2>
+  </div>
+  <p>Poslední krok pipeline: dostat vyčištěná data do cílové tabulky. Volba strategie závisí na vztahu nových dat k existujícím:</p>
+
+  <table>
+    <tr><th>Scénář</th><th>Operace</th></tr>
+    <tr><td>jen nové záznamy (denní logy, event streamy)</td><td><code class="inline">INSERT INTO</code> / <code class="inline">mode("append")</code></td></tr>
+    <tr><td>full refresh (číselníky, agregace)</td><td><code class="inline">INSERT OVERWRITE</code> / <code class="inline">mode("overwrite")</code></td></tr>
+    <tr><td>mix updatů a insertů (CDC, dimenze)</td><td><code class="inline">MERGE INTO</code></td></tr>
+    <tr><td>selektivní náhrada podle podmínky</td><td><code class="inline">REPLACE WHERE</code> / <code class="inline">REPLACE USING</code></td></tr>
+  </table>
+
+  <p><strong>MERGE INTO</strong> je nejuniverzálnější: spáruje zdrojové řádky s cílovými podle klíče v <code class="inline">ON</code> a pro každou větev (matched / not matched) definuje akci — proto se mu říká <strong>upsert</strong>:</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Mechanismus příkazu MERGE. Zdrojová tabulka se páruje s cílovou podle klíče v podmínce ON. Shodné řádky jdou do větve WHEN MATCHED s akcí UPDATE nebo DELETE, neshodné do větve WHEN NOT MATCHED s akcí INSERT. Výsledkem je aktualizovaná cílová Delta tabulka.">
+      <defs>
+        <marker id="arr8b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="20" y="60" width="150" height="60" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="95" y="85" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">source</text>
+      <text x="95" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">customer_updates</text>
+      <rect x="20" y="170" width="150" height="60" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="95" y="195" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">target</text>
+      <text x="95" y="213" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">customers (Delta)</text>
+
+      <path d="M310,105 L400,145 L310,185 L220,145 Z" fill="#fff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="310" y="140" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="600" fill="#1a3a6b" text-anchor="middle">shoda klíče?</text>
+      <text x="310" y="156" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">ON target.id = source.id</text>
+
+      <line x1="170" y1="90" x2="250" y2="125" stroke="#6b7280" marker-end="url(#arr8b)"/>
+      <line x1="170" y1="200" x2="250" y2="168" stroke="#6b7280" marker-end="url(#arr8b)"/>
+
+      <rect x="470" y="55" width="200" height="70" rx="8" fill="#fff" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="570" y="80" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="700" fill="#22c55e" text-anchor="middle">WHEN MATCHED</text>
+      <text x="570" y="99" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">UPDATE SET … / DELETE</text>
+      <text x="570" y="115" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">volitelně s podmínkou AND</text>
+
+      <rect x="470" y="175" width="200" height="70" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="570" y="200" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="700" fill="#e8721c" text-anchor="middle">WHEN NOT MATCHED</text>
+      <text x="570" y="219" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">INSERT (…) VALUES (…)</text>
+      <text x="570" y="235" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">nebo INSERT *</text>
+
+      <line x1="400" y1="130" x2="470" y2="95" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arr8b)"/>
+      <text x="435" y="100" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e" font-weight="600">ano</text>
+      <line x1="400" y1="160" x2="470" y2="205" stroke="#e8721c" stroke-width="1.5" marker-end="url(#arr8b)"/>
+      <text x="435" y="200" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" font-weight="600">ne</text>
+
+      <rect x="720" y="115" width="80" height="70" rx="8" fill="#1a3a6b"/>
+      <text x="760" y="145" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">target</text>
+      <text x="760" y="162" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">po upsertu</text>
+      <line x1="670" y1="90" x2="720" y2="135" stroke="#6b7280" marker-end="url(#arr8b)"/>
+      <line x1="670" y1="210" x2="720" y2="165" stroke="#6b7280" marker-end="url(#arr8b)"/>
+      <text x="410" y="30" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">MERGE INTO — jedna transakce, dvě větve</text>
+    </svg>
+    <figcaption>MERGE páruje zdroj s cílem podle klíče: shodné řádky projdou větví WHEN MATCHED (UPDATE/DELETE), nové větví WHEN NOT MATCHED (INSERT) — vše v jedné atomické operaci.</figcaption>
+  </figure>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">MERGE INTO</span> <span class="tbl">customers</span> <span class="kw">AS</span> target
+<span class="kw">USING</span> <span class="tbl">customer_updates</span> <span class="kw">AS</span> source
+<span class="kw">ON</span> target.<span class="col">customer_id</span> = source.<span class="col">customer_id</span>
+<span class="kw">WHEN MATCHED AND</span> source.<span class="col">price</span> &lt;&gt; target.<span class="col">price</span> <span class="kw">THEN</span>
+    <span class="kw">UPDATE SET</span> target.<span class="col">price</span> = source.<span class="col">price</span>,
+               target.<span class="col">updated_at</span> = <span class="fn">current_timestamp</span>()
+<span class="kw">WHEN MATCHED AND</span> source.<span class="col">discontinued</span> = <span class="kw">true</span> <span class="kw">THEN</span>
+    <span class="kw">DELETE</span>
+<span class="kw">WHEN NOT MATCHED THEN</span>
+    <span class="kw">INSERT</span> *;</pre>
+  </div>
+
+  <p>V PySparku poskytuje totéž Delta Lake API — <code class="inline">DeltaTable.forName(...).merge(...)</code> s metodami <code class="inline">whenMatchedUpdateAll()</code> a <code class="inline">whenNotMatchedInsertAll()</code> pro případ shodných schémat.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> MERGE vyžaduje <em>unikátní</em> shodu — pokud na jeden cílový řádek míří víc zdrojových řádků, operace selže. Zdroj proto před mergem deduplikujte (sekce 8.3). A stejně tak: <code class="inline">INSERT INTO</code> duplicity nekontroluje — stejný batch načtený dvakrát znamená dvojnásobné řádky.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Selektivní overwrite: REPLACE WHERE a REPLACE USING<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Mezi „append" a „přepsat vše" existuje střední cesta. <code class="inline">INSERT INTO ... REPLACE WHERE podmínka</code> atomicky smaže řádky odpovídající podmínce a vloží nové — ideální pro opravu konkrétního časového okna. Novější <code class="inline">REPLACE USING (sloupce)</code> nahradí jen ty „partition" hodnot, kterých se příchozí data dotýkají, a podle dokumentace funguje na všech typech compute včetně SQL warehouse a serverless; dokumentace ho doporučuje před klasickým <code class="inline">INSERT OVERWRITE PARTITION</code> s <code class="inline">partitionOverwriteMode=dynamic</code>, který je omezen na classic compute. Varianty <code class="inline">REPLACE ON</code> a přesné požadavky na runtime verze se vyvíjejí — aktuální stav ověřte v dokumentaci.</p>
+    </div>
+  </div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> profiling → typy → dedup/NULL → transformace → load. Append pro nové záznamy, overwrite pro full refresh, MERGE pro upserty, REPLACE WHERE/USING pro chirurgické zásahy. Tenhle řetězec je jádro každé bronze→silver pipeline — v deklarativních pipelines ho pak jen zabalíte do spravovaného rámce (viz kapitola 7).</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/8-load-data-merge-insert-append#replace-data-with-insert-overwrite" target="_blank" rel="noopener">Replace data with INSERT OVERWRITE</a> · <a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/8-load-data-merge-insert-append#choose-the-right-loading-strategy" target="_blank" rel="noopener">Choose the right loading strategy</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">8.8</div>
+    <h2>Lab 8: Cleansing and Transforming Real Estate Data in Unity Catalog (45 minut)</h2>
+  </div>
+  <p>Realitní kancelář <strong>Pristine Properties</strong> působící ve velkých nizozemských městech nasbírala inzeráty nemovitostí z poboček a satelitních databází — s nepřesnými cenami, duplicitními inzeráty, NULLy v klíčových polích a statistikami trhu v širokém formátu. Vaším úkolem je data zprofilovat, narovnat datové typy cen a timestampů, vyřešit duplicity a chybějící hodnoty v PySparku, spojit inzeráty s makléři a prodeji přes inner/left joiny a přetvarovat statistiky pomocí SQL PIVOT/UNPIVOT.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/08-cleanse-transform-load-data-into-unity-catalog.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/cleanse-transform-load-data-into-unity-catalog/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Proč pro ceny nemovitostí použijete DECIMAL a ne DOUBLE, a co rozhoduje mezi TIMESTAMP a TIMESTAMP_NTZ? <strong>2)</strong> Jak zajistíte, že po deduplikaci přežije právě nejnovější verze inzerátu? <strong>3)</strong> Kdy sáhnete po LEFT JOIN místo INNER JOIN při spojování inzerátů s prodeji — a co udělá UNPIVOT se statistikami trhu v širokém formátu?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_07_ingest.html">← Ingest dat</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 8 z 16</span>
+      <a href="dp750_09_data_quality.html" style="margin-left:auto">Data quality constraints →</a>
+    </div>
+  </main>
+</div>
+
+<script>function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?'🙈 Skrýt nápovědu':'💡 Zobrazit nápovědu'})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent='✓ Zkopírováno';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopírovat';btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent='Ctrl+C';setTimeout(()=>{btn.textContent='Kopírovat'},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent='☰ Kapitoly'}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent='✕ Zavřít'}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-orig',m==='orig');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>
