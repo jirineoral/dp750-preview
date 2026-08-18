@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Select and configure compute — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Select and configure compute</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="../dp750_02_compute.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_03_objekty_unity_catalog.html" class="next">Objects in Unity Catalog →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-volba-compute" class="toc-item active" data-section="sec-volba-compute">Choosing the right compute type</a>
+    <a href="#sec-konfigurace-vykonu" class="toc-item" data-section="sec-konfigurace-vykonu">Configuring performance: VMs, workers, autoscaling</a>
+    <a href="#sec-funkce-compute" class="toc-item" data-section="sec-funkce-compute">Compute features: Photon, policies, pools, auto-termination</a>
+    <a href="#sec-knihovny" class="toc-item" data-section="sec-knihovny">Installing libraries</a>
+    <a href="#sec-pristup" class="toc-item" data-section="sec-pristup">Access control for compute</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 2: Select and Configure Compute in Azure Databricks (30 minutes)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Chapter 2</div>
+      <h1>Select and configure compute</h1>
+      <div class="hero-subtitle">Compute types, performance tuning, cluster features, libraries, and access control</div>
+      <div class="hero-meta"><span>🗂 Selecting and configuring compute</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Chapter objectives</h3>
+  <ul>
+    <li>Choose the right compute type for a given workload (serverless vs. classic, all-purpose vs. job, SQL warehouse).</li>
+    <li>Configure cluster performance: VM types, worker count, autoscaling, Photon, and spot instances.</li>
+    <li>Use compute features: policies, instance pools, and automatic termination.</li>
+    <li>Install libraries cluster-scoped as well as notebook-scoped from various sources.</li>
+    <li>Set up access control for compute: access modes, permission levels, and entitlements.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-volba-compute">
+  <div class="section-header">
+    <div class="section-num">2.1</div>
+    <h2>Choosing the right compute type</h2>
+  </div>
+  <p>The choice of compute type directly determines cost, performance, and operational complexity. There are two basic axes. <strong>Serverless compute</strong> is fully managed by Databricks (it runs in their subscription, starts in a matter of seconds, and scales automatically), while <strong>classic compute</strong> is configured by you and runs in your Azure subscription (start-up typically in minutes, full control over VMs, networking, and the runtime version).</p>
+  <p>The second axis is purpose: <strong>all-purpose compute</strong> serves interactive development in notebooks and is shared by the team; <strong>job compute</strong> is created for an automated job run and terminates itself when it finishes — no idle cost; a <strong>SQL warehouse</strong> is compute optimized purely for SQL queries and BI.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 420" role="img" aria-label="A decision tree for choosing compute: the workload type branches into SQL and BI queries leading to a serverless SQL warehouse, interactive development leading through a question about RDDs, R, GPUs, or custom networking either to classic compute in dedicated access mode or to serverless notebooks, and automated jobs leading through a question about custom configuration and spot instances either to classic job compute or to serverless jobs.">
+      <defs>
+        <marker id="arr4" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="320" y="15" width="180" height="45" rx="8" fill="#1a3a6b"/>
+      <text x="410" y="42" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#ffffff">Which workload?</text>
+      <line x1="360" y1="60" x2="150" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <line x1="410" y1="60" x2="410" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <line x1="460" y1="60" x2="670" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <rect x="55" y="110" width="190" height="42" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="150" y="136" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" fill="#1a3a6b">SQL queries / BI</text>
+      <rect x="315" y="110" width="190" height="42" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="410" y="129" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" fill="#1a3a6b">interactive development</text>
+      <text x="410" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">(notebooks)</text>
+      <rect x="575" y="110" width="190" height="42" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="670" y="136" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" fill="#1a3a6b">automated job</text>
+      <line x1="150" y1="152" x2="150" y2="335" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <line x1="410" y1="152" x2="410" y2="195" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <line x1="670" y1="152" x2="670" y2="195" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <rect x="300" y="200" width="220" height="58" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="223" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">Do you need the RDD API, R,</text>
+      <text x="410" y="241" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">GPUs, or custom networking?</text>
+      <rect x="560" y="200" width="220" height="58" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="670" y="223" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">Custom configuration,</text>
+      <text x="670" y="241" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">spot instances, JARs?</text>
+      <line x1="340" y1="258" x2="290" y2="335" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <text x="295" y="295" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">yes</text>
+      <line x1="470" y1="258" x2="500" y2="335" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <text x="497" y="295" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">no</text>
+      <line x1="620" y1="258" x2="600" y2="335" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <text x="590" y="295" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">yes</text>
+      <line x1="720" y1="258" x2="740" y2="335" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <text x="742" y="295" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">no</text>
+      <rect x="55" y="340" width="180" height="58" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="145" y="363" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#15803d">Serverless</text>
+      <text x="145" y="382" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#15803d">SQL warehouse</text>
+      <rect x="245" y="340" width="160" height="58" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="325" y="363" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Classic —</text>
+      <text x="325" y="382" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">dedicated mode</text>
+      <rect x="415" y="340" width="160" height="58" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="495" y="363" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#15803d">Serverless</text>
+      <text x="495" y="382" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#15803d">notebooks</text>
+      <rect x="585" y="340" width="130" height="58" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="650" y="363" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Classic</text>
+      <text x="650" y="382" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">job compute</text>
+      <rect x="725" y="340" width="90" height="58" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="770" y="363" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#15803d">Serverless</text>
+      <text x="770" y="382" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#15803d">jobs</text>
+    </svg>
+    <figcaption>A decision tree for choosing compute: start with the workload type; reach for classic compute only once you hit a specific limit of serverless (RDDs, R, GPUs, custom networking or configuration).</figcaption>
+  </figure>
+
+  <p>A comparison of the main options in a nutshell:</p>
+  <table>
+    <tr><th>Compute type</th><th>Start-up</th><th>Management</th><th>Suitable for</th><th>Main limitation</th></tr>
+    <tr><td>Serverless (notebooks, jobs)</td><td>seconds</td><td>minimal</td><td>development, ETL, BI</td><td>in notebooks, no Scala, R, RDD API, or JAR libraries</td></tr>
+    <tr><td>Classic — standard mode</td><td>minutes</td><td>medium</td><td>shared team cluster</td><td>requires Unity Catalog</td></tr>
+    <tr><td>Classic — dedicated mode</td><td>minutes</td><td>medium</td><td>RDDs, GPUs, R, custom containers</td><td>a single user/group</td></tr>
+    <tr><td>SQL warehouse serverless</td><td>seconds</td><td>minimal</td><td>BI dashboards, SQL analytics</td><td>SQL workloads only</td></tr>
+    <tr><td>SQL warehouse pro / classic</td><td>minutes</td><td>medium</td><td>custom networking / basic SQL</td><td>slower scaling</td></tr>
+    <tr><td>Instance pools</td><td>faster than starting a new cluster</td><td>higher</td><td>frequent classic cluster starts</td><td>you pay for idle VMs</td></tr>
+  </table>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> serverless <strong>in notebooks</strong> does not support <strong>Scala</strong>, <strong>R</strong>, <strong>JAR libraries</strong>, or the <strong>RDD API</strong>, and it restricts custom Spark configuration. The limitation applies to notebooks, though — <strong>JAR tasks in Lakeflow Jobs are supported on serverless</strong> (in public preview according to the documentation; verify the state in the docs). Anyone who needs Scala or R interactively, the RDD API, or JAR libraries in a notebook goes to classic compute in dedicated access mode.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Serverless performance modes: speed vs. cost<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Serverless for jobs and pipelines offers two modes. <strong>Performance-optimized</strong> (the default) keeps a pool of pre-warmed resources — start-up in seconds, suitable for latency-sensitive workloads. <strong>Standard mode</strong> typically starts in 4–6 minutes but, according to the documentation, can reduce DBU consumption by up to 70 % — ideal for scheduled nightly batches where start-up time does not matter. You switch it with the <code class="inline">Performance optimized</code> toggle in the job detail; for notebooks only performance-optimized is available, and standard mode does not work for continuous pipelines or <code class="inline">runs/submit</code>.</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> on classic job compute, <strong>spot instances</strong> (Azure Spot VMs) save a great deal — surplus Azure capacity discounted often by up to 90 %. Azure can take them back with a 30-second warning; Spark, however, survives the loss of a worker by rescheduling the tasks. Details in section 2.2.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/2-choose-appropriate-compute-type#compare-compute-types" target="_blank" rel="noopener">Compare compute types</a> · <a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/2-choose-appropriate-compute-type#choose-a-serverless-performance-mode" target="_blank" rel="noopener">Choose a serverless performance mode</a></span></div>
+</div>
+
+<div class="section" id="sec-konfigurace-vykonu">
+  <div class="section-header">
+    <div class="section-num">2.2</div>
+    <h2>Configuring performance: VMs, workers, autoscaling</h2>
+  </div>
+  <p>The performance of a classic cluster is determined by three components: the <strong>total number of cores</strong> (maximum parallelism — 8 workers × 4 cores = 32 concurrent tasks), the <strong>total memory</strong> (how much data joins and aggregations can handle in RAM before <strong>spilling</strong> to disk begins), and the <strong>local storage</strong> (scratch space for shuffle operations and caching).</p>
+  <p>You choose the VM family according to the nature of the workload:</p>
+  <table>
+    <tr><th>VM family</th><th>Optimized for</th><th>When to use</th></tr>
+    <tr><td><strong>E-series</strong></td><td>memory</td><td>large joins, aggregations, in-memory analytics</td></tr>
+    <tr><td><strong>F-series</strong></td><td>CPU</td><td>compute-intensive transformations with a small memory footprint</td></tr>
+    <tr><td><strong>L-series</strong></td><td>storage (NVMe)</td><td>repeated reads of the same data, intensive caching</td></tr>
+    <tr><td><strong>NC/ND-series</strong></td><td>GPU</td><td>deep learning, model training (requires Runtime ML)</td></tr>
+  </table>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="A cluster architecture with autoscaling: a driver node on an on-demand VM coordinates four worker nodes. The first two workers represent the minimum, the other two are outlined with a dashed border and are added or removed by autoscaling up to the configured maximum. Workers can run on spot instances, the driver always on on-demand.">
+      <defs>
+        <marker id="arr5" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="40" y="90" width="170" height="110" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="125" y="120" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Driver node</text>
+      <text x="125" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">coordinates execution</text>
+      <text x="125" y="165" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">schedules tasks</text>
+      <text x="125" y="188" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#e8721c">always an on-demand VM</text>
+      <line x1="210" y1="130" x2="280" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5)"/>
+      <line x1="210" y1="145" x2="280" y2="145" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5)"/>
+      <line x1="210" y1="160" x2="280" y2="185" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5)"/>
+      <line x1="210" y1="170" x2="280" y2="225" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arr5)"/>
+      <rect x="285" y="80" width="150" height="50" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="360" y="102" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Worker 1</text>
+      <text x="360" y="120" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">task execution</text>
+      <rect x="285" y="140" width="150" height="50" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="360" y="162" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Worker 2</text>
+      <text x="360" y="180" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">task execution</text>
+      <rect x="285" y="200" width="150" height="50" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="2" stroke-dasharray="6,4"/>
+      <text x="360" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#6b7280">Worker 3…N</text>
+      <text x="360" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">added by autoscaling</text>
+      <path d="M455,80 L470,80 L470,250 L455,250" fill="none" stroke="#e8721c" stroke-width="2"/>
+      <text x="485" y="110" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">autoscaling</text>
+      <text x="485" y="132" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">min. 2 → max. N workers</text>
+      <text x="485" y="154" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">optimized: scale-up in 2 steps,</text>
+      <text x="485" y="172" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">scale-down by shuffle state</text>
+      <text x="485" y="200" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">utilization check: job compute 40 s,</text>
+      <text x="485" y="218" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">all-purpose 150 s</text>
+      <text x="485" y="246" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#15803d">workers can be spot instances</text>
+    </svg>
+    <figcaption>A cluster consists of a driver (coordination, always an on-demand VM) and workers (execution). Autoscaling keeps the worker count between the configured minimum and maximum according to the current load.</figcaption>
+  </figure>
+
+  <p>At the same total capacity you can choose <strong>fewer larger</strong> workers (less network traffic during shuffles — better for analytical workloads with joins) or <strong>more smaller</strong> ones (higher parallelism — cheaper for simple batch processing). You enable <strong>autoscaling</strong> by entering a min/max worker count; Databricks uses <strong>optimized autoscaling</strong>, which scales up in two steps and can scale down even on a non-idle cluster based on the state of the shuffle files.</p>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> autoscaling pays off with variable load (data exploration, ad-hoc analysis). For predictable steady-state workloads, a fixed worker count gives more stable performance and simpler capacity planning.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> use spot instances <strong>only for workers, never for the driver</strong> — when Azure reclaims the driver, the whole cluster goes down. To soften the impact, enable <strong>decommissioning</strong>: after receiving the preemption notice, a worker still manages to move shuffle and cache data to healthy nodes.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Flexible node types — insurance against a stockout<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>When Azure runs out of capacity for the chosen VM type in a region, the cluster fails with the error <code class="inline">CLOUD_PROVIDER_RESOURCE_STOCKOUT</code>. <strong>Flexible node types</strong> automatically reach for a compatible alternative (the same vCPU count, memory in the 100–110 % range, the same architecture and disk configuration). A workspace admin enables it with the <code class="inline">Enable auto flexible node types</code> toggle in the Compute admin settings; for a specific cluster it can be disabled through the Clusters API by setting <code class="inline">alternate_node_type_ids</code> to an empty list. It is especially valuable with spot instances — it tries several types before falling back to on-demand.</p>
+    </div>
+  </div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> look for bottlenecks in the <strong>Spark UI</strong> — the Jobs Timeline shows long stages, and the stage detail then shows <code class="inline">Shuffle Spill (Memory)</code> and <code class="inline">Shuffle Spill (Disk)</code>. Frequent spilling = too little memory, so reach for E-series or larger nodes. A later chapter is devoted to monitoring.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/3-configure-compute-performance#configure-autoscaling" target="_blank" rel="noopener">Configure autoscaling</a> · <a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/3-configure-compute-performance#balance-cost-and-performance" target="_blank" rel="noopener">Balance cost and performance</a></span></div>
+</div>
+
+<div class="section" id="sec-funkce-compute">
+  <div class="section-header">
+    <div class="section-num">2.3</div>
+    <h2>Compute features: Photon, policies, pools, auto-termination</h2>
+  </div>
+  <p><strong>Photon</strong> is a native execution engine that replaces parts of Spark with optimized C++ code. It speeds up joins, aggregations, and scans of wide tables the most; on Runtime 9.1 LTS+ it is enabled by default. For small jobs finishing in under two seconds it may not pay off (Photon has a higher DBU rate) and <strong>it is not supported on GPU clusters at all</strong> — turn it off for ML on GPUs.</p>
+  <p>Choose the <strong>Databricks Runtime</strong> according to purpose: for interactive development the newest version is fine, for production jobs use <strong>LTS</strong> versions (longer support, proven stability). The Spark version is tied to the runtime — upgrading the runtime means upgrading Spark, so test it in a dev environment first in production. For ML, choose <strong>Databricks Runtime ML</strong> with preinstalled libraries and GPU drivers (CUDA).</p>
+  <p><strong>Auto-termination</strong> shuts a cluster down after a given period of inactivity — the configuration stays and the cluster can be started again at any time. For interactive work a sensible timeout is around 15–45 minutes depending on the team's working habits; job clusters terminate automatically once the job finishes.</p>
+  <p><strong>Instance pools</strong> keep a set of pre-allocated idle VMs: a cluster from a pool starts in under a minute because the VMs are already running. You configure the minimum idle instances (how many clusters typically run concurrently), the maximum capacity (a fair split of the quota between teams), and the pool's idle auto-termination; pre-warming a specific runtime version on the instances speeds start-up up further. You pay for the VMs in the idle state (not DBUs), so a pool only pays off with frequent starts — in the serverless era it is more of a tool for classic-only scenarios.</p>
+  <p><strong>Compute policies</strong> restrict what users are allowed to configure: an admin uses them to enforce allowed VM types, a maximum cluster size, an LTS runtime, or mandatory auto-termination. Databricks ships predefined policies (e.g. <code class="inline">Personal Compute</code>, <code class="inline">Shared Compute</code>, <code class="inline">Job Compute</code> — the last one enforcing an LTS runtime and production defaults); a custom policy is JSON with rules:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">JSON</span><button class="copy-btn">Copy</button></div>
+    <pre>{
+  <span class="str">"spark_version"</span>: { <span class="str">"type"</span>: <span class="str">"regex"</span>, <span class="str">"pattern"</span>: <span class="str">".*-lts.*"</span> },
+  <span class="str">"node_type_id"</span>: { <span class="str">"type"</span>: <span class="str">"allowlist"</span>,
+                     <span class="str">"values"</span>: [<span class="str">"Standard_E4ds_v5"</span>, <span class="str">"Standard_E8ds_v5"</span>] },
+  <span class="str">"autotermination_minutes"</span>: { <span class="str">"type"</span>: <span class="str">"range"</span>,
+                                <span class="str">"maxValue"</span>: <span class="num">60</span>, <span class="str">"defaultValue"</span>: <span class="num">30</span> },
+  <span class="str">"autoscale.max_workers"</span>: { <span class="str">"type"</span>: <span class="str">"range"</span>, <span class="str">"maxValue"</span>: <span class="num">8</span> }
+}</pre>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> the policy sample is illustrative — verify the complete syntax of attributes and virtual fields in the Databricks documentation (Compute policies).</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> Photon = faster queries (default, not on GPUs) · LTS runtime = production stability · auto-termination = no forgotten running clusters · pools = fast start-up for classic clusters · policies = guardrails and cost control for the whole workspace.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/4-configure-compute-feature-settings#enable-photon-acceleration" target="_blank" rel="noopener">Enable Photon acceleration</a> · <a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/4-configure-compute-feature-settings#select-databricks-runtime-and-spark-version" target="_blank" rel="noopener">Select Databricks Runtime and Spark version</a></span></div>
+</div>
+
+<div class="section" id="sec-knihovny">
+  <div class="section-header">
+    <div class="section-num">2.4</div>
+    <h2>Installing libraries</h2>
+  </div>
+  <p>The runtime contains hundreds of preinstalled packages, but sooner or later you need something extra. The crucial thing is the difference between two installation scopes:</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 290" role="img" aria-label="Two library installation scopes: on the left cluster-scoped — the faker library installed on the cluster is available to all three attached notebooks and is reinstalled on every cluster restart. On the right notebook-scoped — a pip install command in one notebook creates an isolated environment valid only for that session, and the other notebooks do not see it.">
+      <defs>
+        <marker id="arr6" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <text x="200" y="30" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Cluster-scoped</text>
+      <rect x="60" y="45" width="280" height="70" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="200" y="72" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Cluster (Libraries tab)</text>
+      <text x="200" y="95" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">faker==40.8.0 · mssql-jdbc.jar</text>
+      <line x1="120" y1="115" x2="105" y2="165" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr6)"/>
+      <line x1="200" y1="115" x2="200" y2="165" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr6)"/>
+      <line x1="280" y1="115" x2="295" y2="165" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr6)"/>
+      <rect x="60" y="170" width="85" height="45" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="102" y="196" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">notebook A</text>
+      <rect x="158" y="170" width="85" height="45" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="200" y="196" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">notebook B</text>
+      <rect x="256" y="170" width="85" height="45" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="298" y="196" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">job task</text>
+      <text x="200" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#15803d">shared by all · survives a cluster restart</text>
+      <text x="200" y="265" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">requires CAN MANAGE on the cluster</text>
+      <line x1="410" y1="45" x2="410" y2="265" stroke="#e2e8f0" stroke-width="2"/>
+      <text x="615" y="30" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#e8721c">Notebook-scoped</text>
+      <rect x="480" y="45" width="270" height="70" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="615" y="72" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">notebook C</text>
+      <text x="615" y="95" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">%pip install faker==40.8.0</text>
+      <line x1="615" y1="115" x2="615" y2="165" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr6)"/>
+      <rect x="505" y="170" width="220" height="45" rx="8" fill="#e8f0fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="615" y="190" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">isolated Python environment</text>
+      <text x="615" y="206" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">for this session only</text>
+      <text x="615" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#15803d">does not affect other notebooks</text>
+      <text x="615" y="265" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">disappears when the session ends</text>
+    </svg>
+    <figcaption>A cluster-scoped library applies to every notebook and job on the cluster and is reinstalled at each start; a notebook-scoped installation through %pip lives only within that session.</figcaption>
+  </figure>
+
+  <p>You install <strong>compute-scoped (cluster-scoped) libraries</strong> on the <code class="inline">Libraries</code> tab of the given cluster (this requires the <code class="inline">CAN MANAGE</code> permission). They support Python wheels, Java JARs, and R packages, and are reinstalled automatically at every cluster start — a consistent environment for the whole team. The downside: you resolve version conflicts on behalf of everyone; when two teams need different versions of the same library, they have to move to separate clusters or to notebook-scoped installation.</p>
+  <p>You install <strong>notebook-scoped libraries</strong> directly in the notebook and they apply only to the current session:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># notebook-scoped install — applies to this session only</span>
+%pip install faker==<span class="num">40.8.0</span>
+
+<span class="cm"># the Python interpreter restarts after the install</span>
+dbutils.library.<span class="fn">restartPython</span>()</pre>
+  </div>
+
+  <p>Package sources: public repositories (<strong>PyPI</strong> for Python, <strong>Maven</strong> for Java/Scala with the coordinates <code class="inline">groupId:artifactId:version</code>, <strong>CRAN</strong> for R), or files — <strong>workspace files</strong> (a 500 MB limit) and <strong>Unity Catalog volumes</strong> (full governance: access through UC permissions, audit log). Since Runtime 15.0 you can also install from <code class="inline">requirements.txt</code>. A path then looks like <code class="inline">/Volumes/main/engineering/libraries/mypackage-1.0.0-py3-none-any.whl</code> — the installing identity needs <code class="inline">READ VOLUME</code>.</p>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> on clusters with <strong>standard access mode</strong>, Maven coordinates, JAR files, and init scripts all require approval in an <strong>allowlist</strong> by the metastore admin (Catalog Explorer → metastore settings → Allowed JARs/Init Scripts). The allowlist works by prefix — <code class="inline">/Volumes/prod-libraries/</code> allows the whole directory; do not forget the trailing slash, otherwise it will also match unintended prefixes.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> in production always pin versions (<code class="inline">pymssql==2.3.9</code>). Without a version you install "latest" and one day your pipeline will fail on someone else's breaking change. The exception: CRAN always pulls the latest version — pin R packages by storing the file in a volume.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Init scripts — when (not) to reach for the shell<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><strong>Init scripts</strong> run at cluster start before the Spark driver launches — they are useful for system-level things libraries cannot solve: <code class="inline">apt-get install</code> of system packages, environment variables, monitoring agents. For installing ordinary libraries Databricks <em>does not recommend</em> them — cluster-scoped libraries are more manageable. Store the script in a UC volume (Runtime 13.3 LTS+), for example <code class="inline">/Volumes/main/engineering/scripts/setup.sh</code>; a non-zero exit code from any script stops the cluster start. Treat them as a last resort — environment variables and Spark configuration are often handled more elegantly by a compute policy.</p>
+    </div>
+  </div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/5-install-libraries-for-compute#configure-libraries-for-standard-access-mode" target="_blank" rel="noopener">Configure libraries for standard access mode</a> · <a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/5-install-libraries-for-compute#choose-the-right-installation-method" target="_blank" rel="noopener">Choose the right installation method</a></span></div>
+</div>
+
+<div class="section" id="sec-pristup">
+  <div class="section-header">
+    <div class="section-num">2.5</div>
+    <h2>Access control for compute</h2>
+  </div>
+  <p>Access to compute is managed in the workspace UI (not in the Azure portal) and has two levels: the cluster's <strong>access mode</strong> (who may work on it and how isolated they are) and the <strong>permission levels</strong> (what a specific user may do with a given cluster).</p>
+  <p>The <strong>access mode</strong> is set to <code class="inline">Auto</code> by default in the UI: it picks <strong>Standard</strong> unless you select an ML runtime or a runtime below 14.3 — then the choice automatically falls to <strong>Dedicated</strong>. <strong>Standard access mode</strong> (formerly shared) allows a cluster to be safely shared by several users — code isolation between users is provided by <strong>Lakeguard</strong>. <strong>Dedicated access mode</strong> (formerly single-user) assigns the cluster to a single user <em>or group</em> and grants full machine privileges — necessary for the RDD API, R, GPU workloads, and custom containers.</p>
+  <table>
+    <tr><th>Permission level</th><th>What it allows</th><th>Typical holder</th></tr>
+    <tr><td><code class="inline">NO PERMISSIONS</code></td><td>the cluster is not visible</td><td>the default state</td></tr>
+    <tr><td><code class="inline">CAN ATTACH TO</code></td><td>attach a notebook, see the Spark UI and metrics</td><td>analyst</td></tr>
+    <tr><td><code class="inline">CAN RESTART</code></td><td>+ start, stop, restart</td><td>senior engineer, team lead</td></tr>
+    <tr><td><code class="inline">CAN MANAGE</code></td><td>+ edit configuration, libraries, resize, permissions</td><td>cluster owner, admin</td></tr>
+  </table>
+  <p>You set permissions through <code class="inline">Compute</code> → the cluster menu → <code class="inline">Permissions</code>; changes take effect immediately without a restart. The creator of a cluster is its owner with <code class="inline">CAN MANAGE</code>, and workspace admins have <code class="inline">CAN MANAGE</code> everywhere automatically. Alongside this there are <strong>workspace-level entitlements</strong> — for example <strong>unrestricted cluster creation</strong> lets a non-admin create clusters with no size limits (without promoting them to admin); for ordinary users, assign a compute policy instead.</p>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> avoid the legacy <strong>No isolation shared</strong> mode entirely — on it, users with nothing more than <code class="inline">CAN ATTACH TO</code> can see service account keys in log4j files. Migrate existing clusters in this mode to standard or dedicated.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> by default only <code class="inline">CAN MANAGE</code> sees the driver logs — stdout/stderr may contain secrets. The behavior is controlled by the Spark configuration <code class="inline">spark.databricks.acl.needAdminPermissionToViewLogs</code>; think carefully before loosening it, and always keep secrets in secret scopes rather than in code.</div></div>
+  <p><strong>Dedicated group access</strong> (Unity Catalog + Runtime 15.4+) makes it possible to assign a cluster to a whole group: each member's permissions are automatically narrowed to the group's permissions on attach (no privilege escalation) and objects created on the cluster are owned by the group, not by an individual. Create a workspace folder for the group (for example <code class="inline">/Workspace/Groups/&lt;groupName&gt;</code>) with <code class="inline">CAN MANAGE</code> for notebooks and experiments.</p>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> grant permissions to <strong>groups</strong> rather than individuals, and stick to the principle of least privilege: analyst = <code class="inline">CAN ATTACH TO</code>, availability owner = <code class="inline">CAN RESTART</code>, <code class="inline">CAN MANAGE</code> for owners only. Audit access regularly through the <code class="inline">system.access.audit</code> table.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/6-configure-compute-access-perms#dedicated-group-access-mode" target="_blank" rel="noopener">Dedicated group access mode</a> · <a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/6-configure-compute-access-perms#best-practices-for-compute-access" target="_blank" rel="noopener">Best practices for compute access</a></span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">2.6</div>
+    <h2>Lab 2: Select and Configure Compute in Azure Databricks (30 minutes)</h2>
+  </div>
+  <p>For the healthcare organization <strong>HealthBridge Analytics</strong> you will create the all-purpose cluster <code class="inline">healthbridge-dev</code> (LTS runtime, memory-optimized workers, autoscaling 1–3, auto-termination 15 minutes, Photon), install the cluster-scoped library <code class="inline">faker==40.8.0</code>, compare it with a notebook-scoped install through <code class="inline">%pip</code>, and generate synthetic patient data combining faker and PySpark.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/02-select-and-configure-compute.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/select-and-configure-compute/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
+  <p>A taste from the notebook — synthetic patients with no risk of leaking real data:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">from</span> faker <span class="kw">import</span> Faker
+
+fake = <span class="fn">Faker</span>()
+<span class="cm"># generate synthetic patients</span>
+patients = [(fake.<span class="fn">name</span>(), fake.<span class="fn">date_of_birth</span>(minimum_age=<span class="num">18</span>, maximum_age=<span class="num">90</span>),
+             fake.<span class="fn">city</span>()) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1000</span>)]
+
+df = spark.<span class="fn">createDataFrame</span>(patients, [<span class="str">"name"</span>, <span class="str">"date_of_birth"</span>, <span class="str">"city"</span>])
+<span class="fn">display</span>(df)</pre>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> Why did you choose memory-optimized (E-series) VMs for the workers when the cluster is meant to join patient data with lab results? <strong>2)</strong> What happens to the cluster-scoped faker library after a cluster restart — and what happens to the notebook-scoped install after the session ends? <strong>3)</strong> Which access mode would you choose if five engineers shared the cluster, and which one for training a GPU model in R?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_01_explore_databricks.html">← Explore Azure Databricks</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 2 of 16</span>
+      <a href="dp750_03_objekty_unity_catalog.html" style="margin-left:auto">Objects in Unity Catalog →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Implement Lakeflow Jobs — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Implement Lakeflow Jobs</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="../dp750_11_lakeflow_jobs.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_12_dev_lifecycle.html" class="next">Development lifecycle →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-anatomie-jobu" class="toc-item active" data-section="sec-anatomie-jobu">Anatomy of a Lakeflow Job: tasks, code sources, compute</a>
+    <a href="#sec-zavislosti-parametry" class="toc-item" data-section="sec-zavislosti-parametry">Task dependencies and job parameters</a>
+    <a href="#sec-triggery" class="toc-item" data-section="sec-triggery">Triggers: scheduled, file arrival, table update, continuous</a>
+    <a href="#sec-planovani" class="toc-item" data-section="sec-planovani">Scheduling: cron, time zones, concurrent runs</a>
+    <a href="#sec-alerty" class="toc-item" data-section="sec-alerty">Alerts and notifications</a>
+    <a href="#sec-retry" class="toc-item" data-section="sec-retry">Automatic restarts and retry policy</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 11: Implement Lakeflow Jobs (45 minutes)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Chapter 11</div>
+      <h1>Implement Lakeflow Jobs</h1>
+      <div class="hero-subtitle">Job configuration, triggers, scheduling, alerts, and automatic retries</div>
+      <div class="hero-meta"><span>🗂 Automation</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Chapter objectives</h3>
+  <ul>
+    <li>Create and configure a Lakeflow Job with tasks, dependencies, and suitable compute</li>
+    <li>Set up job triggers — scheduled, file arrival, table update, and continuous</li>
+    <li>Schedule a job with a cron expression and choose the time zone and concurrent-run behavior correctly</li>
+    <li>Configure alerts and notifications without risking alert fatigue</li>
+    <li>Set up a retry policy and automatic restarts for reliable operation</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-anatomie-jobu">
+  <div class="section-header">
+    <div class="section-num">11.1</div>
+    <h2>Anatomy of a Lakeflow Job: tasks, code sources, compute</h2>
+  </div>
+
+  <p><strong>Lakeflow Jobs</strong> is the orchestrator built directly into Azure Databricks. A job consists of one or more <strong>tasks</strong> arranged into a <strong>DAG</strong> (Directed Acyclic Graph) — the graph determines the order and the parallelism. A minimal job needs three things: a task with the logic, compute for the task to run on, and a unique name.</p>
+
+  <p>You create a job in the UI through <code class="inline">Jobs &amp; Pipelines</code> → <code class="inline">Create</code> → <code class="inline">Job</code>. Every task has a type that determines what gets configured and where it runs:</p>
+
+  <table>
+    <tr><th>Task type</th><th>Key configuration</th><th>Compute</th></tr>
+    <tr><td>Notebook</td><td>notebook path, parameters</td><td>serverless, classic jobs, all-purpose</td></tr>
+    <tr><td>Python script / wheel</td><td>path, CLI arguments / entry point</td><td>serverless, classic jobs, all-purpose</td></tr>
+    <tr><td>SQL</td><td>a query or a file</td><td>serverless / pro SQL warehouse</td></tr>
+    <tr><td>Pipeline</td><td>selection of an existing pipeline</td><td>pipeline compute</td></tr>
+    <tr><td>dbt</td><td>dbt project, profiles</td><td>serverless / classic jobs</td></tr>
+    <tr><td>JAR</td><td>main class, parameters</td><td>serverless, classic jobs</td></tr>
+    <tr><td>Spark Submit</td><td>the legacy JAR variant</td><td>classic jobs compute only</td></tr>
+    <tr><td>Run Job</td><td>a reference to another job</td><td>as per the referenced job</td></tr>
+  </table>
+
+  <p>On top of that there are the control tasks <code class="inline">If/else</code> and <code class="inline">For each</code> for branching and iteration within a job. Task code can live in three places: in the <strong>workspace</strong> (quick start, development), in a <strong>Git repository</strong> (the job takes a snapshot of a specific commit at run time — all the job's tasks share the same Git reference), or in a <strong>volume/cloud storage</strong> (for Python scripts through an <code class="inline">abfss://</code> URI).</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> use Git as the source for production jobs. The job then runs against a defined commit, not against whatever someone happens to have half-finished in the workspace. "It works in my notebook" stops being an argument.</div></div>
+
+  <p>For compute, the default choice today is <strong>serverless compute</strong> — Databricks manages the infrastructure, you configure nothing, and it scales automatically. You pick <strong>classic jobs compute</strong> when you need control over the Spark version, the instance types, or libraries serverless does not support. When several tasks share the same cluster, the cluster lives until all of them finish — you save start-up time between tasks but also pay for any idle periods.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> a job runs with the permissions of its <strong>run identity</strong> — the job owner, or a configured <strong>service principal</strong> — never with the permissions of the user who started the run. If the run identity lacks the necessary Unity Catalog permissions, the job fails at run time with an authorization error even though the configuration is otherwise valid.</div></div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- permissions for the service principal the job will run as</span>
+<span class="kw">GRANT</span> <span class="kw">SELECT</span>, <span class="kw">MODIFY</span> <span class="kw">ON TABLE</span> <span class="tbl">telconnect.silver.cdr_clean</span> <span class="kw">TO</span> <span class="str">`sp-cdr-pipeline`</span>;
+<span class="kw">GRANT</span> <span class="kw">USE SCHEMA</span> <span class="kw">ON SCHEMA</span> <span class="tbl">telconnect.silver</span> <span class="kw">TO</span> <span class="str">`sp-cdr-pipeline`</span>;</pre>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Job permission levels<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Job permissions are independent of compute permissions and come in four levels: <code class="inline">CAN VIEW</code> (sees the configuration and run history), <code class="inline">CAN MANAGE RUN</code> (also starts and cancels runs), <code class="inline">IS OWNER</code> (the default identity for Run as), <code class="inline">CAN MANAGE</code> (full editing including schedules and permissions). Each level includes the rights of those below it. The job creator and admins automatically have <code class="inline">CAN MANAGE</code>. A practical pattern: the pipeline team <code class="inline">CAN MANAGE</code>, operators <code class="inline">CAN MANAGE RUN</code>, stakeholders <code class="inline">CAN VIEW</code>.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/2-create-lakeflow-job#configure-task-sources" target="_blank" rel="noopener">Configure task sources</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/2-create-lakeflow-job#configure-run-identity-and-unity-catalog-access" target="_blank" rel="noopener">Configure run identity and Unity Catalog access</a></span></div>
+</div>
+
+<div class="section" id="sec-zavislosti-parametry">
+  <div class="section-header">
+    <div class="section-num">11.2</div>
+    <h2>Task dependencies and job parameters</h2>
+  </div>
+
+  <p>You define dependencies on a task with the <code class="inline">Depends on</code> field — that is what creates the DAG. Every edge also carries a <strong>Run if</strong> condition saying when the downstream task runs at all:</p>
+
+  <table>
+    <tr><th>Run if condition</th><th>The task runs when…</th></tr>
+    <tr><td><strong>All succeeded</strong></td><td>all upstream tasks succeeded (the default)</td></tr>
+    <tr><td><strong>At least one succeeded</strong></td><td>at least one upstream task succeeded</td></tr>
+    <tr><td><strong>None failed</strong></td><td>none failed (some may have been skipped)</td></tr>
+    <tr><td><strong>All done</strong></td><td>all have finished — regardless of the outcome</td></tr>
+    <tr><td><strong>At least one failed</strong></td><td>at least one upstream task failed</td></tr>
+    <tr><td><strong>All failed</strong></td><td>all of them failed</td></tr>
+  </table>
+
+  <p>Anyone assuming the conditions are only for the "happy path" misses the most useful patterns: <code class="inline">All done</code> for cleanup tasks that must always run, and <code class="inline">At least one failed</code> for an error-handling branch (writing into an incident table, compensating logic).</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="The DAG of a Lakeflow Job for a CDR pipeline. The ingest_cdrs task is followed by clean_cdrs, from which aggregate_usage and detect_fraud run in parallel; both lead into publish_gold with the All succeeded condition and into the cleanup_tmp task with the All done condition.">
+      <defs>
+        <marker id="arr11a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+        <marker id="arr11ao" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <rect x="0" y="0" width="820" height="300" fill="#ffffff"/>
+      <text x="410" y="26" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Job "TelConnect CDR Pipeline" — the task DAG</text>
+      <!-- ingest -->
+      <rect x="20" y="120" width="140" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="90" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">ingest_cdrs</text>
+      <text x="90" y="162" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Notebook · serverless</text>
+      <!-- clean -->
+      <rect x="220" y="120" width="140" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="290" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">clean_cdrs</text>
+      <text x="290" y="162" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Notebook · serverless</text>
+      <!-- parallel -->
+      <rect x="420" y="52" width="160" height="56" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="500" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">aggregate_usage</text>
+      <text x="500" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">SQL · warehouse</text>
+      <rect x="420" y="188" width="160" height="56" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="500" y="212" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">detect_fraud</text>
+      <text x="500" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Python · classic</text>
+      <!-- publish -->
+      <rect x="650" y="52" width="150" height="56" rx="8" fill="#e8f0fb" stroke="#22c55e" stroke-width="2"/>
+      <text x="725" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">publish_gold</text>
+      <text x="725" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">Run if: All succeeded</text>
+      <!-- cleanup -->
+      <rect x="650" y="188" width="150" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2" stroke-dasharray="5 3"/>
+      <text x="725" y="212" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">cleanup_tmp</text>
+      <text x="725" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">Run if: All done</text>
+      <!-- edges -->
+      <line x1="160" y1="148" x2="216" y2="148" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="360" y1="136" x2="416" y2="90" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="360" y1="160" x2="416" y2="206" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="580" y1="80" x2="646" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="580" y1="216" x2="646" y2="106" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11a)"/>
+      <line x1="580" y1="96" x2="646" y2="200" stroke="#e8721c" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr11ao)"/>
+      <line x1="580" y1="228" x2="646" y2="228" stroke="#e8721c" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr11ao)"/>
+      <text x="410" y="286" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">solid arrow = All succeeded · dashed = All done (cleanup runs even after a failure)</text>
+    </svg>
+    <figcaption>A job DAG with parallel tasks and Run if conditions — publishing requires both branches to succeed, cleanup always runs.</figcaption>
+  </figure>
+
+  <p><strong>Job parameters</strong> are defined at job level as key-value pairs and are automatically available to every task. Notebooks read them through widgets, Python scripts receive them as command-line arguments. In parameter values you can use <strong>dynamic value references</strong> — values filled in only at run time:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># the notebook reads a job parameter through a widget</span>
+processing_date = dbutils.widgets.<span class="fn">get</span>(<span class="str">"processing_date"</span>)
+
+<span class="cm"># a parameter value in the job configuration can be dynamic:</span>
+<span class="cm">#   {{job.trigger.time.iso_date}}                          -&gt; the run date</span>
+<span class="cm">#   {{job.trigger.table_update.updated_tables}}            -&gt; which tables changed</span>
+<span class="cm">#   {{job.trigger.table_update.&lt;cat.sch.tbl&gt;.version}}     -&gt; the Delta table version</span></pre>
+  </div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> <strong>tags</strong> (labels or key-value pairs) help filter jobs by team, project, or environment and propagate to job clusters as well — useful for cost attribution.</div></div>
+</div>
+
+<div class="section" id="sec-triggery">
+  <div class="section-header">
+    <div class="section-num">11.3</div>
+    <h2>Triggers: scheduled, file arrival, table update, continuous</h2>
+  </div>
+
+  <p>The trigger determines <em>when</em> a job runs. Besides a time schedule (see section 11.4), Lakeflow Jobs offers <strong>event-based triggers</strong> that react to data rather than to the clock. You add a trigger in <code class="inline">Job details</code> → <code class="inline">Schedules &amp; Triggers</code> → <code class="inline">Add trigger</code>.</p>
+
+  <p>A <strong>file arrival trigger</strong> watches a path in a Unity Catalog external location or volume (including subdirectories, recursively) and starts the job when a <em>new</em> file appears. The check runs best-effort roughly every minute. Overwriting an existing file with the same name does not trigger a run — so design your file deliveries with unique names.</p>
+
+  <p>A <strong>table update trigger</strong> watches one or more Unity Catalog tables (managed Delta/Iceberg, external Delta, streaming tables, materialized views, and views over them) and reacts to inserts, updates, merges, and deletes. With several tables you choose between <code class="inline">Any table is updated</code> (a quick reaction) and <code class="inline">All tables are updated</code> (waiting until all the sources are current).</p>
+
+  <p>Both types share two handy options against "trigger storms": <code class="inline">Minimum time between triggers</code> (a protective pause after a run finishes) and <code class="inline">Wait after last change</code> (a delay that resets with every further change — batching a quick series of updates into one run).</p>
+
+  <p>A <strong>continuous trigger</strong> keeps the job in an endless loop: as soon as a run finishes (even by failing), the next one starts immediately. It suits near real-time processing; do count on continuous compute consumption, though.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> continuous jobs on serverless compute support only <strong>bounded</strong> streaming triggers of the <code class="inline">Trigger.AvailableNow</code> kind. The time-based <code class="inline">ProcessingTime</code> and <code class="inline">Continuous</code> triggers do not work on serverless — for those use classic jobs compute, or Lakeflow Spark Declarative Pipelines in continuous mode.</div></div>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="A decision tree for choosing a trigger: depending on whether the data arrives as files, whether the job depends on upstream tables, and whether near real-time processing is needed, it leads to a file arrival, table update, continuous, or scheduled trigger.">
+      <defs><marker id="arr11b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker></defs>
+      <rect x="0" y="0" width="820" height="320" fill="#ffffff"/>
+      <text x="410" y="26" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Which trigger to choose?</text>
+      <!-- Q1 -->
+      <rect x="20" y="60" width="220" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="130" y="84" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Does an external system</text>
+      <text x="130" y="101" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">deliver files irregularly?</text>
+      <rect x="300" y="60" width="220" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="84" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">File arrival</text>
+      <text x="410" y="101" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">volume / external location</text>
+      <line x1="240" y1="88" x2="296" y2="88" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <text x="266" y="80" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">yes</text>
+      <!-- Q2 -->
+      <rect x="20" y="140" width="220" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="130" y="164" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Does it follow upstream</text>
+      <text x="130" y="181" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">tables in Unity Catalog?</text>
+      <rect x="300" y="140" width="220" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="164" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Table update</text>
+      <text x="410" y="181" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">any / all tables updated</text>
+      <line x1="240" y1="168" x2="296" y2="168" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <text x="266" y="160" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">yes</text>
+      <!-- Q3 -->
+      <rect x="20" y="220" width="220" height="56" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="130" y="244" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Near real-time,</text>
+      <text x="130" y="261" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">must never stand still?</text>
+      <rect x="300" y="220" width="220" height="56" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="244" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Continuous</text>
+      <text x="410" y="261" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">run after run, exponential backoff</text>
+      <line x1="240" y1="248" x2="296" y2="248" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <text x="266" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">yes</text>
+      <!-- default -->
+      <line x1="130" y1="116" x2="130" y2="136" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <line x1="130" y1="196" x2="130" y2="216" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11b)"/>
+      <text x="112" y="130" text-anchor="end" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">no</text>
+      <text x="112" y="210" text-anchor="end" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">no</text>
+      <rect x="580" y="140" width="220" height="56" rx="8" fill="#1a3a6b"/>
+      <text x="690" y="164" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Scheduled</text>
+      <text x="690" y="181" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb">interval or cron (11.4)</text>
+      <line x1="240" y1="276" x2="600" y2="200" stroke="#6b7280" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arr11b)"/>
+      <text x="430" y="296" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">otherwise: a fixed schedule is the simplest and cheapest to operate</text>
+    </svg>
+    <figcaption>A decision tree for choosing the trigger type based on the character of the data flow.</figcaption>
+  </figure>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Limits of file arrival triggers and file events<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Without <strong>file events</strong> enabled on the external location, a limit of 50 jobs with a file arrival trigger per workspace and a maximum of 10,000 files in the watched location applies. With file events enabled (a one-off setup using cloud change notifications) these restrictions fall away and table update triggers work more efficiently too. Verify the exact current limits in the documentation.</p>
+      <p>Before creating a file arrival trigger you need a workspace with Unity Catalog, <code class="inline">READ</code> on the storage location, and <code class="inline">CAN MANAGE</code> on the job.</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> triggers can be paused (<code class="inline">Pause</code>) and resumed at any time without losing the configuration — practical during maintenance windows. An active run is allowed to finish, only new ones do not start.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/3-configure-job-triggers#configure-file-arrival-triggers" target="_blank" rel="noopener">Configure file arrival triggers</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/3-configure-job-triggers#configure-table-update-triggers" target="_blank" rel="noopener">Configure table update triggers</a></span></div>
+</div>
+
+<div class="section" id="sec-planovani">
+  <div class="section-header">
+    <div class="section-num">11.4</div>
+    <h2>Scheduling: cron, time zones, concurrent runs</h2>
+  </div>
+
+  <p>A scheduled trigger comes in two forms. A <strong>simple</strong> schedule is entered as an interval ("every 12 hours") — the scheduler picks the first run itself when you save. An <strong>advanced</strong> schedule uses a <strong>cron expression</strong> with six or seven fields: seconds, minutes, hours, day of month, month, day of week, and optionally year. The minimum interval between runs is 10 seconds.</p>
+
+  <table>
+    <tr><th>Cron expression</th><th>Meaning</th></tr>
+    <tr><td><code class="inline">0 0 12 * * ?</code></td><td>every day at noon</td></tr>
+    <tr><td><code class="inline">0 15 10 ? * MON-FRI</code></td><td>weekdays at 10:15</td></tr>
+    <tr><td><code class="inline">0 0 8 1 * ?</code></td><td>the first day of the month at 8:00</td></tr>
+    <tr><td><code class="inline">0 30 6 ? * 6L</code></td><td>the last Friday of the month at 6:30</td></tr>
+    <tr><td><code class="inline">0 0 */2 * * ?</code></td><td>every 2 hours</td></tr>
+  </table>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Special characters in cron expressions<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><code class="inline">*</code> = all values · <code class="inline">?</code> = "no specific value" (use it in the day-of-month or day-of-week field when you specify the other one) · <code class="inline">-</code> = a range (<code class="inline">10-12</code>) · <code class="inline">,</code> = a list (<code class="inline">MON,WED,FRI</code>) · <code class="inline">/</code> = a step (<code class="inline">0/15</code> = every 15 minutes) · <code class="inline">L</code> = last (day of the month, <code class="inline">6L</code> = the last Friday) · <code class="inline">#</code> = the n-th occurrence (<code class="inline">6#3</code> = the third Friday).</p>
+    </div>
+  </div>
+
+  <p>The <strong>time zone</strong> is not a detail. Zones with daylight saving time (DST) mean that an hourly job either skips a run or shifts by an hour once a year at the changeover. The rule from practice: schedule reports for people in their local time zone (and accept the DST shifts), and schedule technical pipelines tied to UTC timestamps or exact intervals in <strong>UTC</strong>.</p>
+
+  <p>What if a run takes longer than the interval? That is governed by <code class="inline">Maximum concurrent runs</code> — set it to <strong>1</strong> for jobs writing into the same tables — and by the behavior when the limit is exceeded:</p>
+
+  <table>
+    <tr><th>Behavior</th><th>What happens to the new run</th><th>When to use it</th></tr>
+    <tr><td><strong>Queue</strong></td><td>waits in a queue and starts when a slot frees up</td><td>no trigger may be lost (the default choice for pipelines)</td></tr>
+    <tr><td><strong>Cancel</strong></td><td>cancelled immediately</td><td>a stale trigger has no value</td></tr>
+    <tr><td><strong>Skip</strong></td><td>does not happen</td><td>an occasional missed run does not matter</td></tr>
+  </table>
+
+  <p>The documentation on queueing: <em>"Queued runs consume no compute resources while waiting."</em> So the queue is free — you pay only for the run itself.</p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> the scheduler is not a low-latency system — a job start can be delayed by minutes because of the network or a cloud service. Do not schedule business logic to sub-minute precision and leave a time cushion between dependent pipelines.</div></div>
+</div>
+
+<div class="section" id="sec-alerty">
+  <div class="section-header">
+    <div class="section-num">11.5</div>
+    <h2>Alerts and notifications</h2>
+  </div>
+
+  <p>Notifications are configured at job level (<code class="inline">Job notifications</code>) as well as per task. Five event types are available:</p>
+
+  <table>
+    <tr><th>Event</th><th>When it is sent</th><th>Typical use</th></tr>
+    <tr><td><strong>Start</strong></td><td>the run started</td><td>confirmation that a scheduled job took off</td></tr>
+    <tr><td><strong>Success</strong></td><td>the run finished successfully</td><td>a signal for downstream processes</td></tr>
+    <tr><td><strong>Failure</strong></td><td>the run failed</td><td>incident response</td></tr>
+    <tr><td><strong>Duration warning</strong></td><td>the run exceeded a threshold</td><td>detecting performance degradation</td></tr>
+    <tr><td><strong>Streaming backlog</strong></td><td>the backlog stays above a threshold for 10 minutes</td><td>the health of streaming jobs</td></tr>
+  </table>
+
+  <p>The target can be email or a <strong>system destination</strong>: Slack, Microsoft Teams, PagerDuty, and a generic <strong>HTTP webhook</strong>. System destinations must first be created by a workspace admin in <code class="inline">Admin Settings</code> → <code class="inline">Notifications</code>; a maximum of three destinations per event type can be attached to a job/task.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">JSON</span><button class="copy-btn">Copy</button></div>
+    <pre>{
+  <span class="str">"event_type"</span>: <span class="str">"jobs.on_failure"</span>,
+  <span class="str">"workspace_id"</span>: <span class="str">"your_workspace_id"</span>,
+  <span class="str">"run"</span>: { <span class="str">"run_id"</span>: <span class="str">"run_id"</span> },
+  <span class="str">"job"</span>: { <span class="str">"job_id"</span>: <span class="str">"job_id"</span>, <span class="str">"name"</span>: <span class="str">"job_name"</span> }
+}</pre>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> the <strong>Succeeded with failures</strong> state (the job finished, but some tasks failed) counts as a success. If you need to see partial failures too, add task-level notifications. And note: job-level notifications are not sent for the failure and retry of individual tasks.</div></div>
+
+  <p>The biggest enemy of alerting is <strong>alert fatigue</strong> — a team buried in notifications stops reading them, including the critical ones. Proven principles: mute notifications for skipped and cancelled runs (<code class="inline">Mute notifications for skipped/canceled runs</code> — job-level only, tasks have to be set separately), set duration warnings from the run history (warn at 45 minutes for a job that typically runs 30, not at 35), and for tasks with retries enable <code class="inline">Mute notifications until the last retry</code>. And document why each alert exists and what the recipient is supposed to do.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> if the jobs are orchestrated by Azure Data Factory, combine the layers: Databricks notifications for job-level events, ADF alerts (<code class="inline">Monitor</code> → <code class="inline">Alerts &amp; metrics</code>) for orchestration metrics — pipeline run status, activity counts, Integration Runtime utilization.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/5-configure-job-alerts#reduce-notification-noise" target="_blank" rel="noopener">Reduce notification noise</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/5-configure-job-alerts#monitor-with-http-webhooks" target="_blank" rel="noopener">Monitor with HTTP webhooks</a></span></div>
+</div>
+
+<div class="section" id="sec-retry">
+  <div class="section-header">
+    <div class="section-num">11.6</div>
+    <h2>Automatic restarts and retry policy</h2>
+  </div>
+
+  <p>Network outages and transient cloud service errors are a normal operating state in distributed systems. A <strong>retry policy</strong> makes sure a job recovers from such a failure on its own. The default behavior is surprising, though: most jobs <em>do not retry without explicit configuration</em>. There are two exceptions — <strong>serverless jobs</strong> have auto-optimized retries by default and <strong>continuous jobs</strong> always restart, using an <strong>exponential backoff</strong> algorithm.</p>
+
+  <p>Retries are configured at task level: the number of attempts and the interval between them. The interval is counted from the <em>start</em> of the failed run — with a 60 s interval and a task that failed after 30 s, the retry starts 30 s after the failure. The timeout applies to <em>each</em> attempt separately; a timeout expiring counts as a failure and consumes an attempt.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 340" role="img" aria-label="The lifecycle of a Lakeflow Job run: a trigger starts a run, it passes through the concurrency check (queue), executes, and ends either in success with a notification or in failure. A failure is followed by a retry while attempts remain; once the attempts are exhausted a failure alert is sent. Continuous jobs restart with exponential backoff.">
+      <defs>
+        <marker id="arr11c" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+        <marker id="arr11cr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#ef4444"/></marker>
+        <marker id="arr11cg" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#22c55e"/></marker>
+      </defs>
+      <rect x="0" y="0" width="820" height="340" fill="#ffffff"/>
+      <text x="410" y="26" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">The lifecycle of a job run</text>
+      <!-- trigger -->
+      <rect x="20" y="70" width="150" height="90" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="95" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Trigger</text>
+      <text x="95" y="112" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">schedule · file arrival</text>
+      <text x="95" y="128" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">table update · manual</text>
+      <text x="95" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">continuous</text>
+      <!-- queue -->
+      <rect x="220" y="82" width="160" height="66" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="1.5"/>
+      <text x="300" y="106" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Concurrency check</text>
+      <text x="300" y="124" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">free? → run</text>
+      <text x="300" y="139" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">full? → queue / cancel / skip</text>
+      <!-- run -->
+      <rect x="430" y="82" width="130" height="66" rx="8" fill="#1a3a6b"/>
+      <text x="495" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Run</text>
+      <text x="495" y="128" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb">timeout per attempt</text>
+      <!-- success -->
+      <rect x="640" y="52" width="160" height="56" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="720" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#22c55e">Success</text>
+      <text x="720" y="93" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">"Success" notification</text>
+      <!-- fail -->
+      <rect x="640" y="140" width="160" height="56" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
+      <text x="720" y="164" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ef4444">Failure / Timed Out</text>
+      <text x="720" y="181" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">any retries left?</text>
+      <!-- retry box -->
+      <rect x="410" y="230" width="180" height="56" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="500" y="254" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Retry</text>
+      <text x="500" y="271" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">interval; muted notifications</text>
+      <!-- alert box -->
+      <rect x="640" y="230" width="160" height="56" rx="8" fill="#ef4444"/>
+      <text x="720" y="254" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Failure alert</text>
+      <text x="720" y="271" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ffe4e6">email · Slack · PagerDuty</text>
+      <!-- arrows -->
+      <line x1="170" y1="115" x2="216" y2="115" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11c)"/>
+      <line x1="380" y1="115" x2="426" y2="115" stroke="#6b7280" stroke-width="2" marker-end="url(#arr11c)"/>
+      <line x1="560" y1="98" x2="636" y2="82" stroke="#22c55e" stroke-width="2" marker-end="url(#arr11cg)"/>
+      <line x1="560" y1="132" x2="636" y2="162" stroke="#ef4444" stroke-width="2" marker-end="url(#arr11cr)"/>
+      <line x1="680" y1="196" x2="580" y2="234" stroke="#e8721c" stroke-width="2" marker-end="url(#arr11c)"/>
+      <text x="640" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">yes</text>
+      <line x1="740" y1="196" x2="732" y2="226" stroke="#ef4444" stroke-width="2" marker-end="url(#arr11cr)"/>
+      <text x="762" y="216" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">no, exhausted</text>
+      <path d="M 410 250 C 340 250 340 148 424 128" fill="none" stroke="#e8721c" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr11c)"/>
+      <text x="330" y="200" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">a new attempt</text>
+      <text x="410" y="322" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">a continuous job: after a failure it always starts again, with an increasing wait (exponential backoff)</text>
+    </svg>
+    <figcaption>The lifecycle of a run: from the trigger through the concurrency check and execution to the retry loop and the final alert.</figcaption>
+  </figure>
+
+  <p>For <strong>continuous jobs</strong> the exponential backoff works like this: once a threshold of consecutive failures is exceeded the job waits, every further failure extends the wait up to a system maximum, and a successful run (or a run without failures for the threshold period) resets the sequence. The <code class="inline">Task retry mode</code> option (<code class="inline">On failure</code> / <code class="inline">Never</code>) controls whether failed tasks are retried within the run. Continuous jobs support neither classic task-level retry policies nor task dependencies.</p>
+
+  <p>Against "zombie" tasks, deploy <strong>Metric thresholds</strong> → <code class="inline">Run duration</code>: the <code class="inline">Warning</code> value sends a notification, the <code class="inline">Timeout</code> value ends the task with the <code class="inline">Timed Out</code> state and hands it to the retry logic.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> retry is safe only for <strong>idempotent</strong> operations. A job that duplicates writes when run again will not be fixed by a retry policy — quite the opposite. For non-idempotent serverless jobs, turn the retry auto-optimization off.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> a sensible standard: 1–3 retries with an interval of 30 s to 5 minutes. Never unlimited retries — they will not solve a permanent failure, they will just burn compute. And watch the trend: a growing share of runs saved by a retry is usually the first signal of an infrastructure or data problem.</div></div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> restarts handle transient failures, alerts the permanent ones. The combination: retries with muting until the last attempt + a failure notification once the attempts are exhausted + a duration warning. That way you learn about a problem exactly once — and at the moment when getting up is actually worth it.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/6-configure-job-automatic-restarts#configure-continuous-jobs-for-always-on-workloads" target="_blank" rel="noopener">Configure continuous jobs for always-on workloads</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/6-configure-job-automatic-restarts#apply-best-practices-for-production-workloads" target="_blank" rel="noopener">Apply best practices for production workloads</a></span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">11.7</div>
+    <h2>Lab 11: Implement Lakeflow Jobs (45 minutes)</h2>
+  </div>
+  <p>In the role of a data engineer at the telecommunications company <strong>TelConnect</strong> you will automate a pipeline processing Call Detail Records (CDRs) through the bronze → silver → gold layers: you will build a job with two dependent tasks (the <code class="inline">process_cdrs</code> notebook + the <code class="inline">summarize_gold</code> SQL), a dynamic <code class="inline">processing_date</code> parameter, a file arrival trigger over a volume, a nightly cron schedule, failure notifications, and a retry policy with a timeout.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/11-implement-lakeflow-jobs.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/implement-lakeflow-jobs/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> Which Run if condition would you set on a task that should run only after all its predecessors succeed — and which one on a cleanup task? <strong>2)</strong> Why does a file arrival trigger not react to an existing file being overwritten, and how does that affect the design of data deliveries? <strong>3)</strong> A job runs every hour and occasionally takes 75 minutes — how do you make sure the runs do not overlap and none is lost?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_10_pipelines.html">← Data pipelines</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 11 of 16</span>
+      <a href="dp750_12_dev_lifecycle.html" style="margin-left:auto">Development lifecycle →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

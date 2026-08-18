@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Design and implement data pipelines — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Design and implement data pipelines</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="../dp750_10_pipelines.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_11_lakeflow_jobs.html" class="next">Lakeflow Jobs →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-poradi-operaci" class="toc-item active" data-section="sec-poradi-operaci">Designing the order of operations in a pipeline</a>
+    <a href="#sec-notebook-vs-lakeflow" class="toc-item" data-section="sec-notebook-vs-lakeflow">The choice: a notebook, or a declarative pipeline?</a>
+    <a href="#sec-logika-jobu" class="toc-item" data-section="sec-logika-jobu">Designing Lakeflow job logic</a>
+    <a href="#sec-error-handling" class="toc-item" data-section="sec-error-handling">Error handling in pipelines and jobs</a>
+    <a href="#sec-pipeline-z-notebooku" class="toc-item" data-section="sec-pipeline-z-notebooku">A pipeline from notebooks</a>
+    <a href="#sec-lakeflow-deklarativni" class="toc-item" data-section="sec-lakeflow-deklarativni">Declarative pipelines: orchestration and incremental processing</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 10: Design and implement data pipelines with Azure Databricks (45 minutes)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Chapter 10</div>
+      <h1>Design and implement data pipelines</h1>
+      <div class="hero-subtitle">Order of operations, notebook vs. Lakeflow Pipelines, job design, and error handling</div>
+      <div class="hero-meta"><span>🗂 Loading data into Unity Catalog, ETL and pipelines</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Chapter objectives</h3>
+  <ul>
+    <li>Design the order of pipeline operations from ingestion to serving according to the <strong>medallion architecture</strong>.</li>
+    <li>Decide between notebooks and <strong>Lakeflow Spark Declarative Pipelines</strong> based on the nature of the workload.</li>
+    <li>Design the logic of a <strong>Lakeflow job</strong>: task dependencies, conditions, iteration, and parameters.</li>
+    <li>Implement error handling: retry policies, idempotent operations, and quarantine (dead-letter).</li>
+    <li>Build a pipeline from notebooks as well as declaratively through streaming tables and materialized views.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-poradi-operaci">
+  <div class="section-header">
+    <div class="section-num">10.1</div>
+    <h2>Designing the order of operations in a pipeline</h2>
+  </div>
+  <p>A data pipeline is not one script but a sequence of phases where each builds on the validated output of the previous one. The Learn module distinguishes six phases: <strong>ingest → clean &amp; validate → transform → load → serve → monitor</strong>. The first four map naturally onto the layers of the <strong>medallion architecture</strong> you know from earlier chapters — bronze keeps the raw data for possible reprocessing, silver cleans and validates, gold aggregates for consumption.</p>
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="A diagram of a medallion pipeline as a DAG of tasks. The ingest_bronze task fills the bronze layer, followed by clean_silver with the silver layer, then quality_gate deciding based on data quality, and finally aggregate_gold filling the gold layer that BI and ML consumers read from. Monitoring of all phases is shown beneath the flow.">
+      <defs>
+        <marker id="arr10a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="10" y="40" width="120" height="80" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="70" y="70" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Sources</text>
+      <text x="70" y="88" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">files, DBs,</text>
+      <text x="70" y="104" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">message queues</text>
+      <rect x="170" y="40" width="150" height="80" rx="8" fill="#ffffff" stroke="#a16207" stroke-width="2"/>
+      <text x="245" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#a16207">ingest_bronze</text>
+      <text x="245" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">raw data 1:1,</text>
+      <text x="245" y="102" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">incrementally</text>
+      <rect x="360" y="40" width="150" height="80" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+      <text x="435" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">clean_silver</text>
+      <text x="435" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">dedup, NULL filters,</text>
+      <text x="435" y="102" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">types, validation</text>
+      <rect x="550" y="40" width="110" height="80" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="605" y="70" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">quality_gate</text>
+      <text x="605" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">if/else task</text>
+      <rect x="695" y="40" width="115" height="80" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="752" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">aggregate_gold</text>
+      <text x="752" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">joins, aggregations,</text>
+      <text x="752" y="102" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">metrics for BI</text>
+      <line x1="130" y1="80" x2="164" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10a)"/>
+      <line x1="320" y1="80" x2="354" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10a)"/>
+      <line x1="510" y1="80" x2="544" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10a)"/>
+      <line x1="660" y1="80" x2="689" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10a)"/>
+      <text x="245" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#a16207">BRONZE</text>
+      <text x="435" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#6b7280">SILVER</text>
+      <text x="752" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#e8721c">GOLD</text>
+      <rect x="170" y="175" width="490" height="50" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="415" y="196" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">quality_gate → fails: notification + quarantine, gold does not run</text>
+      <text x="415" y="214" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">e.g. {{tasks.quality_check.values.invalid_count}} &gt; 100</text>
+      <line x1="605" y1="120" x2="605" y2="169" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr10a)"/>
+      <rect x="10" y="250" width="800" height="40" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="410" y="275" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Monitor &amp; optimize — run time, record volumes, quality trends, cost (continuously, across all phases)</text>
+    </svg>
+    <figcaption>A medallion pipeline as a DAG of tasks: ingestion into bronze, cleansing into silver, a quality gate as conditional branching, and aggregation into gold; monitoring runs across all the phases.</figcaption>
+  </figure>
+  <p>Three practical rules follow from designing the order of operations. First: <strong>ingestion preserves the raw form</strong> — transforming during ingestion takes away your ability to replay the processing differently. Second: <strong>cleansing comes before transformation</strong> — joins and aggregations over invalid data produce invalid results that are far harder to trace. Third: <strong>incremental processing from the start</strong> — a full reload is comfortable during development but expensive in production.</p>
+  <p>The load and serve phases deal with getting the data to the consumers: the choice between a full refresh, an incremental append, and the merge pattern, the partitioning of target tables, optimized views, and access control. The last phase — monitoring — is not a "once it is finished" matter: metrics for run duration, volumes, and quality belong in the design from day one.</p>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> when designing, draw the pipeline backwards — from the gold table the consumer needs back to the sources. You will avoid "bronze lakes" that nobody reads, and every task in the DAG will have a justifiable consumer.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/2-design-order-operations-pipeline" target="_blank" rel="noopener">Design order of operations for a pipeline</a></span></div>
+</div>
+
+<div class="section" id="sec-notebook-vs-lakeflow">
+  <div class="section-header">
+    <div class="section-num">10.2</div>
+    <h2>The choice: a notebook, or a declarative pipeline?</h2>
+  </div>
+  <p>Azure Databricks offers two ways to write a pipeline. <strong>Notebooks</strong> are procedural: step by step you say <em>how</em> something is to be computed, and you have full control over every detail — error handling, caching, the order of operations. <strong>Declarative pipelines</strong> turn that around: you describe <em>what</em> should exist (tables and their definitions) and the framework derives the dependencies, the execution order, the checkpoints, and the retry logic itself. The basic unit of a declarative pipeline is a <strong>flow</strong> — it reads from a source, transforms, and writes into a table or a sink.</p>
+  <table>
+    <tr><th>Criterion</th><th>Notebook</th><th>Declarative pipeline</th></tr>
+    <tr><td>Execution control</td><td>full control by the developer</td><td>orchestration handled by the system</td></tr>
+    <tr><td>Standard ETL</td><td>verbose code</td><td>concise declarations</td></tr>
+    <tr><td>Data quality</td><td>manual validation</td><td>built-in expectations (see chapter 9)</td></tr>
+    <tr><td>Lineage and monitoring</td><td>external tools</td><td>automatically included</td></tr>
+    <tr><td>Demands on the team</td><td>programming skills</td><td>manageable in pure SQL too</td></tr>
+    <tr><td>Typical scenario</td><td>custom logic, ML, exploration</td><td>production, repeatable ETL</td></tr>
+  </table>
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="A decision tree for choosing between a notebook and a declarative pipeline. The first question: does the task require procedural logic such as branching, API calls, or special libraries? If yes, a notebook. If no, the second question: is it repeatable ETL with quality and lineage requirements? If yes, a declarative pipeline, otherwise consider a hybrid.">
+      <defs>
+        <marker id="arr10b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="280" y="15" width="260" height="60" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="34" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Does the task need procedural logic?</text>
+      <text x="410" y="51" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">branching, loops over an API,</text>
+      <text x="410" y="66" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">custom retry, ML libraries</text>
+      <rect x="60" y="120" width="230" height="70" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="175" y="147" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Notebook (+ Lakeflow Job)</text>
+      <text x="175" y="167" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">full control, custom error handling,</text>
+      <text x="175" y="182" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">cell-by-cell exploration and prototypes</text>
+      <rect x="470" y="120" width="290" height="60" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="615" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Repeatable ETL for production?</text>
+      <text x="615" y="165" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">quality, lineage, monitoring "for free"</text>
+      <rect x="470" y="220" width="290" height="65" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="615" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#22c55e">Declarative pipeline</text>
+      <text x="615" y="265" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">streaming tables + materialized views,</text>
+      <text x="615" y="279" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">expectations, auto-orchestration</text>
+      <rect x="60" y="220" width="230" height="65" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="175" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Hybrid</text>
+      <text x="175" y="263" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">notebooks for preprocessing and ML,</text>
+      <text x="175" y="278" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">a declarative pipeline for the ETL core</text>
+      <line x1="310" y1="75" x2="200" y2="114" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10b)"/>
+      <text x="235" y="95" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">yes</text>
+      <line x1="510" y1="75" x2="600" y2="114" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10b)"/>
+      <text x="580" y="95" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">no</text>
+      <line x1="615" y1="180" x2="615" y2="214" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10b)"/>
+      <text x="640" y="202" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">yes</text>
+      <line x1="464" y1="160" x2="230" y2="214" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10b)"/>
+      <text x="330" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">one-off / mixed</text>
+    </svg>
+    <figcaption>A decision tree: procedural logic and exploration lead to a notebook, repeatable production ETL to a declarative pipeline; in practice a hybrid of the two is common.</figcaption>
+  </figure>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> this is not an "either–or" choice at company level. The common pattern is a hybrid: a declarative pipeline holds the backbone ETL (ingestion, cleansing, aggregation) and notebooks handle the steps that express badly in declarative form — calls to external APIs, ML scoring, one-off migrations. A single Lakeflow Job then ties both together.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/3-choose-notebook-lakeflow-pipelines#compare-the-approaches" target="_blank" rel="noopener">Compare the approaches</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/3-choose-notebook-lakeflow-pipelines#make-your-decision" target="_blank" rel="noopener">Make your decision</a></span></div>
+</div>
+
+<div class="section" id="sec-logika-jobu">
+  <div class="section-header">
+    <div class="section-num">10.3</div>
+    <h2>Designing Lakeflow job logic</h2>
+  </div>
+  <p>A <strong>Lakeflow Job</strong> is the orchestrator: it assembles tasks (notebooks, SQL, pipelines, scripts…) into a <strong>DAG</strong> — a directed acyclic graph that determines the execution order and how failures propagate. Independent tasks can run in parallel (faster, but heavier on compute — and the workspace also limits the number of concurrent tasks), dependent ones serially.</p>
+  <p>When a task runs relative to the results of its predecessors is decided by the <strong>Run if</strong> condition:</p>
+  <table>
+    <tr><th>Condition</th><th>The task runs…</th></tr>
+    <tr><td>All succeeded</td><td>only when all upstream tasks succeeded (the default)</td></tr>
+    <tr><td>At least one succeeded</td><td>when at least one upstream task succeeded</td></tr>
+    <tr><td>None failed</td><td>when none failed (skipped ones do not matter)</td></tr>
+    <tr><td>All done</td><td>after all have finished, regardless of the outcome — typically cleanup</td></tr>
+    <tr><td>At least one failed</td><td>when at least one failed — typically a failure notification</td></tr>
+    <tr><td>All failed</td><td>only when all of them failed</td></tr>
+  </table>
+  <p>Alongside Run if conditions there are two special control tasks. The <strong>If/else condition task</strong> branches the run based on data values — for example the expression <code class="inline">{{tasks.quality_check.values.invalid_count}} &gt; 100</code> sends the run into a remediation branch instead of the gold aggregation. The <strong>For each task</strong> applies the same logic to every element of an array (a list of regions, files, tables) without copying task definitions; the concurrency of the iterations is configurable.</p>
+  <p><strong>Parameters</strong> make a job reusable: in tasks you reach for them through <code class="inline">{{job.parameters.&lt;name&gt;}}</code>, and dynamic references such as <code class="inline">{{job.trigger.time.iso_date}}</code> (the scheduled run time) and <code class="inline">{{backfill.iso_datetime}}</code> for backfill runs are available too. The typical categories: date parameters (scheduled runs and backfills), environment (dev/staging/prod), and behavior control (batch size, output format).</p>
+  <div class="collapsible">
+    <div class="collapsible-header">Choosing compute by task type<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>The Learn module recommends: notebooks and Python scripts → <strong>serverless jobs compute</strong>; SQL queries and files → a <strong>serverless SQL warehouse</strong>; declarative pipelines → <strong>serverless pipeline compute</strong>; JARs → serverless or classic jobs compute; Spark Submit (the legacy JAR variant) → classic jobs compute only. Serverless removes cluster management, classic compute gives detailed control over the configuration. Tasks can share a cluster (faster start) or run in isolation. Verify the availability of the serverless variants in your region in the documentation.</p>
+    </div>
+  </div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> a task can be temporarily <strong>disabled</strong> in a job — it is skipped at run time while its configuration and history remain. When debugging, that is considerably safer than deleting the task and clicking it together again.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/4-design-task-logic-lakeflow-job#implement-iterative-processing-with-for-each" target="_blank" rel="noopener">Implement iterative processing with For each</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/4-design-task-logic-lakeflow-job#select-compute-resources-for-tasks" target="_blank" rel="noopener">Select compute resources for tasks</a></span></div>
+</div>
+
+<div class="section" id="sec-error-handling">
+  <div class="section-header">
+    <div class="section-num">10.4</div>
+    <h2>Error handling in pipelines and jobs</h2>
+  </div>
+  <p>Responsibility for failures is split: the platform itself handles infrastructure problems (cluster node outages), and what is left for you are data and application errors. At the job level you have four tools: <strong>retry policies</strong> (the number of attempts and the interval; continuous jobs automatically apply exponential backoff), <strong>timeouts</strong> (the expected and maximum run duration — preventing tasks from hanging forever; for streaming there are also backlog metric thresholds), <strong>notifications</strong> (email, Slack, Teams, PagerDuty, webhook), and the <strong>conditional dependencies</strong> from the previous section (an "At least one failed" branch = notification and cleanup).</p>
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="A diagram of the error handling loop. A task runs; on failure a distinction is made between a transient error, which goes into a retry with exponential backoff and an attempt limit, and a data error, which sends the invalid records into a dead-letter quarantine table. Once the attempts are exhausted, the team is notified. A successful run continues safely even after repetition thanks to idempotence.">
+      <defs>
+        <marker id="arr10c" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+        <marker id="arr10g" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#22c55e"/></marker>
+        <marker id="arr10r" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#ef4444"/></marker>
+        <marker id="arr10o" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <rect x="30" y="110" width="160" height="70" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="110" y="138" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Task run</text>
+      <text x="110" y="158" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">idempotent write</text>
+      <rect x="270" y="110" width="150" height="70" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+      <text x="345" y="140" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Outcome?</text>
+      <rect x="600" y="20" width="190" height="60" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="695" y="45" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">✓ Success</text>
+      <text x="695" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">downstream tasks continue</text>
+      <rect x="480" y="110" width="180" height="70" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="570" y="135" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">Transient error</text>
+      <text x="570" y="153" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">network, timeout, throttling</text>
+      <text x="570" y="169" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">→ retry + backoff</text>
+      <rect x="480" y="220" width="180" height="70" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
+      <text x="570" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">Data error</text>
+      <text x="570" y="263" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">invalid records</text>
+      <text x="570" y="279" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">→ quarantine (dead-letter)</text>
+      <rect x="700" y="130" width="110" height="150" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="755" y="158" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Notification</text>
+      <text x="755" y="180" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">email, Teams,</text>
+      <text x="755" y="196" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">PagerDuty…</text>
+      <text x="755" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">muted until</text>
+      <text x="755" y="238" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">the last retry</text>
+      <text x="755" y="254" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">attempt</text>
+      <line x1="190" y1="145" x2="264" y2="145" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10c)"/>
+      <line x1="420" y1="120" x2="594" y2="55" stroke="#22c55e" stroke-width="2" marker-end="url(#arr10g)"/>
+      <text x="490" y="80" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">OK</text>
+      <line x1="420" y1="145" x2="474" y2="145" stroke="#e8721c" stroke-width="2" marker-end="url(#arr10o)"/>
+      <line x1="400" y1="180" x2="474" y2="245" stroke="#ef4444" stroke-width="2" marker-end="url(#arr10r)"/>
+      <path d="M 480 145 C 380 60, 180 60, 116 104" fill="none" stroke="#e8721c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr10o)"/>
+      <text x="290" y="52" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">retry (max N attempts, increasing interval)</text>
+      <line x1="660" y1="165" x2="694" y2="180" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr10c)"/>
+      <text x="662" y="205" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">once exhausted</text>
+      <line x1="660" y1="250" x2="694" y2="240" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr10c)"/>
+      <text x="410" y="310" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Idempotence guarantees a repeated run creates no duplicates — which makes retry safe</text>
+    </svg>
+    <figcaption>The error handling loop: transient errors are handled by retry with backoff, data errors by quarantine (dead-letter), exhausted attempts end with a notification; idempotence makes repetition safe.</figcaption>
+  </figure>
+  <p>In a notebook you add the granular level: <code class="inline">try/except</code> over <code class="inline">PySparkException</code> can distinguish the error class and react specifically, and a custom retry function covers calls that job-level retry cannot reach:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">from</span> pyspark.errors <span class="kw">import</span> PySparkException
+<span class="kw">import</span> time
+
+<span class="kw">try</span>:
+    df = spark.read.<span class="fn">table</span>(<span class="str">"source_data"</span>)
+    df.<span class="fn">filter</span>(<span class="str">"amount &gt; 0"</span>).write.<span class="fn">mode</span>(<span class="str">"append"</span>).<span class="fn">saveAsTable</span>(<span class="str">"target_data"</span>)
+<span class="kw">except</span> PySparkException <span class="kw">as</span> e:
+    <span class="cm"># getCondition() since PySpark 4.0; getErrorClass() on older runtimes</span>
+    <span class="kw">if</span> e.<span class="fn">getCondition</span>() <span class="op">==</span> <span class="str">"TABLE_OR_VIEW_NOT_FOUND"</span>:
+        <span class="fn">print</span>(<span class="str">f"Source table not found: {e.getMessageParameters()['relationName']}"</span>)
+    <span class="kw">else</span>:
+        <span class="kw">raise</span>
+
+<span class="cm"># custom retry with exponential backoff</span>
+<span class="kw">def</span> <span class="fn">run_with_retry</span>(operation, max_retries<span class="op">=</span><span class="num">3</span>, base_delay<span class="op">=</span><span class="num">10</span>):
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(max_retries <span class="op">+</span> <span class="num">1</span>):
+        <span class="kw">try</span>:
+            <span class="kw">return</span> <span class="fn">operation</span>()
+        <span class="kw">except</span> Exception <span class="kw">as</span> e:
+            <span class="kw">if</span> attempt <span class="op">==</span> max_retries:
+                <span class="kw">raise</span>
+            delay = base_delay <span class="op">*</span> (<span class="num">2</span> <span class="op">**</span> attempt)
+            time.<span class="fn">sleep</span>(delay)</pre>
+  </div>
+  <p>The key concept without which every retry is dangerous is <strong>idempotence</strong>: running the same step again must not produce duplicate data. In practice you achieve that with <code class="inline">MERGE</code> instead of a blind <code class="inline">INSERT</code>, with streaming checkpoints (exactly-once), or with a "delete &amp; insert" partition pattern. For invalid records that are pointless to retry there is the <strong>dead-letter / quarantine table</strong> — the same pattern we built in chapter 9 for type errors.</p>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> for task notifications, turn on <strong>"Mute notifications until the last retry"</strong>. Otherwise three retry attempts generate three alarms, the team gets used to them — and nobody deals with the fourth, real one. Alert fatigue is a genuine operational risk.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> the documentation recommends "fail fast" when data integrity is compromised, and deliberately testing failures during development — deliberately feed the pipeline a broken file and verify that retry, quarantine, and notifications really work. Error handling that has never run is not error handling.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/5-design-error-handling-pipelines#configure-job-level-error-handling" target="_blank" rel="noopener">Configure job-level error handling</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/5-design-error-handling-pipelines#apply-error-handling-best-practices" target="_blank" rel="noopener">Apply error handling best practices</a></span></div>
+</div>
+
+<div class="section" id="sec-pipeline-z-notebooku">
+  <div class="section-header">
+    <div class="section-num">10.5</div>
+    <h2>A pipeline from notebooks</h2>
+  </div>
+  <p>The most direct route to a pipeline: write each phase as a notebook and assemble them into a job in <strong>Jobs &amp; Pipelines</strong>. A Notebook task gets the path to the notebook, compute, and parameters; you set the dependencies with the <strong>Depends on</strong> field — and the DAG draws itself. The typical result is exactly the trio from the lab: <code class="inline">ingest_bronze</code> → <code class="inline">clean_silver</code> → <code class="inline">aggregate_gold</code>.</p>
+  <p>To make the notebooks reusable, parameterize them with widgets and pass results to the following tasks through task values:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># read a parameter passed from the job</span>
+processing_date = dbutils.widgets.<span class="fn">get</span>(<span class="str">"processing_date"</span>)
+environment = dbutils.widgets.<span class="fn">get</span>(<span class="str">"environment"</span>)
+
+<span class="cm"># pass a value to the following tasks (e.g. for a quality gate)</span>
+dbutils.jobs.taskValues.<span class="fn">set</span>(key<span class="op">=</span><span class="str">"invalid_count"</span>, value<span class="op">=</span>invalid_count)
+
+<span class="cm"># signal the outcome back to the job</span>
+<span class="kw">try</span>:
+    records = <span class="fn">process_data</span>()
+    dbutils.notebook.<span class="fn">exit</span>(<span class="str">f"SUCCESS: Processed {records} records"</span>)
+<span class="kw">except</span> Exception <span class="kw">as</span> e:
+    dbutils.notebook.<span class="fn">exit</span>(<span class="str">f"FAILED: {str(e)}"</span>)</pre>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> a notebook has an output limit — 20 MB in total, 8 MB per cell. Production notebooks should log metrics (record counts, times), not print data. Forget about <code class="inline">display(df)</code> in a production job.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> define dependencies only where they genuinely exist. Every unnecessary edge in the DAG kills parallelism — if two silver tables do not depend on each other, let them run side by side.</div></div>
+</div>
+
+<div class="section" id="sec-lakeflow-deklarativni">
+  <div class="section-header">
+    <div class="section-num">10.6</div>
+    <h2>Declarative pipelines: orchestration and incremental processing</h2>
+  </div>
+  <p>The declarative approach flips the perspective: instead of orchestration, checkpoints, and dependencies you declare tables and the framework takes care of the rest. Three main benefits: <strong>automatic orchestration</strong> (the system derives the order from the dependencies between tables), <strong>incremental processing</strong> (streaming tables process every record exactly once, materialized views recompute only the changes), and <strong>built-in retry</strong> at the level of the Spark task, the flow, and the pipeline.</p>
+  <p>There are two building blocks. A <strong>streaming table</strong> is a Delta table for append-only ingestion — ideal for reading from cloud storage (through Auto Loader) or message queues. A <strong>materialized view</strong> handles transformations — joins, aggregations — and stays synchronized with changes to the upstream tables.</p>
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-10-sql"><span class="tab-icon">🗄️</span>SQL</button>
+      <button class="tab-btn" data-tab="tab-10-py"><span class="tab-icon">🐍</span>Python</button>
+    </div>
+    <div class="tab-panel" id="tab-10-sql">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="cm">-- streaming table: incremental ingest from a volume</span>
+<span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">customers_bronze</span>
+<span class="kw">AS SELECT</span> * <span class="kw">FROM STREAM</span> <span class="fn">read_files</span>(
+  <span class="str">"/Volumes/main/raw_data/customers"</span>,
+  format <span class="op">=&gt;</span> <span class="str">"json"</span>
+);
+
+<span class="cm">-- materialized view: a join synchronized with upstream changes</span>
+<span class="kw">CREATE OR REFRESH MATERIALIZED VIEW</span> <span class="tbl">customer_transactions</span>
+<span class="kw">AS SELECT</span> c.<span class="col">customer_id</span>, c.<span class="col">customer_name</span>, c.<span class="col">region</span>,
+          t.<span class="col">transaction_date</span>, t.<span class="col">amount</span>
+<span class="kw">FROM</span> <span class="tbl">customers</span> c
+<span class="kw">INNER JOIN</span> <span class="tbl">transactions</span> t <span class="kw">ON</span> c.<span class="col">customer_id</span> <span class="op">=</span> t.<span class="col">customer_id</span>;</pre>
+      </div>
+    </div>
+    <div class="tab-panel" id="tab-10-py">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="kw">from</span> pyspark <span class="kw">import</span> pipelines <span class="kw">as</span> dp
+
+@dp.table
+<span class="kw">def</span> <span class="fn">customers_bronze</span>():
+    <span class="kw">return</span> (spark.readStream.<span class="fn">format</span>(<span class="str">"cloudFiles"</span>)
+        .<span class="fn">option</span>(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
+        .<span class="fn">option</span>(<span class="str">"cloudFiles.inferColumnTypes"</span>, <span class="str">"true"</span>)
+        .<span class="fn">load</span>(<span class="str">"/Volumes/main/raw_data/customers"</span>))
+
+@dp.materialized_view
+<span class="kw">def</span> <span class="fn">regional_sales</span>():
+    customers = spark.read.<span class="fn">table</span>(<span class="str">"customers"</span>)
+    transactions = spark.read.<span class="fn">table</span>(<span class="str">"transactions"</span>)
+    <span class="kw">return</span> (customers.<span class="fn">join</span>(transactions, on<span class="op">=</span><span class="str">"customer_id"</span>, how<span class="op">=</span><span class="str">"inner"</span>)
+        .<span class="fn">groupBy</span>(<span class="str">"region"</span>).<span class="fn">agg</span>({<span class="str">"amount"</span>: <span class="str">"sum"</span>}))</pre>
+      </div>
+    </div>
+  </div>
+  <p>Data quality in a declarative pipeline is guarded by <strong>expectations</strong> — covered in full in chapter 9 (section 9.5): <code class="inline">EXPECT</code> only records the violation, <code class="inline">ON VIOLATION DROP ROW</code> filters, <code class="inline">ON VIOLATION FAIL UPDATE</code> stops the flow. Development is supported by the <strong>Lakeflow Pipelines Editor</strong> with dry-run validation, selective execution, dependency visualization, and data preview; the editor's feature set is evolving, so verify the current state in the documentation.</p>
+  <div class="collapsible">
+    <div class="collapsible-header">A common misconception: "a materialized view is just a view"<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Anyone expecting the behavior of a classic view (a query evaluated on every read) will be surprised: a materialized view in Lakeflow is a <em>precomputed</em> table that the pipeline keeps current with respect to upstream changes — incrementally where possible. Reads are therefore fast even over large joins; the price is that the data is exactly as fresh as the last pipeline run/refresh.</p>
+    </div>
+  </div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> the order of operations is set by the medallion (ingest → clean → transform → load → serve → monitor). Choose notebooks for procedural logic, declarative pipelines for repeatable ETL — and feel free to use both in one Lakeflow Job. A DAG with Run if conditions, parameters, retries, idempotence, and quarantine turns a pipeline into a production system rather than a script you launch with a prayer.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/7-create-pipeline-lakeflow-declarative#develop-pipelines-with-the-lakeflow-pipelines-editor" target="_blank" rel="noopener">Develop pipelines with the Lakeflow Pipelines Editor</a></span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">10.7</div>
+    <h2>Lab 10: Design and implement data pipelines with Azure Databricks (45 minutes)</h2>
+  </div>
+  <p>For the hotel platform <strong>GlobStay</strong> (five hotels, nightly batches of reservations from property management systems) you will build a Bronze → Silver → Gold medallion pipeline: parameterized notebooks with deduplication, NULL filters, and data validation, then orchestration in a Lakeflow Job — retry policies, a quality gate with conditional branching, and notifications on failure.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/10-design-implement-data-pipelines.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> Which Run if condition would you use for a task that should send a notification only when one of the upstream tasks fails? <strong>2)</strong> Why must a task with a retry policy be idempotent, and how do you achieve that when writing into a Delta table? <strong>3)</strong> When do you reach for a notebook and when for a Lakeflow Declarative Pipeline — and how do you combine both approaches in a single job?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_09_data_quality.html">← Data quality constraints</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 10 of 16</span>
+      <a href="dp750_11_lakeflow_jobs.html" style="margin-left:auto">Lakeflow Jobs →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

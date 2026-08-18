@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Monitor, troubleshoot, and optimize workloads — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Monitor, troubleshoot, and optimize workloads</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="../dp750_13_monitoring.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_14_fabric_prehled.html" class="next">Microsoft Fabric overview →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-monitoring-spotreby" class="toc-item active" data-section="sec-monitoring-spotreby">Monitoring and managing cluster consumption</a>
+    <a href="#sec-lakeflow-jobs" class="toc-item" data-section="sec-lakeflow-jobs">Troubleshooting and repairing Lakeflow Jobs</a>
+    <a href="#sec-spark-ui" class="toc-item" data-section="sec-spark-ui">Troubleshooting Spark jobs and notebooks</a>
+    <a href="#sec-skew-spill-shuffle" class="toc-item" data-section="sec-skew-spill-shuffle">Caching, skew, spill, and shuffle</a>
+    <a href="#sec-log-analytics" class="toc-item" data-section="sec-log-analytics">Log streaming into Azure Log Analytics</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 13: Monitor, Troubleshoot, and Optimize Workloads (45 minutes)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Chapter 13</div>
+      <h1>Monitor, troubleshoot, and optimize workloads</h1>
+      <div class="hero-subtitle">Cluster consumption, repairing Lakeflow Jobs, Spark UI, caching, skew, spill, shuffle, and Log Analytics</div>
+      <div class="hero-meta"><span>🗂 Monitoring</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Chapter objectives</h3>
+  <ul>
+    <li>Monitor cluster consumption with metrics, system tables, and budgets, and set up auto-termination with autoscaling.</li>
+    <li>Diagnose failed Lakeflow Jobs runs and fix them with repair run, without repeating the whole job.</li>
+    <li>Read the Spark UI — find your way around the job → stage → task structure and locate bottlenecks and failure causes.</li>
+    <li>Recognize and resolve data skew, memory spill, and excessive shuffle (broadcast join, AQE, salting).</li>
+    <li>Describe streaming diagnostic logs into Azure Log Analytics and query them with KQL.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-monitoring-spotreby">
+  <div class="section-header">
+    <div class="section-num">13.1</div>
+    <h2>Monitoring and managing cluster consumption</h2>
+  </div>
+
+  <p>Running a lakehouse in production is not only about the pipeline finishing. It is about it finishing <strong>for reasonable money</strong> and about you learning of a problem before the finance department does. A single forgotten interactive cluster running over the weekend can generate a surprisingly high bill — and an undersized cluster, conversely, means slow jobs and missed SLAs. The goal of monitoring is not to minimize cost at any price, but to <strong>fit the resources exactly to the workload</strong>.</p>
+
+  <p>Azure Databricks offers three complementary layers of observability: immediate metrics in the workspace, historical data in <strong>system tables</strong>, and centralized logs in Azure Log Analytics.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="The Azure Databricks monitoring stack. A workspace with clusters, jobs, and SQL warehouses sends data into three channels: the Metrics UI for the immediate state, system tables in Unity Catalog for cost history, and diagnostic settings that stream logs into Azure Log Analytics for KQL queries and alerts.">
+      <defs>
+        <marker id="arr13a" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/>
+        </marker>
+      </defs>
+      <!-- workspace -->
+      <rect x="20" y="60" width="200" height="200" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="120" y="88" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Databricks workspace</text>
+      <rect x="40" y="105" width="160" height="38" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="120" y="129" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Clusters (all-purpose, job)</text>
+      <rect x="40" y="153" width="160" height="38" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="120" y="177" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Lakeflow Jobs</text>
+      <rect x="40" y="201" width="160" height="38" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="120" y="225" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SQL warehouses</text>
+      <!-- arrows to channels -->
+      <line x1="220" y1="105" x2="300" y2="95" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
+      <line x1="220" y1="160" x2="300" y2="165" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
+      <line x1="220" y1="230" x2="300" y2="245" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
+      <!-- channel 1 -->
+      <rect x="305" y="65" width="210" height="60" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Metrics UI</text>
+      <text x="410" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">CPU · memory · network · Spark tasks</text>
+      <!-- channel 2 -->
+      <rect x="305" y="140" width="210" height="60" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="165" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">System tables</text>
+      <text x="410" y="185" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">system.billing · system.lakeflow</text>
+      <!-- channel 3 -->
+      <rect x="305" y="215" width="210" height="60" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Diagnostic settings</text>
+      <text x="410" y="260" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">audit + diagnostic events</text>
+      <!-- arrows to outputs -->
+      <line x1="515" y1="95" x2="595" y2="95" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
+      <line x1="515" y1="170" x2="595" y2="170" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
+      <line x1="515" y1="245" x2="595" y2="245" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
+      <!-- outputs -->
+      <rect x="600" y="65" width="200" height="60" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="700" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Immediate state</text>
+      <text x="700" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">right-sizing, bottlenecks</text>
+      <rect x="600" y="140" width="200" height="60" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="700" y="165" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Cost and history</text>
+      <text x="700" y="185" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">SQL queries, budgets, chargeback</text>
+      <rect x="600" y="215" width="200" height="60" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="700" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Azure Log Analytics</text>
+      <text x="700" y="260" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">KQL queries, alerts, dashboards</text>
+      <text x="410" y="35" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Three layers of observability</text>
+    </svg>
+    <figcaption>The monitoring stack: the workspace generates metrics and events that flow into three channels — the Metrics UI for the immediate state, system tables for history and cost, and diagnostic settings for central logs in Azure Log Analytics.</figcaption>
+  </figure>
+
+  <h3>Cluster and SQL warehouse metrics</h3>
+  <p>You will find the native metrics interface on every all-purpose and job cluster: <code class="inline">Compute</code> → the chosen cluster → the <code class="inline">Metrics</code> tab. It shows three categories: <strong>hardware metrics</strong> (CPU, memory, network throughput), <strong>Spark metrics</strong> (active/failed/completed tasks, shuffle read and write), and <strong>GPU metrics</strong> on the ML runtime. The data can be filtered up to 30 days back and you can switch between the aggregated view and individual nodes — handy when you suspect one particular worker.</p>
+  <p>SQL warehouses have their own <code class="inline">Monitoring</code> tab: live statistics (running and queued queries, cluster count), a <strong>peak query count</strong> chart, and query history with a filter for long-running queries. If the running-clusters chart sits at the autoscaling maximum for long periods, the warehouse is not keeping up.</p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> serverless compute for notebooks and jobs has no Metrics tab — query insights are used instead. The goal is the same, the route is different.</div></div>
+
+  <h3>Auto-termination and autoscaling</h3>
+  <p>Monitoring reveals the patterns, configuration reacts to them. <strong>Auto-termination</strong> shuts a cluster down after a given period of inactivity — 30–60 minutes is usual for development environments. A cluster is "inactive" only once all commands have finished, including Spark jobs, Structured Streaming, and JDBC calls. <strong>Autoscaling</strong> dynamically adds and removes workers between the configured minimum and maximum; according to the Learn module this can save roughly 20–40 % of cost compared with a fixed size (the real saving depends on the workload profile).</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> auto-termination does not track the activity of legacy DStreams. If you still run such a workload, either turn auto-termination off or (better) migrate to Structured Streaming.</div></div>
+
+  <h3>Budgets and system tables for cost</h3>
+  <p>Track the real spend through <strong>budgets</strong> in the account console (financial targets + email notifications on overrun, filterable per team/project/workspace) and above all through the <code class="inline">system.billing.usage</code> system table, which can be queried directly with SQL. Anyone expecting to "somehow work the cost out from the invoice" will be surprised — without tags and system tables, attributing costs retrospectively is very hard.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- daily DBU consumption trend</span>
+<span class="kw">SELECT</span> <span class="col">usage_date</span>, <span class="fn">sum</span>(<span class="col">usage_quantity</span>) <span class="kw">AS</span> <span class="col">dbus_consumed</span>
+<span class="kw">FROM</span> <span class="tbl">system.billing.usage</span>
+<span class="kw">WHERE</span> <span class="col">sku_name</span> <span class="op">=</span> <span class="str">"STANDARD_ALL_PURPOSE_COMPUTE"</span>
+<span class="kw">GROUP BY</span> <span class="col">usage_date</span>
+<span class="kw">ORDER BY</span> <span class="col">usage_date</span> <span class="kw">ASC</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- which jobs consumed the most DBUs (candidates for optimization)</span>
+<span class="kw">SELECT</span> <span class="col">usage_metadata.job_id</span> <span class="kw">AS</span> <span class="col">job_id</span>,
+       <span class="fn">sum</span>(<span class="col">usage_quantity</span>) <span class="kw">AS</span> <span class="col">total_dbus</span>
+<span class="kw">FROM</span> <span class="tbl">system.billing.usage</span>
+<span class="kw">WHERE</span> <span class="col">usage_metadata.job_id</span> <span class="kw">IS NOT NULL</span>
+<span class="kw">GROUP BY</span> <span class="col">job_id</span>
+<span class="kw">ORDER BY</span> <span class="col">total_dbus</span> <span class="kw">DESC</span></pre>
+  </div>
+
+  <p>Joining <code class="inline">system.compute.clusters</code> tells you whose clusters burn the most DBUs (<code class="inline">owned_by</code>), and <code class="inline">custom_tags</code> lets you split costs across projects. <strong>Tags</strong> propagate from clusters and the workspace into the billing records — but only from the moment you set them. You cannot tag history retrospectively.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> introduce a tagging convention (business unit, project, environment) at the very start of a project and enforce it with a cluster policy. A monthly review of the cost report then takes minutes, not days.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Serverless and billing — what to watch out for<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Serverless compute has a different billing model. In <code class="inline">system.billing.usage</code> you isolate it with the filter <code class="inline">product_features.is_serverless = true</code>; the <code class="inline">identity_metadata.run_as</code> column says which identity the workload ran under. Because of the distributed architecture, one serverless run can generate <strong>several billing records</strong> — always aggregate with <code class="inline">SUM()</code>, never rely on "one row = one run". For budgets you need account admin permissions; a workspace admin typically only sees them.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/2-monitor-manage-cluster-consumption#track-costs-with-budgets-and-system-tables" target="_blank" rel="noopener">Track costs with budgets and system tables</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/2-monitor-manage-cluster-consumption#monitor-sql-warehouse-performance" target="_blank" rel="noopener">Monitor SQL warehouse performance</a></span></div>
+</div>
+
+<div class="section" id="sec-lakeflow-jobs">
+  <div class="section-header">
+    <div class="section-num">13.2</div>
+    <h2>Troubleshooting and repairing Lakeflow Jobs</h2>
+  </div>
+
+  <p>When an orchestrated job fails, the first question is not "why" but "<strong>where</strong>". Azure Databricks derives the state of the whole run from the <strong>leaf tasks</strong> — the tasks with no downstream dependencies. That is where the seemingly odd "Succeeded with failures" state comes from: a task in the middle of the DAG failed, but all the leaf tasks finished.</p>
+
+  <table>
+    <tr><th>Run state</th><th>Meaning</th></tr>
+    <tr><td><strong>Failed</strong></td><td>One or more leaf tasks did not finish successfully.</td></tr>
+    <tr><td><strong>Succeeded with failures</strong></td><td>Some tasks failed, but all leaf tasks succeeded.</td></tr>
+    <tr><td><strong>Skipped</strong></td><td>The run did not start — the concurrent run limit (job/workspace) was exceeded.</td></tr>
+    <tr><td><strong>Timed Out</strong></td><td>The run exceeded the configured maximum duration.</td></tr>
+    <tr><td><strong>Canceled</strong></td><td>The run was stopped by a user or by automation.</td></tr>
+  </table>
+
+  <p>Individual tasks can additionally be <strong>Disabled</strong> — either you turn them off by hand, or Lakeflow Jobs turns them off automatically because an upstream task is disabled. In the DAG view you recognize them by the crossed-out circle icon.</p>
+
+  <h3>Where it broke: the matrix view</h3>
+  <p>Diagnosis starts in <code class="inline">Jobs &amp; Pipelines</code> → the job detail → the <code class="inline">Runs</code> tab. The <strong>matrix view</strong> shows the run history as a grid where every cell is the state of one task in one run:</p>
+  <ol>
+    <li>Hover over a red (failed) task — you will see the metadata including the error message.</li>
+    <li>Click the task and open <strong>Task run details</strong> with the complete output and logs.</li>
+    <li>Look for a pattern: the same task failing repeatedly → a problem in the task's code or configuration. Failures "jumping" randomly between different tasks → more likely a cluster or resource problem.</li>
+  </ol>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> the <code class="inline">Diagnose Error</code> button in the Jobs UI has the error message analyzed by the assistant (Genie) and suggests solutions for common problems. A good first step, not a substitute for understanding.</div></div>
+
+  <h3>Repair run: fixing without repeating the whole job</h3>
+  <p>The most valuable tool in this section: <strong>repair run</strong> re-runs <em>only the failed tasks and their descendants</em>, not the whole job. For a pipeline where a three-hour transformation succeeded and only the final export failed, that is the difference between three hours and three minutes of compute time.</p>
+  <ol>
+    <li>Open the failed run (the <code class="inline">Start time</code> column or the matrix view).</li>
+    <li>Choose <code class="inline">Repair run</code> — the dialog shows the list of tasks that will be re-run.</li>
+    <li>Optionally adjust the task parameters — the override applies to this repair run only.</li>
+    <li>Confirm; once finished, the matrix view adds a new column with the repair results.</li>
+  </ol>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> repair is available only for jobs with two or more tasks. If the tasks share a job cluster, the repair creates a new cluster instance (e.g. <code class="inline">my_job_cluster_v1</code>). A disabled task is normally skipped during a repair — you force it by including it explicitly in the repair request.</div></div>
+
+  <h3>Stopping, restarting, and proactive monitoring</h3>
+  <p>You stop an active run with the stop button in the <code class="inline">Runs</code> tab (in bulk through <code class="inline">Cancel runs</code> / <code class="inline">Cancel all queued runs</code>). Continuous jobs that fail repeatedly go into <strong>exponential backoff</strong> — Databricks waits longer and longer between attempts. Once the cause is fixed, use <code class="inline">Restart run</code>: it cancels the active run, resets the waiting interval, and starts a new run immediately.</p>
+  <p>Complement reactive firefighting with prevention: <strong>notifications</strong> (email, Slack, webhook) on job failure, a regular review of the matrix view, and queries against the <code class="inline">system.lakeflow</code> schema, where you will find the history of jobs and runs across the account — trends in run duration reveal degradation before it becomes an incident.</p>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/3-troubleshoot-repair-lakeflow-jobs#repair-failed-job-runs" target="_blank" rel="noopener">Repair failed job runs</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/3-troubleshoot-repair-lakeflow-jobs#fix-common-failure-causes" target="_blank" rel="noopener">Fix common failure causes</a></span></div>
+</div>
+
+<div class="section" id="sec-spark-ui">
+  <div class="section-header">
+    <div class="section-num">13.3</div>
+    <h2>Troubleshooting Spark jobs and notebooks</h2>
+  </div>
+
+  <p>The Jobs UI tells you <em>which task</em> failed. But when you need to find out <em>why it is slow</em>, you have to go a layer down — into the <strong>Spark UI</strong>. For that you need to understand how Spark structures the work.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 340" role="img" aria-label="The anatomy of a Spark job. An action in a notebook starts a job that is split into stage 1 and stage 2. Each stage contains tasks running in parallel over individual partitions. Between the stages is a shuffle boundary where data is serialized, written to disk, transferred over the network, and deserialized.">
+      <defs>
+        <marker id="arr13b" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/>
+        </marker>
+      </defs>
+      <!-- action -->
+      <rect x="20" y="40" width="170" height="52" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="105" y="62" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">An action in a notebook</text>
+      <text x="105" y="80" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">df.write, count(), display()</text>
+      <line x1="105" y1="92" x2="105" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13b)"/>
+      <text x="115" y="118" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">starts</text>
+      <!-- job container -->
+      <rect x="20" y="135" width="780" height="180" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="45" y="162" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Job</text>
+      <!-- stage 1 -->
+      <rect x="45" y="175" width="290" height="120" rx="8" fill="#ffffff" stroke="#1a3a6b"/>
+      <text x="190" y="198" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Stage 1 — read + filter</text>
+      <rect x="60" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="90" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 1</text>
+      <rect x="128" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="158" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 2</text>
+      <rect x="196" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="226" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 3</text>
+      <rect x="264" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="294" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 4</text>
+      <text x="190" y="270" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">1 task = 1 partition, running in parallel</text>
+      <!-- shuffle boundary -->
+      <line x1="390" y1="175" x2="390" y2="300" stroke="#e8721c" stroke-width="2" stroke-dasharray="6,4"/>
+      <text x="390" y="168" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">shuffle boundary</text>
+      <text x="390" y="312" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">serialization → disk → network → deserialization</text>
+      <line x1="335" y1="225" x2="440" y2="225" stroke="#e8721c" stroke-width="2" marker-end="url(#arr13b)"/>
+      <!-- stage 2 -->
+      <rect x="445" y="175" width="330" height="120" rx="8" fill="#ffffff" stroke="#1a3a6b"/>
+      <text x="610" y="198" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Stage 2 — join / aggregation</text>
+      <rect x="470" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="500" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 1</text>
+      <rect x="540" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="570" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 2</text>
+      <rect x="610" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="640" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 3</text>
+      <rect x="680" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="710" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 4</text>
+      <text x="610" y="270" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">a stage = a span with no data movement between nodes</text>
+    </svg>
+    <figcaption>The anatomy of a Spark job: an action starts a job, the job splits into stages separated by a shuffle boundary, and each stage runs as a set of parallel tasks over partitions.</figcaption>
+  </figure>
+
+  <h3>Three categories of failure</h3>
+  <p>The causes of Spark job failures fall into three families: <strong>code errors</strong> (syntax, wrong transformations, schema mismatch — the error message usually points straight at the problem), <strong>lack of resources</strong> (out-of-memory, slow shuffle, repeatedly failing tasks), and <strong>environment problems</strong> (a cluster that did not start because of subscription limits, spot instance reclaim, an unavailable external source). The first category is fixed in code, the second by a combination of cluster configuration and optimization, the third often outside Databricks.</p>
+
+  <h3>How to work through the Spark UI</h3>
+  <p>You open the Spark UI from the cluster page (the <code class="inline">Spark UI</code> tab). Start the investigation on the <strong>Jobs Timeline</strong> and look for three patterns:</p>
+  <ul>
+    <li><strong>Failed jobs</strong> (a red indicator) — clicking shows the failed stage and the specific reason, including links to task-level errors.</li>
+    <li><strong>Long-running jobs</strong> — a job markedly longer than the others is the first candidate for a drill-down into the stages.</li>
+    <li><strong>Gaps in the timeline</strong> — short pauses are normal (the driver coordinating), but a gap of more than a minute in the middle of a pipeline suggests an overloaded driver or a cluster failure.</li>
+  </ul>
+  <p>In a problematic job, open the longest stage and read the task metrics: the <code class="inline">Input</code>, <code class="inline">Output</code>, <code class="inline">Shuffle Read</code>, and <code class="inline">Shuffle Write</code> columns show how much data is moving where.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> a diagnostic shortcut — a stage with a <strong>single task</strong> means insufficient parallelization (often after a <code class="inline">coalesce(1)</code> or a narrow read), while <strong>uneven task durations</strong> within the same stage point to data skew (see section 13.4).</div></div>
+
+  <h3>Cluster metrics and driver vs. workers</h3>
+  <p>Complement the Spark UI with a look at the cluster's <code class="inline">Metrics</code> tab. The <strong>Server load distribution</strong> visualization colors the nodes by load: red = overloaded, blue = underused. The classic pattern: a <strong>red driver and blue workers</strong> — the driver is overloaded (typically collecting large results into the notebook, thousands of tiny tasks, or single-threaded Python code) and needs a bigger instance or a code change. High shuffle volumes with a slow run, in turn, point to a network bottleneck — the answer is earlier filtering, a broadcast join, or repartitioning.</p>
+
+  <h3>Restarting a cluster</h3>
+  <p>Exhausted resources, stuck executors, or an outdated image are sometimes only solved by a restart. Before doing it, check the cluster's <code class="inline">Event log</code> (instance acquisition failures, spot reclaims, executor terminations) and restart through the UI or the CLI:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># restart a cluster with the Databricks CLI</span>
+databricks clusters restart CLUSTER_ID
+
+<span class="cm"># you can find CLUSTER_ID with</span>
+databricks clusters list</pre>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> restarting a cluster terminates running jobs and <strong>wipes the Spark UI history</strong>. Save the diagnostic information beforehand. For long-running streaming clusters, consider scheduled restarts during maintenance windows so they run on current images.</div></div>
+</div>
+
+<div class="section" id="sec-skew-spill-shuffle">
+  <div class="section-header">
+    <div class="section-num">13.4</div>
+    <h2>Caching, skew, spill, and shuffle</h2>
+  </div>
+
+  <p>A query that ran for ten minutes yesterday runs for an hour today. Most such mysteries can be traced to four patterns: <strong>caching problems</strong>, <strong>data skew</strong>, <strong>memory spill</strong>, and <strong>excessive shuffle</strong>. They are not independent — skew typically causes spill and both make shuffle worse. That is why they are investigated together.</p>
+
+  <table>
+    <tr><th>Tool</th><th>What it shows</th><th>Where to find it</th></tr>
+    <tr><td><strong>DAG</strong></td><td>The execution plan, operator order, exchange (shuffle) nodes</td><td>Spark UI / query profile</td></tr>
+    <tr><td><strong>Spark UI</strong></td><td>Job, stage, and task metrics, spill, shuffle read/write</td><td>The cluster page → Spark UI</td></tr>
+    <tr><td><strong>Query profile</strong></td><td>A breakdown of a SQL query by operator (time, rows, memory)</td><td>Query History → See query profile</td></tr>
+  </table>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> start with the DAG for the overall picture of the flow and only then go into the Spark UI or the query profile for the specific stage where the time is spent.</div></div>
+
+  <h3>Caching: disk cache vs. Spark cache</h3>
+  <p>Azure Databricks automatically caches Parquet files on the local disks of the workers — the so-called <strong>disk cache</strong> (formerly Delta cache). It works transparently; you can check whether it is on with the <code class="inline">spark.databricks.io.cache.enabled</code> configuration. Alongside it there is the classic <strong>Spark cache</strong> (<code class="inline">.cache()</code> / <code class="inline">.persist()</code>), which requires manual management. Two opposite problems: <em>under-caching</em> (repeatedly reading the same data from remote storage — a high <code class="inline">Input</code> on the same stages over and over in the Spark UI) and <em>over-caching</em> (the cache eats the memory needed for processing and contributes to OOM). Anyone expecting <code class="inline">.cache()</code> to always be a speed-up will be surprised — cached data that is never read again is just paid-for memory; and do not forget <code class="inline">.unpersist()</code>.</p>
+
+  <h3>Data skew: a few tasks toil, the rest wait</h3>
+  <p><strong>Data skew</strong> = some partitions are markedly larger than the others. A few tasks then run many times longer and the whole cluster waits for the stragglers. The typical causes: an uneven distribution of keys in joins and aggregations (one customer in 90 % of the records), <code class="inline">NULL</code> values all heading into one partition, time-based partitioning with "heavy" recent days.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="A visualization of data skew. On the left the Before panel: eight tasks, seven short bars and one extremely long red bar crossing the dashed 75th percentile line — the whole stage waits for the slowest task. On the right the After panel with AQE or salting: eight roughly equal bars, and the stage finishes sooner.">
+      <!-- left panel -->
+      <rect x="20" y="30" width="380" height="250" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="210" y="58" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Before: skew</text>
+      <!-- bars -->
+      <rect x="50" y="80" width="90" height="16" rx="4" fill="#1a3a6b"/>
+      <rect x="50" y="102" width="75" height="16" rx="4" fill="#1a3a6b"/>
+      <rect x="50" y="124" width="100" height="16" rx="4" fill="#1a3a6b"/>
+      <rect x="50" y="146" width="80" height="16" rx="4" fill="#1a3a6b"/>
+      <rect x="50" y="168" width="95" height="16" rx="4" fill="#1a3a6b"/>
+      <rect x="50" y="190" width="70" height="16" rx="4" fill="#1a3a6b"/>
+      <rect x="50" y="212" width="85" height="16" rx="4" fill="#1a3a6b"/>
+      <rect x="50" y="234" width="320" height="16" rx="4" fill="#ef4444"/>
+      <text x="270" y="230" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#ef4444">task 8: Max ≫ 75th percentile</text>
+      <!-- percentile line -->
+      <line x1="160" y1="72" x2="160" y2="258" stroke="#e8721c" stroke-width="2" stroke-dasharray="5,4"/>
+      <text x="166" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">75th percentile</text>
+      <text x="210" y="272" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">task duration → the stage waits for the slowest one</text>
+      <!-- right panel -->
+      <rect x="420" y="30" width="380" height="250" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="610" y="58" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#22c55e">After: AQE / salting</text>
+      <rect x="450" y="80" width="105" height="16" rx="4" fill="#22c55e"/>
+      <rect x="450" y="102" width="95" height="16" rx="4" fill="#22c55e"/>
+      <rect x="450" y="124" width="110" height="16" rx="4" fill="#22c55e"/>
+      <rect x="450" y="146" width="100" height="16" rx="4" fill="#22c55e"/>
+      <rect x="450" y="168" width="108" height="16" rx="4" fill="#22c55e"/>
+      <rect x="450" y="190" width="92" height="16" rx="4" fill="#22c55e"/>
+      <rect x="450" y="212" width="103" height="16" rx="4" fill="#22c55e"/>
+      <rect x="450" y="234" width="112" height="16" rx="4" fill="#22c55e"/>
+      <line x1="575" y1="72" x2="575" y2="258" stroke="#6b7280" stroke-width="2" stroke-dasharray="5,4"/>
+      <text x="581" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">end of stage</text>
+      <text x="610" y="272" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">even partitions → the parallelism is actually used</text>
+    </svg>
+    <figcaption>Data skew in the Spark UI: one overloaded task holds up the whole stage; once the skewed partitions are broken up (AQE, salting) the tasks finish at roughly the same time.</figcaption>
+  </figure>
+
+  <p>The diagnosis: in the Spark UI open the stage detail and the <strong>Summary Metrics</strong> section. From the documentation: <em>"If the Max is more than 50% higher than the 75th percentile, you likely have skew."</em> The remedies, in the order you should try them:</p>
+  <ul>
+    <li><strong>Adaptive Query Execution (AQE)</strong> — breaks skewed partitions apart at run time during joins. It is enabled on modern Databricks Runtimes; verify the configuration.</li>
+    <li><strong>Broadcast join</strong> — send the small table to every executor and sidestep skew in a shuffle join entirely.</li>
+    <li><strong>Salting</strong> — manually adding a random component to the key when the automation is not enough (see the aside below).</li>
+  </ul>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># check the key configurations</span>
+spark.conf.<span class="fn">get</span>(<span class="str">"spark.databricks.io.cache.enabled"</span>)          <span class="cm"># disk cache</span>
+spark.conf.<span class="fn">get</span>(<span class="str">"spark.databricks.optimizer.adaptive.enabled"</span>) <span class="cm"># AQE</span>
+
+<span class="cm"># let shuffle partitions be managed dynamically</span>
+spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.shuffle.partitions"</span>, <span class="str">"auto"</span>)</pre>
+  </div>
+
+  <h3>Memory spill: memory ran out, going through disk</h3>
+  <p><strong>Spill</strong> happens when intermediate results do not fit in memory and Spark puts them on disk — every byte is written and read again. In the stage detail, look for the <code class="inline">Shuffle Spill (Memory)</code> and <code class="inline">Shuffle Spill (Disk)</code> metrics: <strong>any non-zero value</strong> means memory pressure. The remedies: increase the number of partitions (less data per task — hence the <code class="inline">"auto"</code> above), workers with a higher memory-to-core ratio, and above all reduce the data being processed (column selection, early filtering).</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> spill is often only a symptom of skew — an overly large partition does not fit in memory and overflows to disk. Fix the skew first; the spill usually disappears on its own.</div></div>
+
+  <h3>Shuffle: the most expensive operation in Spark</h3>
+  <p><strong>Shuffle</strong> moves data between nodes during joins, aggregations, and repartitioning. It involves serialization, writing to disk, network transfer, and deserialization — which is why it is typically the most expensive part of a query. In the Spark UI you read it from the <code class="inline">Shuffle Read</code> / <code class="inline">Shuffle Write</code> columns; in the DAG and the query profile it appears as <strong>Exchange</strong> nodes. When shuffle read markedly exceeds the size of the input data, you are moving data around needlessly.</p>
+  <ul>
+    <li><strong>Filter as early as possible</strong> — send only the data you really need into the shuffle.</li>
+    <li><strong>Broadcast join</strong> for small tables — the Learn module gives a default automatic broadcast limit of about 30 MB (and AQE can also flip a sort-merge join to a broadcast at run time when runtime statistics reveal a small table); verify the exact thresholds for your runtime in the documentation.</li>
+    <li><strong>Do not repartition needlessly</strong> — every <code class="inline">repartition()</code> is a full shuffle.</li>
+    <li><strong>Co-locate data</strong> — partition/bucket tables that are frequently joined on the same key in the same way.</li>
+  </ul>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># explicit broadcast of a small dimension table</span>
+result = (fact_df
+    .<span class="fn">join</span>(F.<span class="fn">broadcast</span>(dim_df), <span class="str">"customer_id"</span>)
+    .<span class="fn">groupBy</span>(<span class="str">"region"</span>)
+    .<span class="fn">agg</span>(F.<span class="fn">sum</span>(<span class="str">"amount"</span>).<span class="fn">alias</span>(<span class="str">"total_amount"</span>)))</pre>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Salting: breaking up a skewed key by hand<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>When AQE is not enough (extreme skew in an aggregation), add a random "salt" to the key — the key splits into N sub-keys and you aggregate in two phases:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="cm"># phase 1: aggregate by key + salt (spreads the skewed key across 8 tasks)</span>
+salted = (df
+    .<span class="fn">withColumn</span>(<span class="str">"salt"</span>, (F.<span class="fn">rand</span>() <span class="op">*</span> <span class="num">8</span>).<span class="fn">cast</span>(<span class="str">"int"</span>))
+    .<span class="fn">groupBy</span>(<span class="str">"customer_id"</span>, <span class="str">"salt"</span>)
+    .<span class="fn">agg</span>(F.<span class="fn">sum</span>(<span class="str">"amount"</span>).<span class="fn">alias</span>(<span class="str">"partial"</span>)))
+
+<span class="cm"># phase 2: the final aggregation over the small subtotals</span>
+final = salted.<span class="fn">groupBy</span>(<span class="str">"customer_id"</span>).<span class="fn">agg</span>(F.<span class="fn">sum</span>(<span class="str">"partial"</span>))</pre>
+      </div>
+      <p>The price of salting is more complex code and a double aggregation — which is why it is only the third choice after AQE and a broadcast join.</p>
+    </div>
+  </div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> the diagnostic procedure — <strong>1)</strong> Summary Metrics: Max vs. the 75th percentile → skew, <strong>2)</strong> Spill (Memory/Disk) &gt; 0 → memory pressure, <strong>3)</strong> Shuffle Read ≫ Input → needless data movement, <strong>4)</strong> a high Input on repeated reads → caching. The fixes: AQE, broadcast, salting, early filtering, "auto" shuffle partitions.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/5-resolve-cache-skew-spill-shuffle#investigate-data-skew" target="_blank" rel="noopener">Investigate data skew</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/5-resolve-cache-skew-spill-shuffle#investigate-shuffle-issues" target="_blank" rel="noopener">Investigate shuffle issues</a></span></div>
+</div>
+
+<div class="section" id="sec-log-analytics">
+  <div class="section-header">
+    <div class="section-num">13.5</div>
+    <h2>Log streaming into Azure Log Analytics</h2>
+  </div>
+
+  <p>As soon as a company runs more than one workspace, searching logs "workspace by workspace" stops scaling. <strong>Log streaming into Azure Log Analytics</strong> centralizes audit and diagnostic logs from the whole environment into one place, where you query them with <strong>KQL (Kusto Query Language)</strong> and build alerts and dashboards on top of them.</p>
+
+  <p>The data flow: the workspace generates audit/diagnostic events (cluster creation, job run, notebook execution, permission change) → <strong>Azure diagnostic settings</strong> capture and route them → Log Analytics stores them in per-service tables → you query with KQL. Diagnostic settings are typically configured by the platform administrator in the Azure portal; a data engineer mostly consumes the logs.</p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> diagnostic logs require the <strong>Premium plan</strong> of Azure Databricks and typically appear in Log Analytics within ~15 minutes of the event. For querying audit logs inside Databricks the preferred route is the <code class="inline">system.access.audit</code> system table — choose Log Analytics when you need cross-service monitoring, KQL alerts, or integration with Azure Monitor.</div></div>
+
+  <table>
+    <tr><th>Table</th><th>Contents</th></tr>
+    <tr><td><code class="inline">DatabricksClusters</code></td><td>Cluster creation, termination, resizing, and configuration</td></tr>
+    <tr><td><code class="inline">DatabricksJobs</code></td><td>Job creation, runs, failures, schedule changes</td></tr>
+    <tr><td><code class="inline">DatabricksNotebook</code></td><td>Notebook execution and edits</td></tr>
+    <tr><td><code class="inline">DatabricksSQL</code></td><td>SQL warehouse and query operations</td></tr>
+    <tr><td><code class="inline">DatabricksTables</code></td><td>Table creation/deletion, access, permission changes</td></tr>
+    <tr><td><code class="inline">DatabricksSecrets</code></td><td>Access to secret scopes and secrets</td></tr>
+  </table>
+
+  <p>Every table shares a standard set of columns: <code class="inline">TimeGenerated</code>, <code class="inline">OperationName</code>, <code class="inline">Identity</code>, <code class="inline">SourceIPAddress</code>, <code class="inline">RequestParams</code>, and <code class="inline">Response</code>. So investigating job failures starts in <code class="inline">DatabricksJobs</code>, and a security incident in <code class="inline">DatabricksSecrets</code> and <code class="inline">DatabricksTables</code>.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">KQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">// which job operations failed in the last 7 days and when the failures cluster</span>
+<span class="tbl">DatabricksJobs</span>
+<span class="op">|</span> <span class="kw">where</span> <span class="col">TimeGenerated</span> <span class="op">&gt;</span> <span class="fn">ago</span>(<span class="num">7d</span>)
+<span class="op">|</span> <span class="kw">where</span> <span class="col">Response</span> <span class="kw">contains</span> <span class="str">"error"</span> <span class="kw">or</span> <span class="col">Response</span> <span class="kw">contains</span> <span class="str">"failed"</span>
+<span class="op">|</span> <span class="kw">summarize</span> <span class="col">FailureCount</span> <span class="op">=</span> <span class="fn">count</span>() <span class="kw">by</span> <span class="col">OperationName</span>, <span class="fn">bin</span>(<span class="col">TimeGenerated</span>, <span class="num">1h</span>)
+<span class="op">|</span> <span class="kw">order by</span> <span class="col">FailureCount</span> <span class="kw">desc</span></pre>
+  </div>
+
+  <p>From a query it is one step to an <strong>alert</strong>: in Log Analytics you choose <code class="inline">New alert rule</code>, set the condition and an <strong>action group</strong> (email, SMS, mobile app, ITSM integration). The typical scenarios: more than five job failures in an hour, table operations outside business hours, an unusual wave of cluster creation (runaway automation).</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">KQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">// alert: more than 5 job failures in the last 60 minutes</span>
+<span class="tbl">DatabricksJobs</span>
+<span class="op">|</span> <span class="kw">where</span> <span class="col">TimeGenerated</span> <span class="op">&gt;</span> <span class="fn">ago</span>(<span class="num">1h</span>)
+<span class="op">|</span> <span class="kw">where</span> <span class="col">Response</span> <span class="kw">contains</span> <span class="str">"error"</span> <span class="kw">or</span> <span class="col">Response</span> <span class="kw">contains</span> <span class="str">"failed"</span>
+<span class="op">|</span> <span class="kw">summarize</span> <span class="col">FailureCount</span> <span class="op">=</span> <span class="fn">count</span>()
+<span class="op">|</span> <span class="kw">where</span> <span class="col">FailureCount</span> <span class="op">&gt;</span> <span class="num">5</span></pre>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> a proven cross-investigation approach — find the failed run in <code class="inline">DatabricksJobs</code>, check the state of the underlying cluster in <code class="inline">DatabricksClusters</code>, and if the job runs a notebook, track the detail down in <code class="inline">DatabricksNotebook</code>. Frequent autoscaling events, in turn, reveal an undersized default configuration.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/6-implement-log-streaming-azure-analytics#query-logs-with-kusto-query-language" target="_blank" rel="noopener">Query logs with Kusto Query Language</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/6-implement-log-streaming-azure-analytics#create-alerts-for-proactive-monitoring" target="_blank" rel="noopener">Create alerts for proactive monitoring</a></span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">13.6</div>
+    <h2>Lab 13: Monitor, Troubleshoot, and Optimize Workloads (45 minutes)</h2>
+  </div>
+
+  <p>The scenario: a reporting query that used to finish in a few minutes suddenly runs many times longer — the cluster looks busy, but most tasks finish quickly and a few drag on. In the lab you will first create the <strong>synthetic skew and shuffle workloads</strong> yourself (a skewed groupBy, a sort-merge join), diagnose the problems in the Spark UI (Summary Metrics, DAG, Exchange nodes), and then fix them with broadcast joins, AQE, and shuffle reduction.</p>
+
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/13-monitor-troubleshoot-optimize-workloads-azure-databricks.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> the lab requires a classic cluster (not serverless) with <strong>Photon disabled</strong> (<code class="inline">spark.databricks.photon.enabled false</code>). From the lab documentation: <em>"When enabled, it optimises shuffle and skew handling automatically, which masks the performance problems this lab is designed to demonstrate."</em></div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> What in a stage's Summary Metrics tells you there is data skew, and what is the rule of thumb for the ratio of Max to the 75th percentile? <strong>2)</strong> Which tasks does a repair run re-run on a failed Lakeflow Job? <strong>3)</strong> Why does a broadcast join eliminate the shuffle of a large table, and what limits it under the default settings?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_12_dev_lifecycle.html">← Development lifecycle</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 13 of 16</span>
+      <a href="dp750_14_fabric_prehled.html" style="margin-left:auto">Microsoft Fabric overview →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Development lifecycle in Azure Databricks — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Development lifecycle in Azure Databricks</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="../dp750_12_dev_lifecycle.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_13_monitoring.html" class="next">Monitoring and optimization →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-git-folders" class="toc-item active" data-section="sec-git-folders">Git folders: version control right in the workspace</a>
+    <a href="#sec-branching-pr" class="toc-item" data-section="sec-branching-pr">Branching, pull requests, and conflicts</a>
+    <a href="#sec-testovani" class="toc-item" data-section="sec-testovani">Testing strategy: the pyramid, pytest, integration</a>
+    <a href="#sec-bundles" class="toc-item" data-section="sec-bundles">Declarative Automation Bundles: configuration and packaging</a>
+    <a href="#sec-deploy-cli" class="toc-item" data-section="sec-deploy-cli">Deploying a bundle through the Databricks CLI</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 12: Implement Development Lifecycle Processes (45 minutes)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Chapter 12</div>
+      <h1>Development lifecycle in Azure Databricks</h1>
+      <div class="hero-subtitle">Git folders, branching and pull requests, testing, Asset Bundles, and deployment via the CLI</div>
+      <div class="hero-meta"><span>🗂 Automation</span><span data-view="custom">⚠️ Not in the three-day agenda</span></div>
+    </div>
+<div class="callout info" data-view="custom"><div class="callout-icon">ℹ️</div><div><strong>Not in the three-day agenda:</strong> this module is part of the official four-day DP-750 course. We do not cover it in class in the shortened three-day version — the chapter is here for self-study and the lab it links to stays fully available.</div></div>
+
+<div class="objectives">
+  <h3>Chapter objectives</h3>
+  <ul>
+    <li>Apply code versioning best practices with Git folders in Azure Databricks</li>
+    <li>Work with feature branches, pull requests, and resolving merge conflicts</li>
+    <li>Design a testing strategy — unit tests with pytest, integration, end-to-end, and UAT</li>
+    <li>Configure a Declarative Automation Bundle (databricks.yml, variables, targets)</li>
+    <li>Deploy a bundle to dev and prod environments through the Databricks CLI</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-git-folders">
+  <div class="section-header">
+    <div class="section-num">12.1</div>
+    <h2>Git folders: version control right in the workspace</h2>
+  </div>
+
+  <p><strong>Git folders</strong> (formerly known as Repos) bring a visual Git client and API into the Azure Databricks workspace. You clone repositories, create branches, commit, and push straight from the workspace — with no switching to external tools. The supported providers: <strong>Azure DevOps</strong>, <strong>GitHub</strong>, <strong>GitLab</strong>, and <strong>Bitbucket</strong>.</p>
+
+  <p>You create a Git folder through <code class="inline">Workspace</code> → <code class="inline">Create</code> → <code class="inline">Git folder</code>: enter the repository URL, the provider, and a folder name. Once cloned, the repository contents appear in the workspace and you can work with notebooks, Python files, and SQL scripts right away.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> every team member should have <strong>their own Git folder</strong> connected to the shared repository. When several people share one folder, one user switching branches changes the contents for everyone — a source of very hard-to-debug "mysteries".</div></div>
+
+  <p>Always <strong>pull</strong> before starting work — regularly pulling changes minimizes integration conflicts. Be aware that a pull changing a notebook's source code resets its state: cell outputs, comments, and the notebook version are cleared to match the new content.</p>
+
+  <p>Keeping the repository tidy means: a <code class="inline">.gitignore</code> for temporary outputs, credentials, and environment-specific configuration (it applies to already tracked files only after they are explicitly removed from Git), a logical folder structure, and deleting the old branch at the provider after a merge — local branches survive up to 30 days after the remote branch is deleted.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Git folder limits and sparse checkout<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>A working branch is limited to 1 GB and Databricks recommends keeping the number of assets under 20,000 (verify the exact current limits in the documentation). For a large monorepo use <strong>sparse checkout</strong> — you clone only the directories you actually need.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/2-apply-version-control-git#understand-git-folders-in-azure-databricks" target="_blank" rel="noopener">Understand Git folders in Azure Databricks</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/2-apply-version-control-git#keep-your-repository-organized" target="_blank" rel="noopener">Keep your repository organized</a></span></div>
+</div>
+
+<div class="section" id="sec-branching-pr">
+  <div class="section-header">
+    <div class="section-num">12.2</div>
+    <h2>Branching, pull requests, and conflicts</h2>
+  </div>
+
+  <p>A <strong>feature branch</strong> isolates work in progress from the main branch. In the Git dialog (the button with the branch name next to the notebook) you choose <code class="inline">Create branch</code>, name it, and typically create it from <code class="inline">main</code>. Consistent naming pays off:</p>
+
+  <table>
+    <tr><th>Pattern</th><th>Use</th></tr>
+    <tr><td><code class="inline">feature/feature-name</code></td><td>new functionality</td></tr>
+    <tr><td><code class="inline">bugfix/problem-description</code></td><td>bug fixes</td></tr>
+    <tr><td><code class="inline">users/name/description</code></td><td>personal experiments</td></tr>
+  </table>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> switching branches can <strong>delete workspace assets</strong> the target branch does not contain — shared or bookmarked notebooks suddenly disappear. Uncommitted changes are carried over to the new branch on switch if they do not conflict; discard beforehand whatever you do not want carried over.</div></div>
+
+  <p>You commit from the Git dialog: the UI highlights the changed files, shows a visual diff, you write a descriptive commit message and hit <code class="inline">Commit &amp; Push</code>. A <strong>pull request</strong> is then created and reviewed in the Git provider's interface — Databricks provides the Git operations, code review lives at the provider. You typically cannot commit directly into a protected <code class="inline">main</code>; you go through a feature branch and a PR.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 260" role="img" aria-label="The Git workflow in Azure Databricks: a feature branch is created from main, commits are made in the Git folder, a push sends the changes to the Git provider where a pull request with code review and CI tests takes place, and after the merge into main a deploy follows.">
+      <defs><marker id="arr12a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker></defs>
+      <rect x="0" y="0" width="820" height="260" fill="#ffffff"/>
+      <text x="410" y="24" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Git workflow: branch → PR → merge → deploy</text>
+      <!-- main line -->
+      <line x1="40" y1="80" x2="780" y2="80" stroke="#1a3a6b" stroke-width="3"/>
+      <text x="52" y="66" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">main (protected)</text>
+      <circle cx="90" cy="80" r="7" fill="#1a3a6b"/>
+      <circle cx="620" cy="80" r="8" fill="#22c55e" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="620" y="62" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">merge</text>
+      <!-- feature line -->
+      <path d="M 90 80 C 130 80 130 160 180 160" fill="none" stroke="#e8721c" stroke-width="2.5"/>
+      <line x1="180" y1="160" x2="440" y2="160" stroke="#e8721c" stroke-width="2.5"/>
+      <text x="200" y="184" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">feature/cdr-cleanup</text>
+      <circle cx="240" cy="160" r="6" fill="#e8721c"/>
+      <circle cx="330" cy="160" r="6" fill="#e8721c"/>
+      <circle cx="420" cy="160" r="6" fill="#e8721c"/>
+      <text x="330" y="204" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">commits in the Git folder (Databricks workspace)</text>
+      <!-- PR box -->
+      <rect x="470" y="130" width="130" height="60" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="535" y="152" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Pull request</text>
+      <text x="535" y="168" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">review + CI tests</text>
+      <text x="535" y="182" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">(Git provider)</text>
+      <line x1="440" y1="160" x2="466" y2="160" stroke="#e8721c" stroke-width="2.5" marker-end="url(#arr12a)"/>
+      <path d="M 600 155 C 615 140 612 100 618 90" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arr12a)"/>
+      <!-- deploy -->
+      <rect x="670" y="120" width="130" height="56" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="735" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">Deploy</text>
+      <text x="735" y="161" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">bundle → prod (12.5)</text>
+      <line x1="660" y1="84" x2="722" y2="118" stroke="#22c55e" stroke-width="2" marker-end="url(#arr12a)"/>
+      <text x="410" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">every developer works on their own branch in their own Git folder — conflicts stay small and are resolved early</text>
+    </svg>
+    <figcaption>The recommended team workflow: a feature branch in a Git folder, a pull request at the Git provider, and an automated deploy after the merge.</figcaption>
+  </figure>
+
+  <p><strong>Merge conflicts</strong> arise when several people change the same lines. The Git folders UI offers a list of conflicting files and three routes: <code class="inline">Keep all current changes</code>, <code class="inline">Take all incoming changes</code>, or editing the file by hand with the conflict markers (<code class="inline">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> … <code class="inline">=======</code> … <code class="inline">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>) and <code class="inline">Mark As Resolved</code>. Then <code class="inline">Continue Merge</code>/<code class="inline">Continue Rebase</code> — or <code class="inline">Abort</code> if you got it wrong.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Notebook outputs and file formats<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>For notebooks in source formats (<code class="inline">.py</code>, <code class="inline">.sql</code>, <code class="inline">.scala</code>, <code class="inline">.r</code>) cell outputs are not included in commits — the repository holds clean code and the diffs are readable. If you do need to version the outputs, use the <code class="inline">IPYNB</code> format. For a data engineering pipeline the source format is almost always the better choice.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/3-manage-branching-pull-requests-conflicts#work-with-pull-requests" target="_blank" rel="noopener">Work with pull requests</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/3-manage-branching-pull-requests-conflicts#resolve-merge-conflicts" target="_blank" rel="noopener">Resolve merge conflicts</a></span></div>
+</div>
+
+<div class="section" id="sec-testovani">
+  <div class="section-header">
+    <div class="section-num">12.3</div>
+    <h2>Testing strategy: the pyramid, pytest, integration</h2>
+  </div>
+
+  <p>A good testing strategy follows the <strong>testing pyramid</strong>: many fast unit tests at the bottom, fewer integration tests in the middle, and a handful of end-to-end tests and UAT scenarios at the top.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 280" role="img" aria-label="The testing pyramid: the base is made up of many fast unit tests (milliseconds), above them integration tests (seconds), higher up end-to-end tests of whole pipelines (minutes), and at the top UAT — validation of business requirements by stakeholders.">
+      <rect x="0" y="0" width="820" height="280" fill="#ffffff"/>
+      <text x="300" y="24" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">The testing pyramid</text>
+      <!-- pyramid layers -->
+      <polygon points="270,40 330,40 355,85 245,85" fill="#e8721c" stroke="#e2e8f0"/>
+      <polygon points="245,90 355,90 385,135 215,135" fill="#f0a35e" stroke="#e2e8f0"/>
+      <polygon points="215,140 385,140 420,185 180,185" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <polygon points="180,190 420,190 455,235 145,235" fill="#1a3a6b" stroke="#e2e8f0"/>
+      <text x="300" y="68" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">UAT</text>
+      <text x="300" y="118" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">End-to-end</text>
+      <text x="300" y="168" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Integration tests</text>
+      <text x="300" y="218" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">Unit tests (pytest)</text>
+      <!-- annotations -->
+      <text x="500" y="66" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">business validation · staging · stakeholders</text>
+      <text x="500" y="116" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">the whole pipeline · minutes · deployment pipeline</text>
+      <text x="500" y="166" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">components working together · seconds · test catalog</text>
+      <text x="500" y="216" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">isolated functions · milliseconds · synthetic data</text>
+      <line x1="480" y1="52" x2="480" y2="230" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="80" y="120" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" transform="rotate(-90 80 120)">← fewer tests, broader scope</text>
+      <text x="300" y="262" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">more tests, faster feedback →</text>
+    </svg>
+    <figcaption>The testing pyramid: the higher you go, the fewer tests, the longer the run, and the broader the scope — from functions to business scenarios.</figcaption>
+  </figure>
+
+  <p><strong>Unit tests</strong> test individual functions in isolation. The key Databricks recommendation: keep transformation logic in <code class="inline">.py</code> modules <em>outside notebooks</em> and import it into the notebooks — it is then easy to test with standard <strong>pytest</strong>. Name the test files <code class="inline">test_*.py</code> or <code class="inline">*_test.py</code>:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">import</span> pytest
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> transforms <span class="kw">import</span> filter_country_region
+
+<span class="fn">@pytest.fixture</span>
+<span class="kw">def</span> <span class="fn">sample_data</span>():
+    <span class="cm"># synthetic data with the structure of production - no sensitive data</span>
+    <span class="kw">return</span> pd.<span class="fn">DataFrame</span>({
+        <span class="str">"iso_code"</span>: [<span class="str">"USA"</span>, <span class="str">"USA"</span>, <span class="str">"CAN"</span>, <span class="str">"GBR"</span>],
+        <span class="str">"value"</span>: [<span class="num">100</span>, <span class="num">200</span>, <span class="num">150</span>, <span class="num">175</span>],
+    })
+
+<span class="kw">def</span> <span class="fn">test_filter_default</span>(sample_data):
+    result = <span class="fn">filter_country_region</span>(sample_data)
+    <span class="kw">assert</span> <span class="fn">len</span>(result) == <span class="num">2</span>
+    <span class="kw">assert</span> <span class="fn">all</span>(result.iso_code == <span class="str">"USA"</span>)</pre>
+  </div>
+
+  <p>The <code class="inline">@pytest.fixture</code> fixture supplies reusable synthetic data — you test the structure and the logic, not production content. You can also run the tests directly in a notebook:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre>%pip install pytest
+
+<span class="kw">import</span> pytest, sys
+sys.dont_write_bytecode = <span class="kw">True</span>   <span class="cm"># no cache on a read-only filesystem</span>
+
+retcode = pytest.<span class="fn">main</span>([<span class="str">"tests/"</span>, <span class="str">"-v"</span>, <span class="str">"-p"</span>, <span class="str">"no:cacheprovider"</span>])
+<span class="kw">assert</span> retcode == <span class="num">0</span>, <span class="str">"Tests failed - check the output above"</span></pre>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> design functions with a predictable return type. A function returning "a DataFrame or <code class="inline">False</code>" tests terribly — let it always return a DataFrame, even an empty one.</div></div>
+
+  <table>
+    <tr><th>Test type</th><th>Verifies</th><th>Scope</th><th>Speed</th></tr>
+    <tr><td><strong>Unit</strong></td><td>individual functions</td><td>a function/class, synthetic data</td><td>milliseconds</td></tr>
+    <tr><td><strong>Integration</strong></td><td>components working together</td><td>several components, a test catalog</td><td>seconds</td></tr>
+    <tr><td><strong>End-to-end</strong></td><td>the whole workflow</td><td>a complete pipeline</td><td>minutes</td></tr>
+    <tr><td><strong>UAT</strong></td><td>business requirements</td><td>business scenarios, staging</td><td>depends on the scenario</td></tr>
+  </table>
+
+  <p><strong>Integration tests</strong> run against real Databricks resources — they read a test table, run a transformation, and verify the schema and types of the output. Create a <strong>dedicated test catalog/schema</strong> for them with a representative sample of data. <strong>End-to-end tests</strong> simulate a whole daily run (set up inputs → run the pipeline → assert on the output table → clean up); run them in the deployment pipeline or off-peak, not on every commit. <strong>UAT</strong> then means: acceptance criteria agreed with stakeholders in advance, a staging environment mirroring production, and prepared scenarios (a notebook reconciling monthly revenue against the financial system, say).</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> never run integration or e2e tests against production tables. An isolated test environment with the structure of production but without sensitive data is a necessary condition — not a nice-to-have.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/4-implement-testing-strategy#implement-unit-tests-with-pytest" target="_blank" rel="noopener">Implement unit tests with pytest</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/4-implement-testing-strategy#organize-your-test-structure" target="_blank" rel="noopener">Organize your test structure</a></span></div>
+</div>
+
+<div class="section" id="sec-bundles">
+  <div class="section-header">
+    <div class="section-num">12.4</div>
+    <h2>Declarative Automation Bundles: configuration and packaging</h2>
+  </div>
+
+  <p><strong>Declarative Automation Bundles</strong> — formerly known as <strong>Databricks Asset Bundles</strong> (DAB); older materials and slides use the original name — are the <strong>infrastructure-as-code</strong> approach to deploying Databricks resources. You describe jobs, pipelines, and other resources in YAML files and then deploy the same definition declaratively to dev, staging, and production. From the documentation: <em>"Declarative Automation Bundles (formerly known as Databricks Asset Bundles)"</em>.</p>
+
+  <p>The foundation is the <code class="inline">databricks.yml</code> file in the project root:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">YAML</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">bundle</span>:
+  <span class="kw">name</span>: <span class="str">order-processing</span>
+
+<span class="kw">include</span>:
+  - <span class="str">resources/*.yml</span>      <span class="cm"># splitting the configuration across several files</span>
+
+<span class="kw">variables</span>:
+  <span class="kw">environment</span>:
+    <span class="kw">description</span>: <span class="str">Environment name</span>
+    <span class="kw">default</span>: <span class="str">development</span>
+
+<span class="kw">resources</span>:
+  <span class="kw">jobs</span>:
+    <span class="kw">etl_pipeline</span>:
+      <span class="kw">name</span>: <span class="str">${var.environment}-order-pipeline</span>
+      <span class="kw">tasks</span>:
+        - <span class="kw">task_key</span>: <span class="str">extract</span>
+          <span class="kw">notebook_task</span>:
+            <span class="kw">notebook_path</span>: <span class="str">./notebooks/extract.py</span>
+        - <span class="kw">task_key</span>: <span class="str">transform</span>
+          <span class="kw">depends_on</span>:
+            - <span class="kw">task_key</span>: <span class="str">extract</span>
+          <span class="kw">notebook_task</span>:
+            <span class="kw">notebook_path</span>: <span class="str">./notebooks/transform.py</span></pre>
+  </div>
+
+  <p>The <code class="inline">bundle</code> mapping defines the project identity, <code class="inline">resources</code> the objects to deploy (most often jobs with tasks, dependencies through <code class="inline">depends_on</code>, and parameters through <code class="inline">base_parameters</code>), and <code class="inline">include</code> pulls in further YAML files. State paths relative to the bundle root. <strong>Variables</strong> with <code class="inline">${var.name}</code> substitution replace hardcoded values — they can be filled from a default, a per-target override, the CLI option <code class="inline">--var="key=value"</code>, or an environment variable prefixed with <code class="inline">BUNDLE_VAR_</code>.</p>
+
+  <p><strong>Targets</strong> represent deployment environments. The modes are essential: <code class="inline">mode: development</code> prefixes resource names with <code class="inline">[dev user]</code>, pauses all schedules, and allows concurrent runs — a dev deployment does not step on production. <code class="inline">mode: production</code>, by contrast, validates that the Git branch matches and recommends deploying through a <strong>service principal</strong>:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">YAML</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">targets</span>:
+  <span class="kw">dev</span>:
+    <span class="kw">default</span>: <span class="kw">true</span>
+    <span class="kw">mode</span>: <span class="str">development</span>
+    <span class="kw">variables</span>:
+      <span class="kw">environment</span>: <span class="str">development</span>
+  <span class="kw">staging</span>:
+    <span class="kw">presets</span>:                       <span class="cm"># fine tuning without a full mode</span>
+      <span class="kw">name_prefix</span>: <span class="str">staging_</span>
+      <span class="kw">trigger_pause_status</span>: <span class="str">PAUSED</span>
+  <span class="kw">prod</span>:
+    <span class="kw">mode</span>: <span class="str">production</span>
+    <span class="kw">workspace</span>:
+      <span class="kw">host</span>: <span class="str">https://adb-prod.azuredatabricks.net</span>
+    <span class="kw">variables</span>:
+      <span class="kw">environment</span>: <span class="str">production</span></pre>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Bundle configuration in Python (Public Preview)<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Besides YAML, a bundle can also be defined as Python code — you describe jobs and resources programmatically. At the time of writing this is Public Preview and YAML remains the most common route; verify the current state in the documentation.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/5-configure-package-databricks-asset-bundles#customize-deployment-parameters-with-variables" target="_blank" rel="noopener">Customize deployment parameters with variables</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/5-configure-package-databricks-asset-bundles#set-up-deployment-targets" target="_blank" rel="noopener">Set up deployment targets</a></span></div>
+</div>
+
+<div class="section" id="sec-deploy-cli">
+  <div class="section-header">
+    <div class="section-num">12.5</div>
+    <h2>Deploying a bundle through the Databricks CLI</h2>
+  </div>
+
+  <p>Deployment is driven by the <strong>Databricks CLI</strong> in four steps: validate, preview, deploy, verify. During a deploy the CLI stores state in the workspace — it knows what it created, and on the next deployment it updates resources, adds new ones, and deletes those that disappeared from the configuration.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># authenticate against the workspace</span>
+databricks auth login --host https://adb-1234567890123456.7.azuredatabricks.net
+
+databricks bundle validate            <span class="cm"># check the syntax and configuration</span>
+databricks bundle plan                <span class="cm"># preview: what will be created / changed / deleted</span>
+databricks bundle deploy -t dev       <span class="cm"># deploy to the dev target</span>
+databricks bundle summary             <span class="cm"># overview of deployed resources + URLs</span>
+databricks bundle open etl_pipeline   <span class="cm"># opens the resource in the browser</span>
+
+<span class="cm"># production in CI/CD: without interactive confirmations</span>
+databricks bundle deploy -t prod --auto-approve</pre>
+  </div>
+
+  <table>
+    <tr><th>Command</th><th>What it does</th></tr>
+    <tr><td><code class="inline">bundle validate</code></td><td>checks the syntax, prints the bundle identity (name, target, workspace, path)</td></tr>
+    <tr><td><code class="inline">bundle plan</code></td><td>shows the planned actions (create/update/delete) without making changes</td></tr>
+    <tr><td><code class="inline">bundle deploy</code></td><td>uploads the artifacts and creates/updates the resources in the target (<code class="inline">-t</code>)</td></tr>
+    <tr><td><code class="inline">bundle summary</code></td><td>lists the deployed resources with direct links into the UI</td></tr>
+    <tr><td><code class="inline">bundle run</code> / <code class="inline">bundle destroy</code></td><td>runs a job from the bundle / removes the deployed resources</td></tr>
+  </table>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="The bundle deployment flow: a local project with databricks.yml, notebooks, and tests goes through the validate, plan, and deploy commands. A deploy with the dev target leads into the dev workspace with a dev prefix and paused schedules; a deploy through a CI/CD pipeline under a service principal with the prod target leads into the production workspace.">
+      <defs><marker id="arr12b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker></defs>
+      <rect x="0" y="0" width="820" height="330" fill="#ffffff"/>
+      <text x="410" y="24" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">A bundle: one definition, several environments</text>
+      <!-- local project -->
+      <rect x="20" y="70" width="190" height="120" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="115" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Bundle project (Git)</text>
+      <text x="115" y="116" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">databricks.yml</text>
+      <text x="115" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">resources/*.yml</text>
+      <text x="115" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">notebooks/ · src/ · tests/</text>
+      <text x="115" y="174" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">variables + targets</text>
+      <!-- CLI -->
+      <rect x="280" y="86" width="180" height="88" rx="8" fill="#1a3a6b"/>
+      <text x="370" y="112" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Databricks CLI</text>
+      <text x="370" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb">validate → plan → deploy</text>
+      <text x="370" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb">state stored in the workspace</text>
+      <line x1="210" y1="130" x2="276" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arr12b)"/>
+      <!-- dev workspace -->
+      <rect x="560" y="52" width="240" height="96" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="680" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Dev workspace</text>
+      <text x="680" y="97" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">mode: development</text>
+      <text x="680" y="114" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">names prefixed [dev user]</text>
+      <text x="680" y="131" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">schedules paused</text>
+      <line x1="460" y1="110" x2="556" y2="92" stroke="#e8721c" stroke-width="2" marker-end="url(#arr12b)"/>
+      <text x="505" y="86" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">deploy -t dev</text>
+      <!-- prod workspace -->
+      <rect x="560" y="196" width="240" height="96" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="680" y="220" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#22c55e">Prod workspace</text>
+      <text x="680" y="241" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">mode: production</text>
+      <text x="680" y="258" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Git branch validation</text>
+      <text x="680" y="275" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">deployed by a service principal</text>
+      <!-- CI/CD -->
+      <rect x="280" y="220" width="180" height="66" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="370" y="244" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">CI/CD pipeline</text>
+      <text x="370" y="262" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">after a merge into main</text>
+      <text x="370" y="277" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">--auto-approve</text>
+      <line x1="370" y1="174" x2="370" y2="216" stroke="#6b7280" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arr12b)"/>
+      <line x1="460" y1="250" x2="556" y2="248" stroke="#22c55e" stroke-width="2" marker-end="url(#arr12b)"/>
+      <text x="505" y="238" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">deploy -t prod</text>
+      <text x="410" y="316" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">the same resource definition — different variable values and a different mode per target</text>
+    </svg>
+    <figcaption>The bundle deployment flow: from a Git project through the Databricks CLI into the dev workspace manually and into production through CI/CD under a service principal.</figcaption>
+  </figure>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> the deployment identity = the bundle name + the target + the identity of the deploying user. When every team member deploys into a shared environment under their own identity, conflicting parallel deployments appear. Agree on who (ideally which service principal) deploys into shared targets.</div></div>
+
+  <p>The most common snags: authentication errors (fixed by <code class="inline">databricks auth login</code>), a <strong>lock conflict</strong> after an interrupted deployment (<code class="inline">--force-lock</code>), jobs from the bundle running at the moment of deployment (the behavior is governed by <code class="inline">--fail-on-active-runs</code>), and warnings about unknown properties — usually an old CLI version against a newer schema.</p>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> the whole lifecycle fits together: the code lives in Git folders (12.1), changes go through a feature branch and a PR (12.2), CI runs the pytest tests (12.3), and after the merge the pipeline deploys the same bundle first to dev and then to prod (12.4–12.5). No manual clicking of job configuration in production — everything is in the repository. Orchestration of the jobs themselves is covered in chapter 11.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/6-deploy-bundle-databricks-cli#preview-deployment-changes" target="_blank" rel="noopener">Preview deployment changes</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/6-deploy-bundle-databricks-cli#troubleshoot-common-deployment-issues" target="_blank" rel="noopener">Troubleshoot common deployment issues</a></span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">12.6</div>
+    <h2>Lab 12: Implement Development Lifecycle Processes (45 minutes)</h2>
+  </div>
+  <p>You will take over an order-processing pipeline (cleansing orders, normalizing status codes, computing totals with tax) and bring it to production maturity: write pytest unit and integration tests for the <code class="inline">transforms.py</code> module, package the job into a Declarative Automation Bundle with dev/prod targets, and deploy it through the Databricks CLI (<code class="inline">validate</code> → <code class="inline">plan</code> → <code class="inline">deploy</code>).</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/12-implement-development-lifecycle-processes-in-azure-databricks.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> Why does Databricks recommend keeping transformation functions in .py modules outside notebooks, and how does that relate to pytest? <strong>2)</strong> What exactly does <code class="inline">mode: development</code> change automatically on the deployed resources, and why? <strong>3)</strong> What is the difference between <code class="inline">bundle plan</code> and <code class="inline">bundle deploy</code>, and when does plan save production?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_11_lakeflow_jobs.html">← Lakeflow Jobs</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 12 of 16</span>
+      <a href="dp750_13_monitoring.html" style="margin-left:auto">Monitoring and optimization →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

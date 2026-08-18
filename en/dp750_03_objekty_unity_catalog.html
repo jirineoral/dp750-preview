@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Create and organize objects in Unity Catalog — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Create and organize objects in Unity Catalog</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="../dp750_03_objekty_unity_catalog.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_04_zabezpeceni.html" class="next">Securing Unity Catalog →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-namespace-a-naming" class="toc-item active" data-section="sec-namespace-a-naming">The three-level namespace and naming conventions</a>
+    <a href="#sec-vytvoreni-katalogu" class="toc-item" data-section="sec-vytvoreni-katalogu">Creating a catalog</a>
+    <a href="#sec-vytvoreni-schematu" class="toc-item" data-section="sec-vytvoreni-schematu">Creating a schema</a>
+    <a href="#sec-tabulky-a-views" class="toc-item" data-section="sec-tabulky-a-views">Tables and views</a>
+    <a href="#sec-volumes" class="toc-item" data-section="sec-volumes">Volumes: governance for files</a>
+    <a href="#sec-ddl-operace" class="toc-item" data-section="sec-ddl-operace">DDL operations: functions, procedures, ALTER, and tags</a>
+    <a href="#sec-foreign-catalog" class="toc-item" data-section="sec-foreign-catalog">Foreign catalogs and Lakehouse Federation</a>
+    <a href="#sec-genie-instructions" class="toc-item" data-section="sec-genie-instructions">AI/BI Genie instructions</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 3: Create and Organize Objects in Unity Catalog (45 minutes)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Chapter 3</div>
+      <h1>Create and organize objects in Unity Catalog</h1>
+      <div class="hero-subtitle">Catalogs, schemas, tables, views, volumes, foreign catalogs, and AI/BI Genie</div>
+      <div class="hero-meta"><span>🗂 Organizing objects in Unity Catalog</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Chapter objectives</h3>
+  <ul>
+    <li>Design consistent naming conventions and use the three-level namespace <code class="inline">catalog.schema.object</code></li>
+    <li>Create a catalog and a schema including managed storage location and workspace bindings</li>
+    <li>Tell managed and external tables apart, and create views, materialized views, and volumes</li>
+    <li>Perform DDL operations — SQL/Python functions, procedures, ALTER, and governance tags</li>
+    <li>Connect an external database through a foreign catalog (Lakehouse Federation) and configure AI/BI Genie instructions</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-namespace-a-naming">
+  <div class="section-header">
+    <div class="section-num">3.1</div>
+    <h2>The three-level namespace and naming conventions</h2>
+  </div>
+
+  <p>Everything you create in Unity Catalog lives in a <strong>three-level namespace</strong>: <code class="inline">catalog.schema.object</code>. Above these three levels sits the <strong>metastore</strong> — one per region, shared by all workspaces in that region. You do not create a metastore for every project; it is the roof under which you build your catalogs.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 400" role="img" aria-label="The Unity Catalog hierarchy: a metastore at the region level contains catalogs, a catalog contains schemas, and each schema contains tables, views, volumes, and functions. At the bottom is an example of the three-level name prod_catalog.sales.orders.">
+      <defs>
+        <marker id="arr31" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#6b7280"/>
+        </marker>
+      </defs>
+      <rect x="20" y="14" width="780" height="330" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="40" y="40" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Metastore</text>
+      <text x="122" y="40" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">— one per region, shared by all workspaces</text>
+      <rect x="45" y="58" width="730" height="270" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="65" y="84" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Catalog</text>
+      <text x="128" y="84" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">prod_catalog — isolation boundary, own storage and access policies</text>
+      <rect x="70" y="100" width="340" height="210" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="88" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Schema — sales</text>
+      <rect x="88" y="142" width="145" height="42" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="160" y="167" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Tables</text>
+      <rect x="247" y="142" width="145" height="42" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="319" y="167" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Views</text>
+      <rect x="88" y="196" width="145" height="42" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="160" y="221" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Volumes</text>
+      <rect x="247" y="196" width="145" height="42" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="319" y="221" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Functions</text>
+      <text x="88" y="270" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">tables = structured data,</text>
+      <text x="88" y="286" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">volumes = files, functions = logic</text>
+      <rect x="430" y="100" width="325" height="210" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="448" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#6b7280">Schema — hr</text>
+      <text x="448" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">another logical unit: team, project,</text>
+      <text x="448" y="170" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">domain, or medallion layer</text>
+      <line x1="592" y1="190" x2="592" y2="240" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr31)" stroke-dasharray="4 3"/>
+      <text x="448" y="266" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">every schema has its own tables,</text>
+      <text x="448" y="284" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">views, volumes, and functions</text>
+      <text x="410" y="378" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" text-anchor="middle">
+        <tspan fill="#1a3a6b" font-weight="bold">prod_catalog</tspan><tspan fill="#6b7280">.</tspan><tspan fill="#e8721c" font-weight="bold">sales</tspan><tspan fill="#6b7280">.</tspan><tspan fill="#22c55e" font-weight="bold">orders</tspan>
+        <tspan fill="#6b7280" font-size="12">   — the fully qualified object name</tspan>
+      </text>
+    </svg>
+    <figcaption>The Unity Catalog hierarchy: metastore (region) → catalog → schema → tables, views, volumes, and functions.</figcaption>
+  </figure>
+
+  <p>Before you start creating anything, agree on your <strong>naming conventions</strong>. Unity Catalog has a few hard rules that make the decisions easier:</p>
+
+  <table>
+    <tr><th>Rule</th><th>Detail</th></tr>
+    <tr><td>Name length</td><td>max. 255 characters</td></tr>
+    <tr><td>Letter case</td><td>object names are stored as lowercase; <code class="inline">SalesData</code> = <code class="inline">salesdata</code></td></tr>
+    <tr><td>Forbidden characters</td><td>dot, space, slash, control characters (the dot separates namespace levels)</td></tr>
+    <tr><td>Special characters</td><td>possible with backticks, e.g. <code class="inline">`sales-data`</code> — avoid them in practice</td></tr>
+    <tr><td>Columns</td><td>keep the case you enter, queries are case-insensitive</td></tr>
+  </table>
+
+  <p>The recommended pattern is <strong>lowercase with underscores</strong> (<code class="inline">customer_data</code>, <code class="inline">sales_summary</code>) — camelCase gets converted to lowercase anyway and only creates confusion. Prefix views with <code class="inline">vw_</code> and temporary staging tables with <code class="inline">tmp_</code>. Align schema names with the layers of the medallion architecture: <code class="inline">bronze</code>, <code class="inline">silver</code>, <code class="inline">gold</code> — then everyone can tell at a glance what they are holding when they see <code class="inline">sales_data.gold.monthly_revenue</code>.</p>
+
+  <p>For catalogs you decide between two strategies: <strong>by domain</strong> (<code class="inline">sales_data</code>, <code class="inline">finance_data</code>) or <strong>by environment</strong> (<code class="inline">dev</code>, <code class="inline">test</code>, <code class="inline">prod</code>). The combination <code class="inline">{domain}_{environment}</code> — that is, <code class="inline">sales_dev</code>, <code class="inline">sales_prod</code> — scales best, but the number of catalogs grows, so you need discipline in managing them.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> conventions that are not enforced do not last long. Restrict the <code class="inline">CREATE TABLE</code>/<code class="inline">CREATE SCHEMA</code> privileges to specific teams, validate names in the CI/CD pipeline, and regularly hunt for inconsistencies with a query against <code class="inline">information_schema</code>.</div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> versioning does not belong in a name — <code class="inline">sales_final_report_v1_updated</code> is a classic antipattern. Version and status belong in metadata (comments, tags), not in the identifier.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/2-apply-naming-conventions#design-naming-strategies-for-environment-isolation" target="_blank" rel="noopener">Design naming strategies for environment isolation</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/2-apply-naming-conventions#implement-conventions-across-your-organization" target="_blank" rel="noopener">Implement conventions across your organization</a></span></div>
+</div>
+
+<div class="section" id="sec-vytvoreni-katalogu">
+  <div class="section-header">
+    <div class="section-num">3.2</div>
+    <h2>Creating a catalog</h2>
+  </div>
+
+  <p>A <strong>catalog</strong> is the top-level container and the primary unit of <strong>data isolation</strong>: every catalog can have its own storage location, security boundary, and access policies. To create one you need to be a <strong>metastore admin</strong> or hold the <strong>CREATE CATALOG</strong> privilege. Every new catalog automatically gets two schemas: <code class="inline">default</code> and <code class="inline">information_schema</code>.</p>
+
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-03-catalog-sql"><span class="tab-icon">🗄️</span>SQL</button>
+      <button class="tab-btn" data-tab="tab-03-catalog-ui"><span class="tab-icon">🖱️</span>Catalog Explorer</button>
+    </div>
+    <div class="tab-panel" id="tab-03-catalog-sql">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="cm">-- catalog with dedicated managed storage</span>
+<span class="kw">CREATE CATALOG IF NOT EXISTS</span> <span class="tbl">prod_catalog</span>
+<span class="kw">MANAGED LOCATION</span> <span class="str">'abfss://prod-data@mystorageaccount.dfs.core.windows.net/catalog-root'</span>
+<span class="kw">COMMENT</span> <span class="str">'Production catalog with dedicated ADLS Gen2 storage'</span>;</pre>
+      </div>
+      <p><code class="inline">IF NOT EXISTS</code> makes the script idempotent — you can run it repeatedly without an error.</p>
+    </div>
+    <div class="tab-panel" id="tab-03-catalog-ui">
+      <p>In the UI: <strong>Catalog</strong> in the left navigation → <strong>Create catalog</strong> → name plus the <strong>Standard</strong> type → optionally a managed storage location → <strong>Create</strong>. After creating it, set the <strong>workspace bindings</strong> — by default a new catalog is visible from <em>all</em> workspaces attached to the metastore. Restrict a production catalog to the production workspace only.</p>
+    </div>
+  </div>
+
+  <p>The <strong>managed storage location</strong> determines where Unity Catalog physically stores the files of managed tables and volumes in the catalog. Without it, managed objects fall back to the metastore's default storage — and if the metastore has no default, <code class="inline">MANAGED LOCATION</code> is mandatory when creating the catalog. To set it you need an existing <strong>external location</strong> and the <strong>CREATE MANAGED STORAGE</strong> privilege.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> a catalog being visible from all workspaces by default is a common operational foul. A dev workspace that "sees" <code class="inline">prod_catalog</code> is one bad <code class="inline">USE CATALOG</code> away from an incident. Set the workspace bindings right after creating the catalog.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> dedicated managed storage per catalog also solves compliance — it keeps sensitive data in the storage account and region that match the regulatory requirements, and physically isolates it from the other catalogs.</div></div>
+</div>
+
+<div class="section" id="sec-vytvoreni-schematu">
+  <div class="section-header">
+    <div class="section-num">3.3</div>
+    <h2>Creating a schema</h2>
+  </div>
+
+  <p>A <strong>schema</strong> is the second namespace level and organizes data inside a catalog into logical units — typically one use case, project, or team. In Databricks you will also come across the term "database": <code class="inline">CREATE DATABASE</code> is an alias for <code class="inline">CREATE SCHEMA</code>, they are the same thing. To create one you need <strong>USE CATALOG</strong> and <strong>CREATE SCHEMA</strong> on the parent catalog.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">CREATE SCHEMA IF NOT EXISTS</span> <span class="tbl">prod_catalog.customer_analytics</span>
+<span class="kw">COMMENT</span> <span class="str">'Customer behavior and segmentation analysis'</span>;
+
+<span class="cm">-- schema with its own storage (e.g. finance for compliance reasons)</span>
+<span class="kw">CREATE SCHEMA IF NOT EXISTS</span> <span class="tbl">prod_catalog.financial_data</span>
+<span class="kw">MANAGED LOCATION</span> <span class="str">'abfss://finance@mystorageaccount.dfs.core.windows.net/schema-data'</span>;</pre>
+  </div>
+
+  <p>Three proven patterns for organizing schemas:</p>
+
+  <table>
+    <tr><th>Pattern</th><th>Example</th><th>When to use</th></tr>
+    <tr><td>By department</td><td><code class="inline">marketing_analytics</code>, <code class="inline">financial_data</code></td><td>business units own their data</td></tr>
+    <tr><td>By project</td><td><code class="inline">customer_churn_model</code>, <code class="inline">pricing_optimization</code></td><td>temporary initiatives, easy clean-up once the project ends</td></tr>
+    <tr><td>By processing stage</td><td><code class="inline">bronze</code>, <code class="inline">silver</code>, <code class="inline">gold</code></td><td>medallion pipeline, the most common one in data engineering</td></tr>
+  </table>
+
+  <p>Managed storage at the schema level is optional — if you do not specify it, managed tables use the catalog's storage (or the metastore's). So the fallback hierarchy is: <strong>schema → catalog → metastore</strong>.</p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> for a user to see a schema at all and query its contents, they need at least <code class="inline">USE SCHEMA</code> (plus <code class="inline">USE CATALOG</code> on the catalog). The chapter on securing Unity Catalog covers privileges in detail.</div></div>
+</div>
+
+<div class="section" id="sec-tabulky-a-views">
+  <div class="section-header">
+    <div class="section-num">3.4</div>
+    <h2>Tables and views</h2>
+  </div>
+
+  <h3>Managed vs. external tables</h3>
+
+  <p>A <strong>managed table</strong> is the default: Databricks manages both the metadata and the data files, the format is <strong>Delta Lake</strong> (ACID transactions, time travel, schema enforcement), and <code class="inline">DROP TABLE</code> deletes both metadata and data. An <strong>external table</strong> only registers metadata over data in external storage — <code class="inline">DROP</code> removes just the registration in the catalog, the files stay.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="A comparison of a managed and an external table. With a managed table, Unity Catalog owns both the metadata and the data files, and DROP TABLE deletes both. With an external table, Unity Catalog owns only the metadata, the data stays in your own storage, and DROP TABLE deletes only the metadata.">
+      <text x="215" y="36" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b" text-anchor="middle">MANAGED TABLE (default)</text>
+      <rect x="40" y="52" width="350" height="150" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="60" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" font-weight="bold">MANAGED BY DATABRICKS / UNITY CATALOG</text>
+      <rect x="60" y="88" width="310" height="44" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="215" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Metadata (Unity Catalog)</text>
+      <text x="215" y="124" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">name, schema, privileges, lineage</text>
+      <rect x="60" y="142" width="310" height="44" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="215" y="162" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Data files (Delta, managed storage)</text>
+      <text x="215" y="178" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">optimization and lifecycle handled by the platform</text>
+      <text x="60" y="232" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#ef4444" font-weight="bold">DROP TABLE →</text>
+      <text x="160" y="232" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">deletes metadata and data</text>
+      <text x="60" y="252" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">(files are removed after the retention period)</text>
+      <text x="605" y="36" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#e8721c" text-anchor="middle">EXTERNAL TABLE</text>
+      <rect x="430" y="52" width="350" height="68" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="450" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" font-weight="bold">MANAGED BY UNITY CATALOG</text>
+      <rect x="450" y="84" width="310" height="28" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="605" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Metadata (Unity Catalog)</text>
+      <rect x="430" y="134" width="350" height="68" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="450" y="158" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" font-weight="bold">MANAGED BY YOU (LOCATION)</text>
+      <rect x="450" y="166" width="310" height="28" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="605" y="185" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8721c" text-anchor="middle" font-weight="bold">Data files (your ADLS Gen2)</text>
+      <text x="450" y="232" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#22c55e" font-weight="bold">DROP TABLE →</text>
+      <text x="552" y="232" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">deletes only the metadata,</text>
+      <text x="450" y="252" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">data stays in the storage</text>
+      <text x="410" y="294" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">Rule of thumb: build new pipelines on managed tables.</text>
+      <text x="410" y="312" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">External only when there is a concrete reason.</text>
+    </svg>
+    <figcaption>Managed table: Unity Catalog owns both metadata and data. External table: Unity Catalog owns only the metadata, the data files stay in your storage. Build new pipelines on managed tables; reach for external only when there is a concrete reason — sharing with other systems, or data that already exists in the storage.</figcaption>
+  </figure>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- managed table (default, Delta Lake format)</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">production.sales.sales_transactions</span> (
+  <span class="col">transaction_id</span> <span class="kw">BIGINT</span>,
+  <span class="col">customer_id</span> <span class="kw">INT</span>,
+  <span class="col">amount</span> <span class="kw">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>),
+  <span class="col">transaction_date</span> <span class="kw">DATE</span>
+);
+
+<span class="cm">-- external table over existing CSV files</span>
+<span class="kw">CREATE EXTERNAL TABLE</span> <span class="tbl">production.sales.archived_sales</span>
+<span class="kw">USING</span> CSV
+<span class="kw">LOCATION</span> <span class="str">'abfss://container@storage.dfs.core.windows.net/sales/archive'</span>
+<span class="kw">OPTIONS</span> (header <span class="str">'true'</span>, inferSchema <span class="str">'true'</span>);</pre>
+  </div>
+
+  <h3>Primary and foreign keys</h3>
+
+  <p>Unity Catalog can define <strong>PRIMARY KEY</strong> and <strong>FOREIGN KEY</strong> constraints — but watch out for expectations carried over from classic databases:</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">A common misconception: PK/FK constraints enforce integrity<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Anyone expecting a <code class="inline">PRIMARY KEY</code> in Databricks to block duplicate rows will be surprised. PK/FK constraints are <strong>informational only</strong> — they are not enforced on write. From the documentation: <em>"these constraints are informational only and are not enforced."</em> They serve as metadata documenting the data model, for the query optimizer (better join strategies), and for tools such as AI/BI Genie, which derive join relationships from them. Data quality is enforced only by <code class="inline">NOT NULL</code> and <code class="inline">CHECK</code> constraints.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">CREATE TABLE</span> <span class="tbl">customers</span> (
+  <span class="col">customer_id</span> <span class="kw">BIGINT NOT NULL</span>,
+  <span class="col">customer_name</span> <span class="kw">STRING</span>,
+  <span class="kw">CONSTRAINT</span> customers_pk <span class="kw">PRIMARY KEY</span> (<span class="col">customer_id</span>)
+);
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">orders</span> (
+  <span class="col">order_id</span> <span class="kw">BIGINT NOT NULL PRIMARY KEY</span>,
+  <span class="col">customer_id</span> <span class="kw">BIGINT</span>,
+  <span class="col">total_amount</span> <span class="kw">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>),
+  <span class="kw">CONSTRAINT</span> orders_customers_fk <span class="kw">FOREIGN KEY</span> (<span class="col">customer_id</span>)
+    <span class="kw">REFERENCES</span> <span class="tbl">customers</span>(<span class="col">customer_id</span>)
+);</pre>
+  </div>
+
+  <h3>Views: standard, dynamic, materialized</h3>
+
+  <table>
+    <tr><th>Type</th><th>Data</th><th>When to use</th></tr>
+    <tr><td><strong>View</strong></td><td>stores nothing, the query runs on every access</td><td>encapsulating logic, always current data</td></tr>
+    <tr><td><strong>Dynamic view</strong></td><td>like a view + row filtering / column masking</td><td>access control per user (<code class="inline">is_account_group_member()</code>)</td></tr>
+    <tr><td><strong>Materialized view</strong></td><td>precomputed results in a Delta table</td><td>expensive aggregations, dashboards, slight staleness acceptable</td></tr>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- dynamic view: masking a column by group</span>
+<span class="kw">CREATE VIEW</span> <span class="tbl">sales_redacted</span> <span class="kw">AS</span>
+<span class="kw">SELECT</span> <span class="col">user_id</span>,
+  <span class="kw">CASE WHEN</span> <span class="fn">is_account_group_member</span>(<span class="str">'auditors'</span>) <span class="kw">THEN</span> <span class="col">email</span>
+       <span class="kw">ELSE</span> <span class="str">'REDACTED'</span> <span class="kw">END AS</span> <span class="col">email</span>,
+  <span class="col">product</span>, <span class="col">total</span>
+<span class="kw">FROM</span> <span class="tbl">sales_raw</span>;
+
+<span class="cm">-- materialized view with a scheduled refresh</span>
+<span class="kw">CREATE MATERIALIZED VIEW</span> <span class="tbl">daily_sales_summary</span>
+<span class="kw">SCHEDULE EVERY</span> <span class="num">1</span> <span class="kw">DAY</span>
+<span class="kw">AS SELECT</span> <span class="col">transaction_date</span>,
+  <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> <span class="col">transaction_count</span>,
+  <span class="fn">SUM</span>(<span class="col">amount</span>) <span class="kw">AS</span> <span class="col">total_sales</span>
+<span class="kw">FROM</span> <span class="tbl">sales_transactions</span>
+<span class="kw">GROUP BY</span> <span class="col">transaction_date</span>;</pre>
+  </div>
+
+  <p>Materialized views support <strong>incremental refresh</strong> — they process only the changed data. The condition is that the source Delta tables have <strong>row tracking</strong> enabled (<code class="inline">delta.enableRowTracking = true</code>). Enabling it on a large existing table takes a while, upgrades the table protocol, and is irreversible.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Materialized view vs. streaming table — which one when?<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>A <strong>streaming table</strong> (<code class="inline">CREATE OR REFRESH STREAMING TABLE</code>) processes only the new rows since the last refresh — streaming semantics, exactly-once. It suits incremental ingestion (Auto Loader over cloud storage, Kafka) and bronze/silver layers where data is only appended. A materialized view, by contrast, computes aggregations over the complete dataset with batch semantics. Rule of thumb: the source only appends and keeps no history (Kafka) → streaming table; an aggregation over the whole with periodic recomputation → materialized view. The chapter on ingestion covers streaming tables in detail.</p>
+    </div>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> dynamic views require a SQL warehouse or compute with standard/dedicated access mode (for dedicated, on Databricks Runtime 15.4 LTS+). On an older runtime a query through a dynamic view will not run.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> instead of classic partitioning, use <strong>liquid clustering</strong> (<code class="inline">CLUSTER BY</code>) for tables as well as materialized views — the data layout is optimized automatically according to the queries and there is no risk of skewed partitions.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/5-create-tables-views-materialized#create-materialized-views" target="_blank" rel="noopener">Create materialized views</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/5-create-tables-views-materialized#best-practices-for-tables-and-views" target="_blank" rel="noopener">Best practices for tables and views</a></span></div>
+</div>
+
+<div class="section" id="sec-volumes">
+  <div class="section-header">
+    <div class="section-num">3.5</div>
+    <h2>Volumes: governance for files</h2>
+  </div>
+
+  <p>A <strong>volume</strong> is a Unity Catalog object for <strong>non-tabular data</strong> — CSVs for ingestion, images, audio, ML models. It sits at the third namespace level (<code class="inline">catalog.schema.volume</code>) and brings the same governance model you know from tables to files.</p>
+
+  <p>Just as with tables, you choose <strong>managed</strong> (Unity Catalog handles both storage and lifecycle; after a drop the files are marked for deletion after the retention period) or <strong>external</strong> (the files sit at a path you specify and a drop removes only the registration). Use an external volume when systems outside Databricks access the files too, or when you are adding governance on top of existing storage.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- managed volume</span>
+<span class="kw">CREATE VOLUME IF NOT EXISTS</span> <span class="tbl">dev_catalog.bronze_schema.landing_files</span>
+<span class="kw">COMMENT</span> <span class="str">'Landing area for CSV files from external systems'</span>;
+
+<span class="cm">-- external volume over existing storage</span>
+<span class="kw">CREATE EXTERNAL VOLUME</span> <span class="tbl">prod_catalog.silver_schema.ml_models</span>
+<span class="kw">LOCATION</span> <span class="str">'abfss://models@mystorageaccount.dfs.core.windows.net/production/'</span>;
+
+<span class="cm">-- permissions: read and write for a group</span>
+<span class="kw">GRANT READ VOLUME, WRITE VOLUME ON VOLUME</span> <span class="tbl">dev_catalog.bronze_schema.landing_files</span>
+<span class="kw">TO</span> <span class="str">`data-engineers`</span>;</pre>
+  </div>
+
+  <p>You access files through the uniform POSIX-style path <code class="inline">/Volumes/&lt;catalog&gt;/&lt;schema&gt;/&lt;volume&gt;/&lt;path&gt;</code> — it works in Spark, pandas, SQL, and <code class="inline">dbutils.fs</code>, with no credentials or connection strings:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># the same path for Spark and pandas</span>
+df <span class="op">=</span> spark.read.format(<span class="str">"csv"</span>).<span class="fn">load</span>(<span class="str">"/Volumes/dev_catalog/bronze_schema/landing_files/data.csv"</span>)
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+pdf <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="str">"/Volumes/dev_catalog/bronze_schema/landing_files/data.csv"</span>)
+
+<span class="cm"># file management</span>
+dbutils.fs.<span class="fn">ls</span>(<span class="str">"/Volumes/dev_catalog/bronze_schema/landing_files"</span>)</pre>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> volumes do not support ACLs at the subdirectory level — privileges always apply to the <em>whole</em> volume. If you need different rights for different sets of files, create a separate volume for each security boundary.</div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> <code class="inline">READ VOLUME</code> alone is not enough to read a file — the user also needs <code class="inline">USE CATALOG</code> and <code class="inline">USE SCHEMA</code> on the parent objects. Privileges in the hierarchy are always evaluated from the top down.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/6-create-volumes#choose-between-managed-and-external-volumes" target="_blank" rel="noopener">Choose between managed and external volumes</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/6-create-volumes#manage-volume-permissions" target="_blank" rel="noopener">Manage volume permissions</a></span></div>
+</div>
+
+<div class="section" id="sec-ddl-operace">
+  <div class="section-header">
+    <div class="section-num">3.6</div>
+    <h2>DDL operations: functions, procedures, ALTER, and tags</h2>
+  </div>
+
+  <h3>Functions as governed objects</h3>
+
+  <p>Functions in Unity Catalog are not just syntactic sugar — they are <strong>governed objects</strong> with an owner, privileges, and usage tracking. You define them once and call them from anywhere, so a discount calculation or a grade classification is consistent across the whole organization. Both <strong>scalar</strong> and <strong>table-valued</strong> functions are supported, in SQL or Python:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- SQL scalar function</span>
+<span class="kw">CREATE FUNCTION</span> <span class="tbl">dev_catalog.finance_schema.calculate_discount</span>(price <span class="kw">DOUBLE</span>, discount_rate <span class="kw">DOUBLE</span>)
+<span class="kw">RETURNS DOUBLE</span>
+<span class="kw">RETURN</span> price <span class="op">*</span> (<span class="num">1</span> <span class="op">-</span> discount_rate);
+
+<span class="cm">-- Python function (runs on serverless / pro SQL warehouse)</span>
+<span class="kw">CREATE FUNCTION</span> <span class="tbl">dev_catalog.analytics_schema.normalize_text</span>(input_text <span class="kw">STRING</span>)
+<span class="kw">RETURNS STRING</span>
+<span class="kw">LANGUAGE PYTHON</span>
+<span class="kw">AS</span> $$
+  <span class="kw">return</span> input_text.lower().strip() <span class="kw">if</span> input_text <span class="kw">else</span> <span class="kw">None</span>
+$$;
+
+<span class="cm">-- table-valued function</span>
+<span class="kw">CREATE FUNCTION</span> <span class="tbl">dev_catalog.utils_schema.split_to_rows</span>(input_array <span class="kw">ARRAY&lt;STRING&gt;</span>)
+<span class="kw">RETURNS TABLE</span>(value <span class="kw">STRING</span>)
+<span class="kw">RETURN SELECT</span> <span class="fn">explode</span>(input_array) <span class="kw">AS</span> <span class="col">value</span>;</pre>
+  </div>
+
+  <p>For multi-step workflows (validation → transformation → load) there are <strong>SQL stored procedures</strong> — <code class="inline">CREATE PROCEDURE</code> with IN/OUT/INOUT parameters, variables, and flow control, invoked through <code class="inline">CALL</code>. They require Databricks Runtime 17.0+; verify the exact support status in the documentation.</p>
+
+  <h3>ALTER: ownership, tags, structure</h3>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- transfer catalog ownership to a group</span>
+<span class="kw">ALTER CATALOG</span> <span class="tbl">dev_catalog</span> <span class="kw">SET OWNER TO</span> <span class="str">`data_engineering_team`</span>;
+
+<span class="cm">-- governance tags for classification and discoverability</span>
+<span class="cm">-- both the tag name and the value must be string literals</span>
+<span class="kw">ALTER CATALOG</span> <span class="tbl">dev_catalog</span> <span class="kw">SET TAGS</span> (
+  <span class="str">'environment'</span> <span class="op">=</span> <span class="str">'development'</span>,
+  <span class="str">'cost_center'</span> <span class="op">=</span> <span class="str">'engineering'</span>,
+  <span class="str">'data_classification'</span> <span class="op">=</span> <span class="str">'internal'</span>
+);
+
+<span class="cm">-- structural changes to a table without a rebuild</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">dev_catalog.sales_schema.orders</span>
+<span class="kw">ADD COLUMN</span> <span class="col">shipping_carrier</span> <span class="kw">STRING</span> <span class="kw">COMMENT</span> <span class="str">'Name of the shipping carrier'</span>;
+
+<span class="kw">ALTER TABLE</span> <span class="tbl">dev_catalog.sales_schema.orders</span>
+<span class="kw">ALTER COLUMN</span> <span class="col">quantity</span> <span class="kw">TYPE BIGINT</span>;</pre>
+  </div>
+
+  <p><code class="inline">ALTER TABLE</code> handles adding, renaming, and dropping columns and widening types (<code class="inline">INT</code> → <code class="inline">BIGINT</code>) while preserving the data — it requires the <code class="inline">MODIFY</code> privilege. <strong>Type widening</strong> works on Delta tables from Databricks Runtime 15.2 up; if the type should widen automatically already during ingestion, enable <code class="inline">delta.enableTypeWidening</code> on the table. Verify the supported type pairs and the exact feature status in the documentation. Renaming a column requires Delta column mapping to be enabled. Tags are searchable metadata: the basis for data classification, cost management, and later automated governance.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> <code class="inline">ALTER CATALOG prod_catalog ENABLE PREDICTIVE OPTIMIZATION</code> turns on automatic maintenance (compaction, vacuum) for every table in the catalog — tables inherit the setting unless they override it at their own level.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/7-implement-data-definition-language-operations#create-procedures-for-multi-step-operations" target="_blank" rel="noopener">Create procedures for multi-step operations</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/7-implement-data-definition-language-operations#modify-table-structure-and-constraints" target="_blank" rel="noopener">Modify table structure and constraints</a></span></div>
+</div>
+
+<div class="section" id="sec-foreign-catalog">
+  <div class="section-header">
+    <div class="section-num">3.7</div>
+    <h2>Foreign catalogs and Lakehouse Federation</h2>
+  </div>
+
+  <p>Not all of your data is in the lakehouse — and not all of it needs to be moved there. <strong>Lakehouse Federation</strong> makes it possible to query external databases (PostgreSQL, MySQL, Azure SQL, Snowflake, BigQuery…) directly from Databricks, with Unity Catalog controlling access, auditing, and tracking lineage. Ideal for ad-hoc analysis over live operational data, a proof of concept without ETL, and gradual migration.</p>
+
+  <p>The architecture rests on two objects: a <strong>connection</strong> holds the technical connection details (JDBC host, port, credentials — ideally through Databricks secrets) and a <strong>foreign catalog</strong> mirrors a specific external database into the Unity Catalog namespace. One connection can serve several foreign catalogs (several databases on the same server).</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="The query flow in Lakehouse Federation: a user query goes through Unity Catalog, where privileges are evaluated and an audit record is written. The foreign catalog mirrors the metadata of the external database and the connection holds the credentials. The query is translated into the dialect of the external database and pushed down to its compute, and the results come back.">
+      <defs>
+        <marker id="arr37" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#e8721c"/>
+        </marker>
+        <marker id="arr37b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#22c55e"/>
+        </marker>
+      </defs>
+      <rect x="20" y="100" width="180" height="90" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="110" y="130" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b" text-anchor="middle">User / BI tool</text>
+      <text x="110" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">SELECT ... FROM</text>
+      <text x="110" y="168" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">fed_pg.public.transactions</text>
+      <rect x="250" y="40" width="300" height="230" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="400" y="66" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b" text-anchor="middle">Azure Databricks — Unity Catalog</text>
+      <rect x="270" y="82" width="260" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="400" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b" text-anchor="middle">Foreign catalog</text>
+      <text x="400" y="121" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">a mirror of the external DB metadata</text>
+      <rect x="270" y="146" width="260" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="400" y="167" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b" text-anchor="middle">Connection</text>
+      <text x="400" y="185" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">JDBC URL + credentials (secrets)</text>
+      <rect x="270" y="210" width="260" height="44" rx="8" fill="#ffffff" stroke="#22c55e"/>
+      <text x="400" y="228" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e" text-anchor="middle">privileges + audit log + lineage</text>
+      <text x="400" y="246" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">unified governance for all data</text>
+      <rect x="610" y="52" width="190" height="46" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="705" y="80" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c" text-anchor="middle">PostgreSQL</text>
+      <rect x="610" y="110" width="190" height="46" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="705" y="138" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c" text-anchor="middle">Azure SQL Database</text>
+      <rect x="610" y="168" width="190" height="46" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="705" y="196" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c" text-anchor="middle">Snowflake, BigQuery…</text>
+      <line x1="200" y1="145" x2="245" y2="145" stroke="#e8721c" stroke-width="2" marker-end="url(#arr37)"/>
+      <line x1="550" y1="120" x2="605" y2="100" stroke="#e8721c" stroke-width="2" marker-end="url(#arr37)"/>
+      <text x="577" y="94" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" font-weight="bold" text-anchor="middle">pushdown</text>
+      <line x1="605" y1="150" x2="550" y2="165" stroke="#22c55e" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr37b)"/>
+      <text x="585" y="180" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e" text-anchor="middle">results</text>
+      <text x="410" y="300" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">The query is translated into the target database dialect and runs on its compute; filters and aggregations are pushed down.</text>
+    </svg>
+    <figcaption>Lakehouse Federation: the connection holds the credentials, the foreign catalog mirrors the external database, and Unity Catalog enforces uniform governance over queries into external systems.</figcaption>
+  </figure>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- 1) connection: credentials through Databricks secrets, not in plaintext</span>
+<span class="kw">CREATE CONNECTION</span> <span class="tbl">postgresql_prod</span> <span class="kw">TYPE</span> postgresql
+<span class="kw">OPTIONS</span> (
+  host <span class="str">'prod-db.example.com'</span>,
+  port <span class="str">'5432'</span>,
+  user <span class="fn">secret</span> (<span class="str">'prod-secrets'</span>,<span class="str">'postgres-user'</span>),
+  password <span class="fn">secret</span> (<span class="str">'prod-secrets'</span>,<span class="str">'postgres-password'</span>)
+);
+
+<span class="cm">-- 2) foreign catalog mirroring the customers database</span>
+<span class="kw">CREATE FOREIGN CATALOG IF NOT EXISTS</span> <span class="tbl">prod_customer_data</span>
+<span class="kw">USING CONNECTION</span> <span class="tbl">postgresql_prod</span>
+<span class="kw">OPTIONS</span> (database <span class="str">'customers'</span>);
+
+<span class="cm">-- 3) query it like an ordinary Unity Catalog table</span>
+<span class="kw">SELECT</span> <span class="col">customer_id</span>, <span class="fn">SUM</span>(<span class="col">transaction_amount</span>) <span class="kw">AS</span> <span class="col">total_spent</span>
+<span class="kw">FROM</span> <span class="tbl">prod_customer_data.public.transactions</span>
+<span class="kw">GROUP BY</span> <span class="col">customer_id</span>;</pre>
+  </div>
+
+  <p>Metadata is synchronized automatically on every query. With high-frequency queries this can be slow — in that case refresh the metadata on a schedule through <code class="inline">REFRESH FOREIGN CATALOG / SCHEMA / TABLE</code> (for example from Lakeflow Jobs) and queries will run against the cache.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> the query executes on the compute of the <em>external</em> database. A federated dashboard that aggregates a production PostgreSQL every few minutes is an excellent way to make an enemy of the operations DBA team. Cache frequently queried external data locally through a materialized view instead.</div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> the privileges you need: <code class="inline">CREATE CONNECTION</code> on the metastore for the connection; <code class="inline">CREATE CATALOG</code> on the metastore plus ownership of the connection (or <code class="inline">CREATE FOREIGN CATALOG</code> on it) for the foreign catalog. Federated access is primarily read-only — verify the write options in the current documentation for the specific system.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/8-implement-foreign-catalog#configure-a-connection-to-the-external-database" target="_blank" rel="noopener">Configure a connection to the external database</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/8-implement-foreign-catalog#grant-access-and-query-foreign-data" target="_blank" rel="noopener">Grant access and query foreign data</a></span></div>
+</div>
+
+<div class="section" id="sec-genie-instructions">
+  <div class="section-header">
+    <div class="section-num">3.8</div>
+    <h2>AI/BI Genie instructions</h2>
+  </div>
+
+  <p><strong>AI/BI Genie</strong> lets business users ask about data in natural language — Genie turns the question into SQL over Unity Catalog tables. To generate the <em>right</em> SQL it needs context: that is what the <strong>knowledge store</strong> of a <strong>Genie Agent</strong> object (formerly a Genie space) is for, where you adjust metadata at the agent's level without changing the underlying objects in the catalog.</p>
+
+  <p>You build a Genie Agent over a selection of tables (max. 25, and it is recommended to start with five or fewer). Then you layer context on top:</p>
+
+  <table>
+    <tr><th>Tool</th><th>What it is for</th></tr>
+    <tr><td>Table and column descriptions</td><td>business language instead of technical ("contains all customer purchases…"), synonyms for columns</td></tr>
+    <tr><td>Hiding columns</td><td>get surrogate keys and audit columns out of the way — they confuse users and the model alike</td></tr>
+    <tr><td>Joins</td><td>relationships between tables including cardinality; Genie loads PK/FK from Unity Catalog by itself</td></tr>
+    <tr><td>Prompt matching</td><td>samples of real values — "California" gets mapped to the code "CA"</td></tr>
+    <tr><td>SQL expressions</td><td>reusable measures/filters/dimensions (gross margin, fiscal quarter)</td></tr>
+    <tr><td>Example SQL queries</td><td>sample questions with ready-made SQL; parameterized ones are marked as <strong>Trusted</strong></td></tr>
+    <tr><td>Text instructions</td><td>global rules ("the fiscal year starts in February") — use sparingly</td></tr>
+  </table>
+
+  <p>This is where the honest work from the previous sections pays off: the PK/FK constraints from section 3.4, descriptive comments, and consistent names are mined automatically by Genie when a Genie Agent is created (knowledge mining) and stored as join relationships. A well-annotated catalog means less manual configuration.</p>
+
+  <p>Configuring Genie is an <strong>iterative process</strong>: test the Genie Agent with your own questions, use <em>Show generated code</em> to check the generated SQL, fix wrong answers and save them as a new instruction (<em>Add as instruction</em>). Keep an eye on user feedback in the Monitoring tab and measure accuracy with benchmark questions.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Genie Agent limits (state per the Learn module, verify in the documentation)<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>A Genie Agent has two separate limits: an <strong>instructions limit of 100</strong> (example SQL queries, SQL functions, and the whole block of text instructions together) and a <strong>knowledge store snippets limit of 200</strong> (table descriptions, join relationships, and SQL expressions together). Entity matching handles up to 1,024 distinct values per column across 120 columns of a single agent. Column descriptions and prompt matching do not count towards the limits. The limits may change — verify the current values in the documentation.</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> start minimal — few tables, few instructions — and expand according to the questions users actually ask. An overloaded Genie Agent with dozens of generic text instructions answers worse than a small, precisely aimed one.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/9-configure-ai-bi-genie-instructions#configure-the-knowledge-store" target="_blank" rel="noopener">Configure the knowledge store</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/9-configure-ai-bi-genie-instructions#add-sql-instructions-and-examples" target="_blank" rel="noopener">Add SQL instructions and examples</a></span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">3.9</div>
+    <h2>Lab 3: Create and Organize Objects in Unity Catalog (45 minutes)</h2>
+  </div>
+
+  <p>Lakeside University is building a data platform for its student administration: in the lab you will create the catalog <code class="inline">edu_dev</code> with medallion schemas (bronze/silver/gold), managed tables of students, courses, and enrollments with PK/FK constraints, a view and a materialized view for analytical queries, a managed volume for CSV files, a SQL function for grade classification, and you will apply governance tags through <code class="inline">ALTER</code>. Optionally you will build a Genie Agent over the dataset.</p>
+
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/03-create-and-organize-objects-in-unity-catalog.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> What happens to the data files on <code class="inline">DROP TABLE</code> for a managed vs. an external table? <strong>2)</strong> Do PK/FK constraints in Unity Catalog enforce referential integrity on write — and what are they for, then? <strong>3)</strong> What is the difference between a connection and a foreign catalog in Lakehouse Federation, and which privileges do you need to create them?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_02_compute.html">← Select and configure compute</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 3 of 16</span>
+      <a href="dp750_04_zabezpeceni.html" style="margin-left:auto">Securing Unity Catalog →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

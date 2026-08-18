@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Power BI, Fabric, and Azure Databricks — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Power BI, Fabric, and Azure Databricks</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="../dp750_15_pbi_fabric_databricks.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_16_migrace_oracle.html" class="next">Migrating from Oracle →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-mapa-cest" class="toc-item active" data-section="sec-mapa-cest">A map of the integration routes: four ways to get data into a report</a>
+    <a href="#sec-konektor-import-directquery" class="toc-item" data-section="sec-konektor-import-directquery">The Power BI connector: Import vs DirectQuery</a>
+    <a href="#sec-optimalizace" class="toc-item" data-section="sec-optimalizace">Optimization: so DirectQuery does not hurt and Import does not bloat</a>
+    <a href="#sec-mirroring" class="toc-item" data-section="sec-mirroring">Mirroring Azure Databricks Unity Catalog into Fabric</a>
+    <a href="#sec-delta-sharing" class="toc-item" data-section="sec-delta-sharing">Delta Sharing: sharing across organizational boundaries</a>
+    <a href="#sec-onelake-storage" class="toc-item" data-section="sec-onelake-storage">OneLake as storage for Databricks</a>
+    <a href="#sec-direct-lake" class="toc-item" data-section="sec-direct-lake">Direct Lake: the speed of Import without the refresh</a>
+    <a href="#sec-shrnuti-zdroje" class="toc-item" data-section="sec-shrnuti-zdroje">Which route when — and a summary</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Chapter 15</div>
+      <h1>Power BI, Fabric, and Azure Databricks</h1>
+      <div class="hero-subtitle">DirectQuery vs. Import and optimization, mirroring into Fabric, Delta Sharing, and OneLake as storage</div>
+      <div class="hero-meta"><span>🗂 Bonus — outside the MOC</span><span>➕ Custom module outside the official MOC</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Chapter objectives</h3>
+  <ul>
+    <li>Get oriented in the routes that connect Azure Databricks, Microsoft Fabric, and Power BI, and understand their trade-offs.</li>
+    <li>Decide between Import and DirectQuery mode with the Power BI connector to a Databricks SQL Warehouse, and be able to optimize both.</li>
+    <li>Set up mirroring of Azure Databricks Unity Catalog into Fabric and explain why it is zero-copy.</li>
+    <li>Use Delta Sharing and OneLake shortcuts for sharing data without copying.</li>
+    <li>Judge when Direct Lake mode makes sense and when it falls back to DirectQuery.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-mapa-cest">
+  <div class="section-header">
+    <div class="section-num">15.1</div>
+    <h2>A map of the integration routes: four ways to get data into a report</h2>
+  </div>
+  <p>Databricks and Fabric are not competitors to the death today — Microsoft sells both platforms and since 2025 has been systematically adding interoperability between them under the "better together" banner. For a data engineer that means a pleasant problem: several routes lead from data in <strong>Unity Catalog</strong> into Power BI, and each has different properties. Anyone who only knows "the warehouse connector" pays needlessly for compute; anyone who blindly deploys mirroring may run into the limits of what actually gets mirrored.</p>
+  <p>The four main routes we will cover in this chapter:</p>
+  <ul>
+    <li>The <strong>Power BI connector</strong> to a Databricks SQL Warehouse — the classic: Import or DirectQuery, with the queries paid for by Databricks compute.</li>
+    <li><strong>Mirroring Unity Catalog into Fabric</strong> — catalog (metadata) mirroring, the data stays put, and Fabric reads it through shortcuts. <strong>Direct Lake</strong> works on top of it.</li>
+    <li><strong>OneLake shortcuts / OneLake as storage</strong> — Fabric points at Delta files in ADLS Gen2, or Databricks reads and writes into OneLake directly.</li>
+    <li><strong>Delta Sharing</strong> — an open protocol for sharing between organizations and platforms, including a Power BI connector.</li>
+  </ul>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 360" role="img" aria-label="A map of the integration routes between Azure Databricks, Microsoft Fabric, and Power BI. On the left Databricks with Unity Catalog, a SQL Warehouse, and Delta tables in ADLS Gen2, in the middle Fabric with OneLake, on the right Power BI. Four numbered arrows show the connector, mirroring, shortcuts, and Delta Sharing.">
+      <defs>
+        <marker id="arr15a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1a3a6b"/></marker>
+        <marker id="arr15o" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <!-- Databricks -->
+      <rect x="20" y="30" width="230" height="300" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="135" y="55" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Azure Databricks</text>
+      <rect x="40" y="75" width="190" height="40" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="135" y="99" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Unity Catalog (metadata)</text>
+      <rect x="40" y="130" width="190" height="40" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="135" y="154" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SQL Warehouse</text>
+      <rect x="40" y="185" width="190" height="55" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="135" y="207" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Delta tables</text>
+      <text x="135" y="226" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">ADLS Gen2 / OneLake</text>
+      <rect x="40" y="255" width="190" height="40" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="135" y="279" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Delta Sharing server</text>
+      <!-- Fabric -->
+      <rect x="330" y="30" width="230" height="245" rx="8" fill="#fff7ef" stroke="#e8721c" stroke-width="2"/>
+      <text x="445" y="55" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#e8721c">Microsoft Fabric</text>
+      <rect x="350" y="75" width="190" height="55" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="445" y="97" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Mirrored Azure Databricks</text>
+      <text x="445" y="116" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">+ SQL analytics endpoint</text>
+      <rect x="350" y="145" width="190" height="55" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="445" y="167" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">OneLake</text>
+      <text x="445" y="186" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">shortcuts → the data stays</text>
+      <rect x="350" y="215" width="190" height="40" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="445" y="239" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Lakehouse / Warehouse</text>
+      <!-- Power BI -->
+      <rect x="640" y="30" width="160" height="300" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="720" y="55" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Power BI</text>
+      <rect x="655" y="75" width="130" height="40" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="720" y="99" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Import</text>
+      <rect x="655" y="130" width="130" height="40" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="720" y="154" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">DirectQuery</text>
+      <rect x="655" y="185" width="130" height="40" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="720" y="209" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Direct Lake</text>
+      <rect x="655" y="255" width="130" height="40" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="720" y="279" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Delta Sharing</text>
+      <!-- arrows -->
+      <path d="M232 150 C 420 150, 480 112, 653 112" fill="none" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr15a)"/>
+      <text x="435" y="139" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">① connector (Import / DirectQuery)</text>
+      <path d="M232 95 L 348 100" fill="none" stroke="#e8721c" stroke-width="2" marker-end="url(#arr15o)"/>
+      <text x="290" y="83" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#e8721c">② UC mirroring</text>
+      <path d="M232 212 L 348 180" fill="none" stroke="#e8721c" stroke-width="2" marker-end="url(#arr15o)"/>
+      <text x="290" y="212" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#e8721c">③ shortcuts</text>
+      <path d="M542 103 L 653 205" fill="none" stroke="#e8721c" stroke-width="2" marker-end="url(#arr15o)"/>
+      <text x="600" y="170" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#e8721c">Direct Lake</text>
+      <path d="M232 275 L 653 275" fill="none" stroke="#1a3a6b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr15a)"/>
+      <text x="440" y="298" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">④ Delta Sharing (open protocol, also outside Azure)</text>
+    </svg>
+    <figcaption>Four routes from Delta tables in Unity Catalog to a report in Power BI — the connector through a SQL Warehouse, catalog mirroring into Fabric, OneLake shortcuts, and Delta Sharing.</figcaption>
+  </figure>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> this chapter is an addition outside the official DP-750 agenda — you do not need it for the exam. In practice, though, "how do I get from Databricks into Power BI" is one of the most frequent questions you will get as a data engineer.</div></div>
+</div>
+
+<div class="section" id="sec-konektor-import-directquery">
+  <div class="section-header">
+    <div class="section-num">15.2</div>
+    <h2>The Power BI connector: Import vs DirectQuery</h2>
+  </div>
+  <p>The native <strong>Azure Databricks connector</strong> in Power BI Desktop connects to a <strong>SQL Warehouse</strong> (recommended for BI workloads, ideally serverless — see chapter 2) through ODBC/HTTP; newer versions can switch to the <strong>ADBC</strong> (Arrow) driver, which speeds up the transfer of large results — verify the exact state and the plan to make ADBC the default in the documentation, because it will affect your gateway versions too. Authentication goes through Microsoft Entra ID for interactive work and through an OAuth service principal (M2M) for scheduled refreshes in the service. The connection can also be set up with Partner Connect straight from the Databricks UI.</p>
+  <p>The crucial choice is the dataset's <strong>storage mode</strong>:</p>
+  <ul>
+    <li><strong>Import</strong> — on refresh, Power BI copies the data into its in-memory <strong>VertiPaq</strong> engine. Visuals then run from memory, typically in under a second, and the SQL Warehouse is only touched by the refresh. The price is duplicated data, a model size limit, and lag (the data is as old as the last refresh).</li>
+    <li><strong>DirectQuery</strong> — every interaction with a visual generates DAX, which is translated into SQL and flies off to the SQL Warehouse. The data is always fresh and the model has no size limit, but report latency depends on the warehouse and every click costs compute. Note: <code class="inline">Databricks.Query</code> (a native query) has limitations in combination with DirectQuery — verify the behavior in the connector documentation.</li>
+  </ul>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="A comparison of the query flow in three modes. Import: the refresh copies data into VertiPaq and visuals read from memory. DirectQuery: every query goes as SQL to the SQL Warehouse. Direct Lake: the engine reads Parquet files straight from OneLake into memory with no SQL layer in between.">
+      <defs>
+        <marker id="arr15b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1a3a6b"/></marker>
+        <marker id="arr15c" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <!-- lane labels -->
+      <text x="20" y="55" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Import</text>
+      <text x="20" y="145" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">DirectQuery</text>
+      <text x="20" y="235" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Direct Lake</text>
+      <!-- Import lane -->
+      <rect x="130" y="30" width="150" height="42" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="205" y="50" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Visual / DAX</text>
+      <text x="205" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">sub-second</text>
+      <rect x="340" y="30" width="170" height="42" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="425" y="50" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">VertiPaq (a copy of the data)</text>
+      <text x="425" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">filled by a scheduled refresh</text>
+      <rect x="590" y="30" width="200" height="42" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="690" y="50" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SQL Warehouse</text>
+      <text x="690" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">only during the refresh</text>
+      <path d="M282 51 L 338 51" fill="none" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr15b)"/>
+      <path d="M588 51 L 512 51" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr15b)"/>
+      <!-- DQ lane -->
+      <rect x="130" y="120" width="150" height="42" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="205" y="140" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Visual / DAX</text>
+      <text x="205" y="155" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">every click = a query</text>
+      <rect x="340" y="120" width="170" height="42" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="425" y="140" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">DAX → SQL translation</text>
+      <rect x="590" y="120" width="200" height="42" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <text x="690" y="140" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SQL Warehouse</text>
+      <text x="690" y="155" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Photon, result cache</text>
+      <path d="M282 141 L 338 141" fill="none" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr15b)"/>
+      <path d="M512 141 L 588 141" fill="none" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr15b)"/>
+      <!-- DL lane -->
+      <rect x="130" y="210" width="150" height="42" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="205" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Visual / DAX</text>
+      <rect x="340" y="210" width="170" height="42" rx="8" fill="#fff7ef" stroke="#e8721c"/>
+      <text x="425" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">VertiPaq (transcoding)</text>
+      <text x="425" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">loads only the needed columns</text>
+      <rect x="590" y="210" width="200" height="42" rx="8" fill="#fff7ef" stroke="#e8721c"/>
+      <text x="690" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Delta / Parquet in OneLake</text>
+      <text x="690" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">no SQL layer in between</text>
+      <path d="M282 231 L 338 231" fill="none" stroke="#e8721c" stroke-width="2" marker-end="url(#arr15c)"/>
+      <path d="M588 231 L 512 231" fill="none" stroke="#e8721c" stroke-width="2" marker-end="url(#arr15c)"/>
+    </svg>
+    <figcaption>The query flow in three modes: Import reads from pre-filled memory, DirectQuery sends every query to the SQL Warehouse, and Direct Lake loads columns of Parquet files from OneLake straight into VertiPaq memory.</figcaption>
+  </figure>
+
+  <table>
+    <tr><th></th><th>Import</th><th>DirectQuery</th></tr>
+    <tr><td>Visual latency</td><td>lowest (in-memory)</td><td>depends on the warehouse (seconds)</td></tr>
+    <tr><td>Data freshness</td><td>as old as the last refresh</td><td>live</td></tr>
+    <tr><td>Data volume</td><td>limited by model memory</td><td>practically unlimited</td></tr>
+    <tr><td>SQL Warehouse cost</td><td>only during the refresh</td><td>every user interaction</td></tr>
+    <tr><td>DAX functions</td><td>all of them</td><td>limited (pushdown)</td></tr>
+    <tr><td>Licensing</td><td>Pro/PPU/capacity</td><td>Pro/PPU/capacity</td></tr>
+  </table>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> DirectQuery over a stopped warehouse means the first user waits for the start-up. A serverless SQL Warehouse starts in seconds, a classic one in minutes — for DirectQuery, serverless is practically mandatory. And count on 50 users clicking around a report being a very "chatty" workload for the warehouse.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Databricks can do the opposite direction too: from Catalog Explorer a schema can be published directly into a Power BI workspace as a semantic model (<em>Publish to Power BI</em>) and the refresh orchestrated as a <strong>Power BI task</strong> in Jobs — the Import model refresh then follows immediately after the pipeline finishes, rather than a blind schedule.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Metric views and Power BI — a frequent question from practice<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Unity Catalog <strong>metric views</strong> — a semantic layer with metric definitions over tables — long reached Power BI through the "Metric View BI Compatibility Mode" option in the connector. Microsoft removed that option from the connector — reports built on it stopped working. The current route is a native query with the <code class="inline">MEASURE()</code> function in DirectQuery mode, or Databricks AI/BI dashboards, which work with metric views natively. The state is evolving, so verify in the documentation.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-optimalizace">
+  <div class="section-header">
+    <div class="section-num">15.3</div>
+    <h2>Optimization: so DirectQuery does not hurt and Import does not bloat</h2>
+  </div>
+  <p>Most "Power BI over Databricks is slow" stories have the same roots: the report sits directly on wide bronze/silver tables, the warehouse is undersized, or statistics are missing. The principles that work:</p>
+  <p><strong>On the Databricks side:</strong> connect reports exclusively to the <strong>gold</strong> layer — a star schema, not wide flat tables. Maintain the tables with <code class="inline">OPTIMIZE</code> plus liquid clustering on the filtering columns and collect statistics so the optimizer generates sensible plans. Precompute the most expensive aggregations as <strong>materialized views</strong> (see chapter 3, or section 10.6) — the warehouse then serves ready-made results:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- statistics for the optimizer</span>
+<span class="kw">ANALYZE TABLE</span> <span class="tbl">main.gold.sales_fact</span> <span class="kw">COMPUTE STATISTICS FOR ALL COLUMNS</span>;
+
+<span class="cm">-- a precomputed aggregation for the most frequent visual</span>
+<span class="kw">CREATE MATERIALIZED VIEW</span> <span class="tbl">main.gold.sales_by_month_mv</span> <span class="kw">AS</span>
+<span class="kw">SELECT</span> <span class="fn">date_trunc</span>(<span class="str">'month'</span>, <span class="col">order_date</span>) <span class="kw">AS</span> <span class="col">month</span>,
+       <span class="col">region</span>,
+       <span class="fn">sum</span>(<span class="col">amount</span>) <span class="kw">AS</span> <span class="col">revenue</span>
+<span class="kw">FROM</span> <span class="tbl">main.gold.sales_fact</span>
+<span class="kw">GROUP BY ALL</span>;</pre>
+  </div>
+  <p>Size a SQL Warehouse for BI workloads towards <strong>more clusters (autoscaling)</strong> rather than a bigger size — BI generates many small concurrent queries, not one big one. <strong>Photon</strong> helps (always on for SQL Warehouses), as do the caching layers: the <strong>result cache</strong> returns repeated queries instantly (typically slicers and shared dashboards), and the disk cache keeps hot data local.</p>
+  <p><strong>On the Power BI side:</strong></p>
+  <ul>
+    <li><strong>A composite model</strong> — facts in DirectQuery, dimensions in <strong>Dual</strong>/Import mode. Slicers then do not go to the warehouse at all.</li>
+    <li><strong>User-defined aggregations</strong> — a small Import table with aggregates "catches" most queries, and DirectQuery reaches for the detail only on drill-down.</li>
+    <li><strong>Incremental refresh</strong> in Import mode — only the last partition is refreshed, not the whole history; with the Databricks connector it works thanks to query folding through <code class="inline">RangeStart</code>/<code class="inline">RangeEnd</code>.</li>
+    <li><strong>Assume referential integrity</strong> on relationships — it generates an <code class="inline">INNER JOIN</code> instead of an <code class="inline">OUTER</code> one, which is cheaper for the warehouse (only if FK integrity really holds!).</li>
+    <li>Fewer visuals per page — every visual in DirectQuery is at least one SQL query.</li>
+  </ul>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> the behavior in practice is easy to measure: Performance Analyzer in Power BI Desktop shows the DAX times, and <strong>Query History</strong> on the SQL Warehouse shows what SQL actually comes out of the report and where it spends its time. These two views side by side reveal the culprit within minutes.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> DirectQuery is not a substitute for data modeling. If a report needs to aggregate billions of rows on every click, no amount of sizing will save it — what you are missing is an aggregation layer in gold, not a bigger warehouse.</div></div>
+</div>
+
+<div class="section" id="sec-mirroring">
+  <div class="section-header">
+    <div class="section-num">15.4</div>
+    <h2>Mirroring Azure Databricks Unity Catalog into Fabric</h2>
+  </div>
+  <p>A <strong>mirrored Azure Databricks catalog</strong> is, from Fabric's point of view, an item that mirrors the <em>structure</em> of Unity Catalog. The key word is structure: unlike database mirroring (SQL, Cosmos…), <strong>no data is copied</strong> here. Fabric pulls in the catalog metadata (schemas, tables) and accesses the Delta files themselves through internal <strong>shortcuts</strong> into ADLS Gen2. From the documentation: <em>"When you use Fabric to read data that is registered in Unity Catalog, there is no data movement or data replication."</em> The feature is <strong>GA</strong> (generally available since mid-2025).</p>
+  <p>What you get once the mirrored catalog is created:</p>
+  <ul>
+    <li>a <strong>Mirrored Azure Databricks</strong> item in the workspace with the selected schemas/tables,</li>
+    <li>an automatically generated <strong>SQL analytics endpoint</strong> — read-only T-SQL querying over the Databricks tables from Fabric,</li>
+    <li>the ability to build a <strong>Direct Lake</strong> semantic model for Power BI on top of it (see section 15.7).</li>
+  </ul>
+  <p>Metadata is synchronized automatically: adding or removing a schema or table in UC propagates into Fabric. Data changes show up with a small delay (seconds to minutes — it is the same discovery mechanism as the SQL analytics endpoint over a lakehouse). Governance stays on two tracks: Unity Catalog controls access on the Databricks side, while Fabric permissions apply to the mirrored item in Fabric — count on that in a security review.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="The architecture of mirroring Unity Catalog into Fabric. Only metadata flows from Unity Catalog into the mirrored item in Fabric. The Delta files stay in ADLS Gen2 and Fabric accesses them through shortcuts. On top of the mirrored item sit the SQL analytics endpoint and a Direct Lake semantic model.">
+      <defs>
+        <marker id="arr15d" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1a3a6b"/></marker>
+        <marker id="arr15e" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <!-- ADB side -->
+      <rect x="20" y="40" width="250" height="240" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="145" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Azure Databricks</text>
+      <rect x="40" y="85" width="210" height="50" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="145" y="106" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Unity Catalog</text>
+      <text x="145" y="123" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">catalog → schema → table</text>
+      <rect x="40" y="195" width="210" height="65" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="145" y="218" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Delta files</text>
+      <text x="145" y="236" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">ADLS Gen2 — the data does not move</text>
+      <path d="M145 137 L 145 193" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <!-- Fabric side -->
+      <rect x="360" y="40" width="440" height="240" rx="8" fill="#fff7ef" stroke="#e8721c" stroke-width="2"/>
+      <text x="580" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#e8721c">Microsoft Fabric / OneLake</text>
+      <rect x="385" y="85" width="200" height="50" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="485" y="106" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Mirrored Azure Databricks</text>
+      <text x="485" y="123" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">catalog metadata only</text>
+      <rect x="385" y="195" width="200" height="65" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="485" y="218" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Shortcuts</text>
+      <text x="485" y="236" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">a virtual reference to ADLS</text>
+      <rect x="625" y="85" width="150" height="50" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="700" y="106" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SQL analytics</text>
+      <text x="700" y="123" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">endpoint (T-SQL)</text>
+      <rect x="625" y="195" width="150" height="65" rx="8" fill="#fff" stroke="#22c55e" stroke-width="2"/>
+      <text x="700" y="220" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Direct Lake</text>
+      <text x="700" y="238" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">semantic model</text>
+      <!-- arrows -->
+      <path d="M252 110 L 383 110" fill="none" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr15d)"/>
+      <text x="316" y="98" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">metadata sync</text>
+      <path d="M383 228 L 252 228" fill="none" stroke="#e8721c" stroke-width="2" marker-end="url(#arr15e)"/>
+      <text x="316" y="216" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#e8721c">data reads (zero-copy)</text>
+      <path d="M587 110 L 623 110" fill="none" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr15d)"/>
+      <path d="M587 228 L 623 228" fill="none" stroke="#e8721c" stroke-width="2" marker-end="url(#arr15e)"/>
+      <text x="410" y="300" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280"></text>
+    </svg>
+    <figcaption>Mirroring Unity Catalog is a metadata operation — Fabric mirrors the catalog structure and accesses the data in ADLS Gen2 through shortcuts, with no copy and no ETL.</figcaption>
+  </figure>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Mind the exclusions:</strong> <strong>materialized views</strong>, <strong>streaming tables</strong>, and external tables in formats other than Delta do not make it into a mirrored catalog. If your gold layer rests on the MVs from section 15.3, you will have to materialize it into ordinary Delta tables for mirroring. Verify the current list of limitations in the documentation.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> mirroring requires a Fabric capacity, but reading the metadata itself is cheap — you pay dearly only for what you then run over the data (T-SQL queries, Direct Lake). Databricks compute is not used at all when reading from Fabric, which is the fundamental difference from the connector in 15.2.</div></div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Common misconceptions about mirroring<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><strong>"Mirroring makes a copy of my data, I will pay for storage twice."</strong> No — with the Azure Databricks variant only the catalog is mirrored, the data stays in ADLS Gen2 and is read through shortcuts.</p>
+      <p><strong>"Through a mirrored catalog I can also write into Databricks."</strong> No, the SQL analytics endpoint is read-only. Writing belongs in Databricks (or into OneLake, see 15.6).</p>
+      <p><strong>"RLS from Unity Catalog propagates into Power BI."</strong> It does not — UC row filters and column masks apply to queries through Databricks compute. The documentation is unambiguous: <em>"Unity Catalog policies and permission aren't mirrored in Fabric."</em> In Fabric you have to solve the security again (Fabric permissions, RLS in the semantic model).</p>
+    </div>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Mind the governance hole:</strong> if ADLS Gen2 is behind a firewall and you use <strong>trusted workspace access</strong> with a connection straight to the storage account, Unity Catalog policies (RLS, column masks, ABAC) are <strong>not enforced</strong> — the documentation states they are not enforced at the storage level. Access then stands or falls on the Fabric workspace identity and the roles on the storage account, so restrict the permissions to a specific folder in the container.</div></div>
+</div>
+
+<div class="section" id="sec-delta-sharing">
+  <div class="section-header">
+    <div class="section-num">15.5</div>
+    <h2>Delta Sharing: sharing across organizational boundaries</h2>
+  </div>
+  <p><strong>Delta Sharing</strong> (see chapter 5, section 5.6) is an open protocol for sharing Delta tables with anyone — another organization, another tenant, another platform. In the context of Power BI and Fabric it takes two forms:</p>
+  <ul>
+    <li>The <strong>Power BI Delta Sharing connector</strong> — the recipient gets a credential file (endpoint URL + bearer token, and more recently OIDC federation without tokens) and connects from Power BI Desktop with the "Delta Sharing" connector. Data is loaded in Import mode; the Advanced options include a row limit (1 million by default, can be raised). It costs the provider no compute — the recipient reads the Parquet files directly through the sharing server.</li>
+    <li><strong>Fabric as the recipient</strong> — data from a Delta Share can be brought into OneLake (through shortcuts or a dataflow, for example) and worked with further in Fabric; the options and the state of this integration are evolving, so check the current documentation.</li>
+  </ul>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- provider: a share + a recipient (open sharing)</span>
+<span class="kw">CREATE SHARE</span> <span class="tbl">gold_reporting</span>;
+<span class="kw">ALTER SHARE</span> <span class="tbl">gold_reporting</span> <span class="kw">ADD TABLE</span> <span class="tbl">main.gold.sales_by_month</span>;
+<span class="kw">CREATE RECIPIENT</span> <span class="tbl">partner_bi</span>;  <span class="cm">-- generates an activation link with a token</span>
+<span class="kw">GRANT SELECT ON SHARE</span> <span class="tbl">gold_reporting</span> <span class="kw">TO RECIPIENT</span> <span class="tbl">partner_bi</span>;</pre>
+  </div>
+  <p>Delta Sharing is the right choice when the recipient is <em>not</em> in your tenant or does not have Databricks: a supply chain, clients, subsidiaries. Inside one organization with a Fabric capacity, mirroring (15.4) tends to be more convenient — Delta Sharing there adds token management and connector limits on top.</p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> the Power BI connector for Delta Sharing works in Import mode — for large shared tables, keep the row limit in mind and remember that the refresh pulls the data over the internet. For large volumes it is better to process the shared data in Databricks/Fabric and let only an aggregate through into Power BI.</div></div>
+</div>
+
+<div class="section" id="sec-onelake-storage">
+  <div class="section-header">
+    <div class="section-num">15.6</div>
+    <h2>OneLake as storage for Databricks</h2>
+  </div>
+  <p><strong>OneLake</strong> is Fabric's logical data lake — technically an ADLS-compatible endpoint (<code class="inline">onelake.dfs.fabric.microsoft.com</code>), so Databricks can work with it like ordinary ABFS storage. The relationship works in both directions:</p>
+    <p><strong>Fabric points at Databricks data — OneLake shortcuts.</strong> A shortcut in a lakehouse is a virtual reference to external storage: you create an <strong>ADLS Gen2 shortcut</strong> to the folder with the Delta tables Databricks produces, and the tables appear in the lakehouse as local — with no copying and no pipeline. It works well for external tables whose path you know; for UC managed tables the cleaner route is the mirroring from 15.4, which handles the paths for you.</p>
+  <p><strong>Databricks reads and writes OneLake — the ABFS path.</strong> On a standard cluster an OAuth configuration with a service principal (Contributor on the Fabric workspace) is enough:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># OAuth through a service principal (secrets, never hardcoded!)</span>
+spark.conf.set(<span class="str">"fs.azure.account.auth.type"</span>, <span class="str">"OAuth"</span>)
+spark.conf.set(<span class="str">"fs.azure.account.oauth.provider.type"</span>,
+    <span class="str">"org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider"</span>)
+spark.conf.set(<span class="str">"fs.azure.account.oauth2.client.id"</span>, client_id)
+spark.conf.set(<span class="str">"fs.azure.account.oauth2.client.secret"</span>, client_secret)
+spark.conf.set(<span class="str">"fs.azure.account.oauth2.client.endpoint"</span>,
+    <span class="str">f"https://login.microsoftonline.com/</span>{tenant_id}<span class="str">/oauth2/token"</span>)
+
+<span class="cm"># reading and writing through the OneLake ABFS endpoint</span>
+path = <span class="str">"abfss://BIWorkspace@onelake.dfs.fabric.microsoft.com/Sales.lakehouse/Tables/dim_customer"</span>
+df = spark.read.format(<span class="str">"delta"</span>).load(path)
+df.write.format(<span class="str">"delta"</span>).mode(<span class="str">"overwrite"</span>).save(path)</pre>
+  </div>
+  <p>This lets a Databricks pipeline write gold tables straight into a Fabric lakehouse — and Power BI has them immediately available for Direct Lake, without any mirroring. The price is that tables written this way live outside Unity Catalog governance (it is a direct write to storage).</p>
+  <p>Newer developments are closing that gap — the state as of August 2026, so verify in the documentation:</p>
+  <ul>
+    <li><strong>OneLake catalog federation</strong> — through <code class="inline">CREATE CONNECTION … TYPE onelake</code> and a foreign catalog, Unity Catalog can read a Fabric Lakehouse and Warehouse without a copy directly from Databricks (zero-copy in the opposite direction). Access is <strong>read-only</strong>, requires DBR 18.0+ in standard access mode (SQL warehouse 2025.40+), and does not support views, materialized views, or complex data types.</li>
+    <li><strong>UC managed tables in OneLake</strong> — a Unity Catalog external location mapped to a OneLake path, so even <em>managed</em> UC tables can physically sit in OneLake. In <strong>Beta</strong> as of mid-2026.</li>
+  </ul>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> serverless compute in Databricks does not allow setting <code class="inline">fs.azure.*</code> Spark configuration — writing directly into OneLake from serverless goes through an MSAL token and the <code class="inline">deltalake</code> library (Python, outside Spark). And when writing into the same path from several engines, stick to the rule of one writer per table, or you are asking for transaction log conflicts.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> if the storage account is behind a firewall, shortcuts to ADLS Gen2 are handled by <em>trusted workspace access</em> and direct Databricks access into OneLake by resource instance rules for the access connector — prepare the networking in advance, it is the most common place where a demo integration freezes.</div></div>
+</div>
+
+<div class="section" id="sec-direct-lake">
+  <div class="section-header">
+    <div class="section-num">15.7</div>
+    <h2>Direct Lake: the speed of Import without the refresh</h2>
+  </div>
+  <p><strong>Direct Lake</strong> is Power BI's third storage mode, available only on a Fabric capacity (F SKU). The trick: the VertiPaq engine loads columns <em>directly from the Delta/Parquet files in OneLake</em> into memory (so-called <strong>transcoding</strong>) — only at the moment a query needs them. A model "refresh" is just <strong>framing</strong>: updating the metadata to a new version of the Delta table, an operation of seconds. The result: queries as fast as Import, data freshness close to DirectQuery, without copying the whole dataset.</p>
+  <p>Direct Lake exists in two variants — and the difference matters in Databricks scenarios:</p>
+  <table>
+    <tr><th></th><th>Direct Lake on OneLake</th><th>Direct Lake on SQL (endpoint)</th></tr>
+    <tr><td>Source</td><td>Delta tables from several Fabric sources</td><td>one lakehouse/warehouse</td></tr>
+    <tr><td>Fallback to DirectQuery</td><td>no — beyond the limits the query/refresh fails</td><td>yes (views, SQL RLS, guardrails)</td></tr>
+    <tr><td>Composite with Import tables</td><td>yes</td><td>no (only as a layer on top)</td></tr>
+    <tr><td>SQL views as a source</td><td>no</td><td>yes, but = DirectQuery</td></tr>
+    <tr><td>Status</td><td>the newer variant, GA</td><td>the original variant, GA</td></tr>
+  </table>
+  <p>With the older "on SQL" variant the key word is <strong>fallback</strong>: when the engine cannot read the Delta files directly (the source is a SQL view, RLS is defined on the endpoint, the table exceeds the capacity guardrails), the query quietly switches to DirectQuery — and the report suddenly runs 5× slower without anyone changing anything. Fallback can be disabled in the model settings (<code class="inline">Direct Lake behavior</code>), in which case you get an error instead of a slowdown — often better in production, because you see the problem immediately.</p>
+  <p><strong>Guardrails</strong> depend on the SKU — roughly: an F64 handles 1.5 billion rows, 5,000 Parquet files, and 25 GB of model memory per table; smaller SKUs proportionally less. Verify the exact figures in the documentation. In practice that means: keep Delta tables for Direct Lake compact (<code class="inline">OPTIMIZE</code>, a sensible number of files and row groups) — the <strong>V-Order</strong> Parquet optimization speeds VertiPaq reads up further and Databricks does not produce it on write. Do not assume tables written by Fabric have it, though — since spring 2025 V-Order has been <strong>disabled by default even for newly created Fabric workspaces</strong> (the documentation: <em>"V-order is disabled by default for all newly created workspaces"</em>), because it slows writes down. For read-heavy tables under Direct Lake, enable it explicitly.</p>
+  <p>What matters for our integration: Direct Lake also works over <strong>mirrored Databricks tables</strong> (15.4) and over <strong>shortcuts</strong> (15.6). The combination "Databricks writes gold → mirroring → Direct Lake" is, as of August 2026, architecturally the cleanest route to fast Power BI over Databricks data without paying for a SQL Warehouse on every click.</p>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> Direct Lake = the performance of Import + the freshness of DirectQuery, in exchange for a Fabric capacity and discipline in maintaining the Delta tables. Over Databricks data it is unlocked by mirroring or a shortcut — with no copy of the data.</div></div>
+  <div class="collapsible">
+    <div class="collapsible-header">How to tell the model has fallen back to DirectQuery<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Performance Analyzer in Power BI Desktop shows a "Direct query" item on the visual instead of pure DAX time; DAX Studio / server timings reveal <code class="inline">DirectQuery</code> events. In Fabric, <em>Analyze query processing for Direct Lake semantic models</em> (Learn) helps — it describes how to analyze queries systematically. The most common causes: the source is a view, SQL RLS on the endpoint, exceeded guardrails, or a first refresh that was never run after an XMLA deployment.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-shrnuti-zdroje">
+  <div class="section-header">
+    <div class="section-num">15.8</div>
+    <h2>Which route when — and a summary</h2>
+  </div>
+  <p>The decision in practice is well captured by a simple tree: first the question of <em>who</em> you are giving the data to, then <em>whether you have a Fabric capacity</em>, and finally <em>how fresh and how large</em> the data needs to be.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="A decision tree for choosing an integration route. Sharing outside the organization leads to Delta Sharing. With a Fabric capacity the route goes through mirroring and Direct Lake, or OneLake as shared storage. Without a Fabric capacity the route leads to the Power BI connector, where small data is handled by Import and large or live data by DirectQuery.">
+      <defs>
+        <marker id="arr15f" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="310" y="20" width="200" height="46" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="40" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Recipient outside</text>
+      <text x="410" y="57" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">the tenant / platform?</text>
+      <rect x="640" y="20" width="160" height="46" rx="8" fill="#fff" stroke="#22c55e" stroke-width="2"/>
+      <text x="720" y="48" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Delta Sharing</text>
+      <path d="M512 43 L 638 43" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arr15f)"/>
+      <text x="575" y="33" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">yes</text>
+      <rect x="310" y="110" width="200" height="46" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="138" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Do you have a Fabric capacity?</text>
+      <path d="M410 66 L 410 108" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arr15f)"/>
+      <text x="425" y="92" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">no</text>
+      <!-- yes branch -->
+      <rect x="600" y="100" width="200" height="60" rx="8" fill="#fff" stroke="#22c55e" stroke-width="2"/>
+      <text x="700" y="123" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">UC mirroring + Direct Lake</text>
+      <text x="700" y="142" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">zero-copy, no SQL Warehouse</text>
+      <path d="M512 133 L 598 130" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arr15f)"/>
+      <text x="555" y="120" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">yes</text>
+      <rect x="600" y="180" width="200" height="60" rx="8" fill="#fff" stroke="#e2e8f0"/>
+      <text x="700" y="203" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Alternative: OneLake storage</text>
+      <text x="700" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">shortcuts / ABFS writes</text>
+      <path d="M700 160 L 700 178" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <!-- no branch -->
+      <rect x="310" y="210" width="200" height="46" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Connector: does the data fit</text>
+      <text x="410" y="247" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">in memory and is a refresh enough?</text>
+      <path d="M410 156 L 410 208" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arr15f)"/>
+      <text x="425" y="186" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">no</text>
+      <rect x="60" y="180" width="180" height="46" rx="8" fill="#fff" stroke="#22c55e" stroke-width="2"/>
+      <text x="150" y="200" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Import</text>
+      <text x="150" y="217" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">+ incremental refresh</text>
+      <rect x="60" y="255" width="180" height="52" rx="8" fill="#fff" stroke="#22c55e" stroke-width="2"/>
+      <text x="150" y="275" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">DirectQuery</text>
+      <text x="150" y="293" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">serverless WH + aggregations</text>
+      <path d="M308 220 L 242 203" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arr15f)"/>
+      <text x="278" y="200" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">yes</text>
+      <path d="M308 250 L 242 275" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arr15f)"/>
+      <text x="278" y="275" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">no</text>
+    </svg>
+    <figcaption>A decision tree: sharing outside the organization is handled by Delta Sharing, with a Fabric capacity the main route goes through mirroring and Direct Lake, and without one the connector remains with the Import vs DirectQuery choice.</figcaption>
+  </figure>
+
+  <table>
+    <tr><th>Scenario</th><th>Recommended route</th><th>Why</th></tr>
+    <tr><td>Smaller gold data, periodic reporting</td><td>Connector + Import</td><td>simplest, fastest visuals, the warehouse only during the refresh</td></tr>
+    <tr><td>Live data / huge facts, no Fabric</td><td>Connector + DirectQuery</td><td>live queries; optimization required (15.3)</td></tr>
+    <tr><td>A Fabric capacity in the organization</td><td>UC mirroring + Direct Lake</td><td>zero-copy, the speed of Import, no SQL Warehouse cost per click</td></tr>
+    <tr><td>Databricks should write straight "into Fabric"</td><td>OneLake shortcuts / ABFS writes</td><td>one storage for both worlds</td></tr>
+    <tr><td>Data for a partner outside the tenant</td><td>Delta Sharing</td><td>an open protocol, no shared tenant and no shared compute</td></tr>
+  </table>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Chapter summary:</strong> <strong>1)</strong> The connector to a SQL Warehouse is the quickest start — Import for speed, DirectQuery for freshness, and both can be optimized considerably (a gold layer, materialized views, composite models, a serverless warehouse). <strong>2)</strong> Mirroring Unity Catalog into Fabric (GA) is metadata-only and zero-copy; it opens a T-SQL endpoint and Direct Lake. <strong>3)</strong> Direct Lake combines the performance of Import with the freshness of DirectQuery — mind the fallback and the guardrails. <strong>4)</strong> OneLake and Databricks are converging in both directions (shortcuts, ABFS writes, catalog federation, UC managed tables in OneLake — parts of it in preview/beta). <strong>5)</strong> Delta Sharing handles sharing across organizational boundaries.</div></div>
+
+  <h3>Curated resources</h3>
+  <ul>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/mirroring/azure-databricks" target="_blank" rel="noopener">Mirroring Azure Databricks Unity Catalog (Learn)</a> — the concept, metadata sync, exclusions; GA.</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/mirroring/azure-databricks-tutorial" target="_blank" rel="noopener">Tutorial: configuring mirroring from Azure Databricks (Learn)</a> — a step-by-step guide.</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/fundamentals/direct-lake-overview" target="_blank" rel="noopener">Direct Lake overview (Learn)</a> — both variants, a comparison of modes, guardrails by SKU.</li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/databricks/partners/bi/power-bi/" target="_blank" rel="noopener">Power BI with Azure Databricks (Learn)</a> — the connector, Publish to Power BI, the Power BI task, ADBC.</li>
+    <li><a href="https://docs.databricks.com/aws/en/cheat-sheet/power-bi" target="_blank" rel="noopener">Databricks Power BI cheat sheet</a> — condensed performance recommendations.</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/onelake/onelake-azure-databricks" target="_blank" rel="noopener">Integrate OneLake with Azure Databricks (Learn)</a> — ABFS reads/writes, the serverless variant.</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/onelake/onelake-shortcuts" target="_blank" rel="noopener">OneLake shortcuts (Learn)</a> — shortcut types including ADLS Gen2.</li>
+    <li><a href="https://learn.microsoft.com/en-us/power-query/connectors/delta-sharing" target="_blank" rel="noopener">The Delta Sharing connector for Power BI (Learn)</a> — connecting as a recipient, the row limit.</li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/databricks/delta-sharing/" target="_blank" rel="noopener">Delta Sharing (Databricks docs)</a> — open sharing vs D2D, managing recipients.</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/fundamentals/whats-new" target="_blank" rel="noopener">What's new in Fabric (Learn)</a> — a running overview of new features and preview/GA status changes; for announcements such as OneLake catalog federation or UC managed tables in OneLake, follow the <em>Microsoft Fabric blog</em> (blog.fabric.microsoft.com) as well.</li>
+  </ul>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_14_fabric_prehled.html">← Microsoft Fabric overview</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 15 of 16</span>
+      <a href="dp750_16_migrace_oracle.html" style="margin-left:auto">Migrating from Oracle →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>
