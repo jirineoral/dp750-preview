@@ -12,7 +12,7 @@ Lektorske_materialy/
 web-src/
 __pycache__/
 *.pyc
-_svgcheck.html
+_svgcheck_*.html
 
 # Lokalni smeti
 .DS_Store
