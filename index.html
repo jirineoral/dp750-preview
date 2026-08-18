@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>DP-750 — Data engineering s Azure Databricks</title>
+<title>DP-750 — Data Engineering with Azure Databricks</title>
 <style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
    Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
 :root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
@@ -174,103 +174,103 @@ html.mode-custom .view-btn[data-view-set="custom"] { background: #1a3a6b; color:
 <body>
 
 <div class="index-hero">
-<div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="en/index.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div>
-  <h1>Data engineering s Azure Databricks</h1>
-  <p data-view="custom">Podkladové materiály ke kurzu DP-750 ve zkrácené třídenní verzi — od workspace, compute a Unity Catalogu přes ETL a pipelines až po propojení s Microsoft Fabric a Power BI.</p>
-  <p data-view="orig">Podkladové materiály ke kurzu DP-750 v rozsahu originální osnovy Microsoftu — od workspace, compute a Unity Catalogu přes ETL a pipelines až po monitoring a optimalizaci workloadů.</p>
+<div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="cs/index.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div>
+  <h1>Data Engineering with Azure Databricks</h1>
+  <p data-view="custom">Course materials for DP-750 in the shortened three-day version — from workspace, compute, and Unity Catalog through ETL and pipelines to the connection with Microsoft Fabric and Power BI.</p>
+  <p data-view="orig">Course materials for DP-750 covering the original Microsoft agenda — from workspace, compute, and Unity Catalog through ETL and pipelines to monitoring and workload optimization.</p>
   <div class="tags">
-    <span class="tag" data-view="custom">🎓 DP-750 · 3 dny</span>
-    <span class="tag" data-view="orig">🎓 DP-750 · 4 dny</span>
+    <span class="tag" data-view="custom">🎓 DP-750 · 3 days</span>
+    <span class="tag" data-view="orig">🎓 DP-750 · 4 days</span>
     <span class="tag">🧱 Azure Databricks</span>
     <span class="tag">🗂 Unity Catalog</span>
     <span class="tag" data-view="custom">🔷 Microsoft Fabric</span>
-    <span class="tag">📜 Zkouška DP-750</span>
+    <span class="tag">📜 DP-750 exam</span>
   </div>
 </div>
 
 <div class="index-content">
 
-  <div class="view-switch" role="group" aria-label="Zobrazení osnovy kurzu">
-    <button type="button" class="view-btn" data-view-set="orig">📘 Originál osnova DP-750 · 4 dny</button>
-    <button type="button" class="view-btn" data-view-set="custom">🎓 Osnova tohoto kurzu · 3 dny</button>
+  <div class="view-switch" role="group" aria-label="Course agenda view">
+    <button type="button" class="view-btn" data-view-set="orig">📘 Official DP-750 agenda · 4 days</button>
+    <button type="button" class="view-btn" data-view-set="custom">🎓 This course's agenda · 3 days</button>
   </div>
-  <p class="view-note" data-view="orig">Oficiální čtyřdenní osnova Microsoftu: 13 modulů DP-750 v původním pořadí, bez vlastních doplňků.</p>
-  <p class="view-note" data-view="custom">Zkrácená třídenní verze: 13 modulů oficiální osnovy (dva z nich zůstávají na samostudium) plus tři vlastní témata pod čarou.</p>
+  <p class="view-note" data-view="orig">The official four-day Microsoft agenda: 13 DP-750 modules in their original order, with no custom additions.</p>
+  <p class="view-note" data-view="custom">The shortened three-day version: 13 modules of the official agenda (two of them left for self-study) plus three custom bonus topics.</p>
 
 <div class="how-to">
-    <h3>ℹ️ Jak používat tyto materiály</h3>
+    <h3>ℹ️ How to use these materials</h3>
     <ul>
-      <li>Každá kapitola je samostatný HTML soubor — otevřete ji přímo v prohlížeči, obsah funguje i offline.</li>
-      <li>Mezi kapitolami se pohybujete tlačítky vpravo nahoře nebo přes <strong>☰ Kapitoly</strong>. Obsah aktuální kapitoly je v levém postranním panelu.</li>
-      <li>Rozbalovací sekce otevřete kliknutím, ukázky kódu zkopírujete tlačítkem <em>Kopírovat</em>.</li>
-      <li>Kapitoly odpovídají 1:1 modulům oficiálního kurzu <strong>DP-750</strong>. Praktická část = oficiální laby na GitHubu (anglicky) — na kurzu je lektor prochází jako dema; jsou krokové a samoobslužné, takže si je můžete kdykoli projít i sami.</li>
-      <li data-view="custom">Kapitoly se štítkem <strong>Mimo osnovu · samostudium</strong> jsou součástí oficiálního čtyřdenního kurzu, ale ve zkrácené třídenní verzi se neprobírají.</li>
-      <li>Přepínačem nahoře volíte, jestli chcete vidět <strong>originální osnovu MOC</strong> (13 modulů oficiálního kurzu, výchozí zobrazení), nebo <strong>osnovu tohoto kurzu</strong> (vlastní bloky + témata pod čarou). Volba se pamatuje i při přechodu mezi kapitolami.</li>
+      <li>Every chapter is a standalone HTML file — open it directly in your browser, the content works offline too.</li>
+      <li>You move between chapters with the buttons in the top right or through <strong>☰ Chapters</strong>. The contents of the current chapter are in the left sidebar.</li>
+      <li>Open collapsible sections by clicking them, and copy code samples with the <em>Copy</em> button.</li>
+      <li>The chapters map 1:1 to the modules of the official <strong>DP-750</strong> course. The hands-on part = the official labs on GitHub — in class the instructor walks through them as demos; they are step-by-step and self-service, so you can go through them on your own at any time.</li>
+      <li data-view="custom">Chapters with the <strong>Not in agenda · self-study</strong> label are part of the official four-day course but are not covered in the shortened three-day version.</li>
+      <li>The switch at the top selects whether you see the <strong>official MOC agenda</strong> (the 13 modules of the official course, the default view) or <strong>this course's agenda</strong> (custom blocks + bonus topics). Your choice is remembered as you move between chapters.</li>
     </ul>
   </div>
 
   <div class="collapsible osnova-box" data-view="custom">
-    <div class="collapsible-header">📋 Osnova tohoto kurzu<span class="chevron">▼</span></div>
+    <div class="collapsible-header">📋 Agenda of this course<span class="chevron">▼</span></div>
     <div class="collapsible-body">
     <div class="osnova-blok">
-      <strong>Představení Azure Databricks</strong>
+      <strong>Introducing Azure Databricks</strong>
       <ul>
-      <li>1. Představení Azure Databricks</li>
+      <li>1. Explore Azure Databricks</li>
       </ul>
     </div>
     <div class="osnova-blok">
-      <strong>Výběr a konfigurace Compute</strong>
+      <strong>Selecting and configuring compute</strong>
       <ul>
-      <li>2. Výběr a konfigurace compute</li>
+      <li>2. Select and configure compute</li>
       </ul>
     </div>
     <div class="osnova-blok">
-      <strong>Organizace objektů v Unity Catalogu</strong>
+      <strong>Organizing objects in Unity Catalog</strong>
       <ul>
-      <li>3. Objekty v Unity Catalogu</li>
+      <li>3. Objects in Unity Catalog</li>
       </ul>
     </div>
     <div class="osnova-blok">
-      <strong>Zabezpečení a governance</strong>
+      <strong>Security and governance</strong>
       <ul>
-      <li>4. Zabezpečení Unity Catalogu</li>
-      <li>5. Governance Unity Catalogu</li>
+      <li>4. Securing Unity Catalog</li>
+      <li>5. Governing Unity Catalog</li>
       </ul>
     </div>
     <div class="osnova-blok">
-      <strong>Datové modelování</strong>
+      <strong>Data modeling</strong>
       <ul>
-      <li>6. Datové modelování</li>
+      <li>6. Data modeling</li>
       </ul>
     </div>
     <div class="osnova-blok">
-      <strong>Plnění dat do Unity Catalogu, ETL a Pipelines</strong>
+      <strong>Loading data into Unity Catalog, ETL and pipelines</strong>
       <ul>
-      <li>7. Ingest dat</li>
-      <li>8. Čištění a transformace dat</li>
-      <li>9. Data quality constraints <em>· samostudium</em></li>
-      <li>10. Datové pipelines</li>
+      <li>7. Data ingestion</li>
+      <li>8. Cleansing and transforming data</li>
+      <li>9. Data quality constraints <em>· self-study</em></li>
+      <li>10. Data pipelines</li>
       </ul>
     </div>
     <div class="osnova-blok">
-      <strong>Automatizace</strong>
+      <strong>Automation</strong>
       <ul>
       <li>11. Lakeflow Jobs</li>
-      <li>12. Vývojový lifecycle <em>· samostudium</em></li>
+      <li>12. Development lifecycle <em>· self-study</em></li>
       </ul>
     </div>
     <div class="osnova-blok">
       <strong>Monitoring</strong>
       <ul>
-      <li>13. Monitoring a optimalizace</li>
+      <li>13. Monitoring and optimization</li>
       </ul>
     </div>
     <div class="osnova-blok osnova-podcarou">
-      <strong>Pod čarou — vlastní témata mimo oficiální MOC</strong>
+      <strong>Bonus — custom topics outside the official MOC</strong>
       <ul>
-      <li>14. Průřez Microsoft Fabric</li>
+      <li>14. Microsoft Fabric overview</li>
       <li>15. Power BI + Fabric + Databricks</li>
-      <li>16. Migrace z Oracle</li>
+      <li>16. Migrating from Oracle</li>
       </ul>
     </div>
     </div>
@@ -279,118 +279,118 @@ html.mode-custom .view-btn[data-view-set="custom"] { background: #1a3a6b; color:
   <div class="course-section" data-view="custom">
     <div class="course-section-header">
       <span class="course-badge badge-moc">MOC</span>
-      <h2>Představení Azure Databricks</h2>
+      <h2>Introducing Azure Databricks</h2>
     </div>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_01_explore_databricks.html">
-        <span class="ch-num">Kapitola 01</span>
-        <span class="ch-title">Představení Azure Databricks</span>
-        <span class="ch-topics">Workspace a UI · Workloady · Klíčové koncepty · Unity Catalog + Purview · Lab 1</span>
+        <span class="ch-num">Chapter 01</span>
+        <span class="ch-title">Explore Azure Databricks</span>
+        <span class="ch-topics">Workspace and UI · Workloads · Key concepts · Unity Catalog + Purview · Lab 1</span>
       </a>
     </div>
   </div>
   <div class="course-section" data-view="custom">
     <div class="course-section-header">
       <span class="course-badge badge-moc">MOC</span>
-      <h2>Výběr a konfigurace Compute</h2>
+      <h2>Selecting and configuring compute</h2>
     </div>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_02_compute.html">
-        <span class="ch-num">Kapitola 02</span>
-        <span class="ch-title">Výběr a konfigurace compute</span>
-        <span class="ch-topics">Typy compute · Výkon · Photon a autoscaling · Knihovny · Access mode · Lab 2</span>
+        <span class="ch-num">Chapter 02</span>
+        <span class="ch-title">Select and configure compute</span>
+        <span class="ch-topics">Compute types · Performance · Photon and autoscaling · Libraries · Access mode · Lab 2</span>
       </a>
     </div>
   </div>
   <div class="course-section" data-view="custom">
     <div class="course-section-header">
       <span class="course-badge badge-moc">MOC</span>
-      <h2>Organizace objektů v Unity Catalogu</h2>
+      <h2>Organizing objects in Unity Catalog</h2>
     </div>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_03_objekty_unity_catalog.html">
-        <span class="ch-num">Kapitola 03</span>
-        <span class="ch-title">Objekty v Unity Catalogu</span>
-        <span class="ch-topics">Naming · Katalog a schéma · Tabulky a views · Volumes · DDL · Foreign catalog · Genie · Lab 3</span>
+        <span class="ch-num">Chapter 03</span>
+        <span class="ch-title">Create and organize objects in Unity Catalog</span>
+        <span class="ch-topics">Naming · Catalog and schema · Tables and views · Volumes · DDL · Foreign catalog · Genie · Lab 3</span>
       </a>
     </div>
   </div>
   <div class="course-section" data-view="custom">
     <div class="course-section-header">
       <span class="course-badge badge-moc">MOC</span>
-      <h2>Zabezpečení a governance</h2>
+      <h2>Security and governance</h2>
     </div>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_04_zabezpeceni.html">
-        <span class="ch-num">Kapitola 04</span>
-        <span class="ch-title">Zabezpečení objektů Unity Catalogu</span>
+        <span class="ch-num">Chapter 04</span>
+        <span class="ch-title">Secure Unity Catalog objects</span>
         <span class="ch-topics">Query lifecycle · Access control · Row filtering · Column masking · Key Vault · Service principals · Lab 4</span>
       </a>
       <a class="chapter-card" href="dp750_05_governance.html">
-        <span class="ch-num">Kapitola 05</span>
-        <span class="ch-title">Governance objektů Unity Catalogu</span>
-        <span class="ch-topics">Table definitions · ABAC · Retence a VACUUM · Lineage · Audit · Delta Sharing · Lab 5</span>
+        <span class="ch-num">Chapter 05</span>
+        <span class="ch-title">Govern Unity Catalog objects</span>
+        <span class="ch-topics">Table definitions · ABAC · Retention and VACUUM · Lineage · Audit · Delta Sharing · Lab 5</span>
       </a>
     </div>
   </div>
   <div class="course-section" data-view="custom">
     <div class="course-section-header">
       <span class="course-badge badge-moc">MOC</span>
-      <h2>Datové modelování</h2>
+      <h2>Data modeling</h2>
     </div>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_06_datove_modelovani.html">
-        <span class="ch-num">Kapitola 06</span>
-        <span class="ch-title">Datové modelování v Unity Catalogu</span>
-        <span class="ch-topics">Ingesční nástroje · Formáty · Partitioning · SCD Type 2 · Temporal tabulky · Granularita · Liquid clustering · Lab 6</span>
+        <span class="ch-num">Chapter 06</span>
+        <span class="ch-title">Design and implement data modeling in Unity Catalog</span>
+        <span class="ch-topics">Ingestion tools · Formats · Partitioning · SCD Type 2 · Temporal tables · Granularity · Liquid clustering · Lab 6</span>
       </a>
     </div>
   </div>
   <div class="course-section" data-view="custom">
     <div class="course-section-header">
       <span class="course-badge badge-moc">MOC</span>
-      <h2>Plnění dat do Unity Catalogu, ETL a Pipelines</h2>
+      <h2>Loading data into Unity Catalog, ETL and pipelines</h2>
     </div>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_07_ingest.html">
-        <span class="ch-num">Kapitola 07</span>
-        <span class="ch-title">Ingest dat do Unity Catalogu</span>
-        <span class="ch-topics">Lakeflow Connect · COPY INTO a CTAS · CDC · Structured Streaming · Auto Loader · Deklarativní pipelines · Lab 7</span>
+        <span class="ch-num">Chapter 07</span>
+        <span class="ch-title">Ingest data into Unity Catalog</span>
+        <span class="ch-topics">Lakeflow Connect · COPY INTO and CTAS · CDC · Structured Streaming · Auto Loader · Declarative pipelines · Lab 7</span>
       </a>
       <a class="chapter-card" href="dp750_08_transformace.html">
-        <span class="ch-num">Kapitola 08</span>
-        <span class="ch-title">Čištění, transformace a load dat</span>
-        <span class="ch-topics">Profiling · Datové typy · Duplicity a NULL · Filtry a agregace · Joins · Pivot · MERGE · Lab 8</span>
+        <span class="ch-num">Chapter 08</span>
+        <span class="ch-title">Cleanse, transform, and load data</span>
+        <span class="ch-topics">Profiling · Data types · Duplicates and NULLs · Filters and aggregations · Joins · Pivot · MERGE · Lab 8</span>
       </a>
       <a class="chapter-card out-card" href="dp750_09_data_quality.html">
-        <span class="ch-num">Kapitola 09</span>
+        <span class="ch-num">Chapter 09</span>
         <span class="ch-title">Data quality constraints</span>
-        <span class="ch-topics">Validace · Type checks · Schema drift · Expectations · Lab 9</span>
-        <span class="badge-out">Mimo osnovu · samostudium</span>
+        <span class="ch-topics">Validation · Type checks · Schema drift · Expectations · Lab 9</span>
+        <span class="badge-out">Not in agenda · self-study</span>
       </a>
       <a class="chapter-card" href="dp750_10_pipelines.html">
-        <span class="ch-num">Kapitola 10</span>
-        <span class="ch-title">Návrh a implementace datových pipelines</span>
-        <span class="ch-topics">Pořadí operací · Notebook vs. pipeline · Logika jobů · Error handling · Lab 10</span>
+        <span class="ch-num">Chapter 10</span>
+        <span class="ch-title">Design and implement data pipelines</span>
+        <span class="ch-topics">Order of operations · Notebook vs. pipeline · Job logic · Error handling · Lab 10</span>
       </a>
     </div>
   </div>
   <div class="course-section" data-view="custom">
     <div class="course-section-header">
       <span class="course-badge badge-moc">MOC</span>
-      <h2>Automatizace</h2>
+      <h2>Automation</h2>
     </div>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_11_lakeflow_jobs.html">
-        <span class="ch-num">Kapitola 11</span>
-        <span class="ch-title">Lakeflow Jobs</span>
-        <span class="ch-topics">Setup jobu · Triggery · Plánování · Alerty · Restarty · Lab 11</span>
+        <span class="ch-num">Chapter 11</span>
+        <span class="ch-title">Implement Lakeflow Jobs</span>
+        <span class="ch-topics">Job setup · Triggers · Scheduling · Alerts · Retries · Lab 11</span>
       </a>
       <a class="chapter-card out-card" href="dp750_12_dev_lifecycle.html">
-        <span class="ch-num">Kapitola 12</span>
-        <span class="ch-title">Vývojový lifecycle v Azure Databricks</span>
-        <span class="ch-topics">Git · Branching a PR · Testování · Automation Bundles · Databricks CLI · Lab 12</span>
-        <span class="badge-out">Mimo osnovu · samostudium</span>
+        <span class="ch-num">Chapter 12</span>
+        <span class="ch-title">Development lifecycle in Azure Databricks</span>
+        <span class="ch-topics">Git · Branching and PRs · Testing · Asset Bundles · Databricks CLI · Lab 12</span>
+        <span class="badge-out">Not in agenda · self-study</span>
       </a>
     </div>
   </div>
@@ -401,9 +401,9 @@ html.mode-custom .view-btn[data-view-set="custom"] { background: #1a3a6b; color:
     </div>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_13_monitoring.html">
-        <span class="ch-num">Kapitola 13</span>
-        <span class="ch-title">Monitoring, troubleshooting a optimalizace</span>
-        <span class="ch-topics">Spotřeba clusterů · Oprava jobů · Spark UI · Skew a shuffle · Log Analytics · Lab 13</span>
+        <span class="ch-num">Chapter 13</span>
+        <span class="ch-title">Monitor, troubleshoot, and optimize workloads</span>
+        <span class="ch-topics">Cluster consumption · Repairing jobs · Spark UI · Skew and shuffle · Log Analytics · Lab 13</span>
       </a>
     </div>
   </div>
@@ -411,25 +411,25 @@ html.mode-custom .view-btn[data-view-set="custom"] { background: #1a3a6b; color:
   <hr class="section-divider" data-view="custom">
   <div class="course-section" data-view="custom">
     <div class="course-section-header">
-      <span class="course-badge badge-extra">Pod čarou</span>
-      <h2>Mimo MOC — vlastní témata</h2>
+      <span class="course-badge badge-extra">Bonus</span>
+      <h2>Outside the MOC — custom topics</h2>
     </div>
-    <p class="group-note">Nadstavba nad oficiální kurz: Microsoft Fabric, napojení na Power BI a migrace z Oracle.</p>
+    <p class="group-note">Added on top of the official course: Microsoft Fabric, connecting Power BI, and migrating from Oracle.</p>
     <div class="chapter-grid">
       <a class="chapter-card extra-card" href="dp750_14_fabric_prehled.html">
-        <span class="ch-num">Kapitola 14</span>
-        <span class="ch-title">Průřez Microsoft Fabric</span>
-        <span class="ch-topics">Co je Fabric · Capacity a CU · OneLake · Workloady · Fabric vs. Databricks</span>
+        <span class="ch-num">Chapter 14</span>
+        <span class="ch-title">Microsoft Fabric overview</span>
+        <span class="ch-topics">What Fabric is · Capacity and CUs · OneLake · Workloads · Fabric vs. Databricks</span>
       </a>
       <a class="chapter-card extra-card" href="dp750_15_pbi_fabric_databricks.html">
-        <span class="ch-num">Kapitola 15</span>
-        <span class="ch-title">Power BI, Fabric a Azure Databricks</span>
-        <span class="ch-topics">DirectQuery vs. Import · Optimalizace · Mirroring · Delta Sharing · OneLake shortcuts · Direct Lake</span>
+        <span class="ch-num">Chapter 15</span>
+        <span class="ch-title">Power BI, Fabric, and Azure Databricks</span>
+        <span class="ch-topics">DirectQuery vs. Import · Optimization · Mirroring · Delta Sharing · OneLake shortcuts · Direct Lake</span>
       </a>
       <a class="chapter-card extra-card" href="dp750_16_migrace_oracle.html">
-        <span class="ch-num">Kapitola 16</span>
-        <span class="ch-title">Migrace z Oracle</span>
-        <span class="ch-topics">Strategie migrace · Lakebridge · PL/SQL → Spark SQL · Typické zrady · Zdroje</span>
+        <span class="ch-num">Chapter 16</span>
+        <span class="ch-title">Migrating from Oracle</span>
+        <span class="ch-topics">Migration strategy · Lakebridge · PL/SQL → Spark SQL · Common pitfalls · Resources</span>
       </a>
     </div>
   </div>
@@ -437,97 +437,97 @@ html.mode-custom .view-btn[data-view-set="custom"] { background: #1a3a6b; color:
   <div class="course-section" data-view="orig">
     <div class="course-section-header">
       <span class="course-badge badge-moc">MOC</span>
-      <h2>Moduly oficiálního kurzu DP-750</h2>
+      <h2>Modules of the official DP-750 course</h2>
     </div>
-    <p class="group-note">13 modulů oficiální osnovy Microsoftu v původním pořadí.</p>
+    <p class="group-note">All 13 modules of the official Microsoft agenda in their original order.</p>
     <div class="chapter-grid">
       <a class="chapter-card" href="dp750_01_explore_databricks.html">
-        <span class="ch-num">Kapitola 01</span>
-        <span class="ch-title">Představení Azure Databricks</span>
-        <span class="ch-topics">Workspace a UI · Workloady · Klíčové koncepty · Unity Catalog + Purview · Lab 1</span>
+        <span class="ch-num">Chapter 01</span>
+        <span class="ch-title">Explore Azure Databricks</span>
+        <span class="ch-topics">Workspace and UI · Workloads · Key concepts · Unity Catalog + Purview · Lab 1</span>
       </a>
       <a class="chapter-card" href="dp750_02_compute.html">
-        <span class="ch-num">Kapitola 02</span>
-        <span class="ch-title">Výběr a konfigurace compute</span>
-        <span class="ch-topics">Typy compute · Výkon · Photon a autoscaling · Knihovny · Access mode · Lab 2</span>
+        <span class="ch-num">Chapter 02</span>
+        <span class="ch-title">Select and configure compute</span>
+        <span class="ch-topics">Compute types · Performance · Photon and autoscaling · Libraries · Access mode · Lab 2</span>
       </a>
       <a class="chapter-card" href="dp750_03_objekty_unity_catalog.html">
-        <span class="ch-num">Kapitola 03</span>
-        <span class="ch-title">Objekty v Unity Catalogu</span>
-        <span class="ch-topics">Naming · Katalog a schéma · Tabulky a views · Volumes · DDL · Foreign catalog · Genie · Lab 3</span>
+        <span class="ch-num">Chapter 03</span>
+        <span class="ch-title">Create and organize objects in Unity Catalog</span>
+        <span class="ch-topics">Naming · Catalog and schema · Tables and views · Volumes · DDL · Foreign catalog · Genie · Lab 3</span>
       </a>
       <a class="chapter-card" href="dp750_04_zabezpeceni.html">
-        <span class="ch-num">Kapitola 04</span>
-        <span class="ch-title">Zabezpečení objektů Unity Catalogu</span>
+        <span class="ch-num">Chapter 04</span>
+        <span class="ch-title">Secure Unity Catalog objects</span>
         <span class="ch-topics">Query lifecycle · Access control · Row filtering · Column masking · Key Vault · Service principals · Lab 4</span>
       </a>
       <a class="chapter-card" href="dp750_05_governance.html">
-        <span class="ch-num">Kapitola 05</span>
-        <span class="ch-title">Governance objektů Unity Catalogu</span>
-        <span class="ch-topics">Table definitions · ABAC · Retence a VACUUM · Lineage · Audit · Delta Sharing · Lab 5</span>
+        <span class="ch-num">Chapter 05</span>
+        <span class="ch-title">Govern Unity Catalog objects</span>
+        <span class="ch-topics">Table definitions · ABAC · Retention and VACUUM · Lineage · Audit · Delta Sharing · Lab 5</span>
       </a>
       <a class="chapter-card" href="dp750_06_datove_modelovani.html">
-        <span class="ch-num">Kapitola 06</span>
-        <span class="ch-title">Datové modelování v Unity Catalogu</span>
-        <span class="ch-topics">Ingesční nástroje · Formáty · Partitioning · SCD Type 2 · Temporal tabulky · Granularita · Liquid clustering · Lab 6</span>
+        <span class="ch-num">Chapter 06</span>
+        <span class="ch-title">Design and implement data modeling in Unity Catalog</span>
+        <span class="ch-topics">Ingestion tools · Formats · Partitioning · SCD Type 2 · Temporal tables · Granularity · Liquid clustering · Lab 6</span>
       </a>
       <a class="chapter-card" href="dp750_07_ingest.html">
-        <span class="ch-num">Kapitola 07</span>
-        <span class="ch-title">Ingest dat do Unity Catalogu</span>
-        <span class="ch-topics">Lakeflow Connect · COPY INTO a CTAS · CDC · Structured Streaming · Auto Loader · Deklarativní pipelines · Lab 7</span>
+        <span class="ch-num">Chapter 07</span>
+        <span class="ch-title">Ingest data into Unity Catalog</span>
+        <span class="ch-topics">Lakeflow Connect · COPY INTO and CTAS · CDC · Structured Streaming · Auto Loader · Declarative pipelines · Lab 7</span>
       </a>
       <a class="chapter-card" href="dp750_08_transformace.html">
-        <span class="ch-num">Kapitola 08</span>
-        <span class="ch-title">Čištění, transformace a load dat</span>
-        <span class="ch-topics">Profiling · Datové typy · Duplicity a NULL · Filtry a agregace · Joins · Pivot · MERGE · Lab 8</span>
+        <span class="ch-num">Chapter 08</span>
+        <span class="ch-title">Cleanse, transform, and load data</span>
+        <span class="ch-topics">Profiling · Data types · Duplicates and NULLs · Filters and aggregations · Joins · Pivot · MERGE · Lab 8</span>
       </a>
       <a class="chapter-card" href="dp750_09_data_quality.html">
-        <span class="ch-num">Kapitola 09</span>
+        <span class="ch-num">Chapter 09</span>
         <span class="ch-title">Data quality constraints</span>
-        <span class="ch-topics">Validace · Type checks · Schema drift · Expectations · Lab 9</span>
+        <span class="ch-topics">Validation · Type checks · Schema drift · Expectations · Lab 9</span>
       </a>
       <a class="chapter-card" href="dp750_10_pipelines.html">
-        <span class="ch-num">Kapitola 10</span>
-        <span class="ch-title">Návrh a implementace datových pipelines</span>
-        <span class="ch-topics">Pořadí operací · Notebook vs. pipeline · Logika jobů · Error handling · Lab 10</span>
+        <span class="ch-num">Chapter 10</span>
+        <span class="ch-title">Design and implement data pipelines</span>
+        <span class="ch-topics">Order of operations · Notebook vs. pipeline · Job logic · Error handling · Lab 10</span>
       </a>
       <a class="chapter-card" href="dp750_11_lakeflow_jobs.html">
-        <span class="ch-num">Kapitola 11</span>
-        <span class="ch-title">Lakeflow Jobs</span>
-        <span class="ch-topics">Setup jobu · Triggery · Plánování · Alerty · Restarty · Lab 11</span>
+        <span class="ch-num">Chapter 11</span>
+        <span class="ch-title">Implement Lakeflow Jobs</span>
+        <span class="ch-topics">Job setup · Triggers · Scheduling · Alerts · Retries · Lab 11</span>
       </a>
       <a class="chapter-card" href="dp750_12_dev_lifecycle.html">
-        <span class="ch-num">Kapitola 12</span>
-        <span class="ch-title">Vývojový lifecycle v Azure Databricks</span>
-        <span class="ch-topics">Git · Branching a PR · Testování · Automation Bundles · Databricks CLI · Lab 12</span>
+        <span class="ch-num">Chapter 12</span>
+        <span class="ch-title">Development lifecycle in Azure Databricks</span>
+        <span class="ch-topics">Git · Branching and PRs · Testing · Asset Bundles · Databricks CLI · Lab 12</span>
       </a>
       <a class="chapter-card" href="dp750_13_monitoring.html">
-        <span class="ch-num">Kapitola 13</span>
-        <span class="ch-title">Monitoring, troubleshooting a optimalizace</span>
-        <span class="ch-topics">Spotřeba clusterů · Oprava jobů · Spark UI · Skew a shuffle · Log Analytics · Lab 13</span>
+        <span class="ch-num">Chapter 13</span>
+        <span class="ch-title">Monitor, troubleshoot, and optimize workloads</span>
+        <span class="ch-topics">Cluster consumption · Repairing jobs · Spark UI · Skew and shuffle · Log Analytics · Lab 13</span>
       </a>
     </div>
   </div>
 
 <div class="course-section">
     <div class="course-section-header">
-      <span class="course-badge badge-ex">Příprava</span>
-      <h2>Zkouška DP-750 a co potřebujete</h2>
+      <span class="course-badge badge-ex">Preparation</span>
+      <h2>The DP-750 exam and what you need</h2>
     </div>
     <div class="how-to" style="margin-bottom:0">
       <ul>
-        <li><strong>Prostředí pro laby:</strong> Azure Databricks workspace (Premium) v Azure subscription, případně <a href="https://www.databricks.com/try-databricks" target="_blank" rel="noopener">Databricks Free Edition</a> pro samostudium. Přesné požadavky uvádí každý lab v úvodu.</li>
-        <li><strong>Oficiální laby:</strong> <a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/" target="_blank" rel="noopener">microsoftlearning.github.io — DP-750T00</a> (anglicky, krokové návody).</li>
-        <li><strong>Learn kolekce kurzu:</strong> každá kapitola odkazuje na příslušný modul na Microsoft Learn — vhodné pro opakování po kurzu.</li>
-        <li><strong>Zkouška DP-750</strong> (<a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-750" target="_blank" rel="noopener">study guide</a>) má čtyři domény: Set up and configure an Azure Databricks environment (15–20 %) · Secure and govern Unity Catalog objects (15–20 %) · Prepare and process data (30–35 %) · Deploy and maintain data pipelines and workloads (30–35 %).</li>
-        <li><strong>Kam dál:</strong> na kurz navazuje <a href="https://learn.microsoft.com/training/courses/dp-600t00" target="_blank" rel="noopener">DP-600 — Microsoft Fabric Analytics Engineer</a>; ochutnávku Fabricu najdete v kapitolách pod čarou.</li>
+        <li><strong>Environment for the labs:</strong> an Azure Databricks workspace (Premium) in an Azure subscription, or the <a href="https://www.databricks.com/try-databricks" target="_blank" rel="noopener">Databricks Free Edition</a> for self-study. Each lab states its exact requirements up front.</li>
+        <li><strong>Official labs:</strong> <a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/" target="_blank" rel="noopener">microsoftlearning.github.io — DP-750T00</a> (step-by-step instructions).</li>
+        <li><strong>Learn collection for the course:</strong> every chapter links to the corresponding module on Microsoft Learn — useful for review after the course.</li>
+        <li><strong>The DP-750 exam</strong> (<a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-750" target="_blank" rel="noopener">study guide</a>) has four domains: Set up and configure an Azure Databricks environment (15–20 %) · Secure and govern Unity Catalog objects (15–20 %) · Prepare and process data (30–35 %) · Deploy and maintain data pipelines and workloads (30–35 %).</li>
+        <li><strong>Where to go next:</strong> this course is followed by <a href="https://learn.microsoft.com/training/courses/dp-600t00" target="_blank" rel="noopener">DP-600 — Microsoft Fabric Analytics Engineer</a>; you will find a taste of Fabric in the bonus chapters.</li>
       </ul>
     </div>
   </div>
 
 </div>
 
-<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
 /* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
    tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
 function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}

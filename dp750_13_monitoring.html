@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Monitoring, troubleshooting a optimalizace — DP-750</title>
+<title>Monitor, troubleshoot, and optimize workloads — DP-750</title>
 <style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
    Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
 :root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
@@ -122,34 +122,34 @@ html.mode-custom [data-view="orig"]{display:none}
 <div id="chapOverlay" class="chapter-menu-overlay"></div>
 <div id="chapMenu" class="chapter-menu">
   <div class="chapter-group">
-    <div class="chapter-group-title">MOC — dny 1 a 2</div>
-    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
-    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
-    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
-    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
-    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
-    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
-    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
   </div>
   <div class="chapter-group">
-    <div class="chapter-group-title">MOC — pokračování</div>
-    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
-    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
-    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
     <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
-    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
-    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
     <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
-      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
     </div>
   </div>
   <div class="chapter-group" data-view="custom">
-    <div class="chapter-group-title">Pod čarou — den 3</div>
-    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
     <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
-    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
-      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
     </div>
   </div>
 </div>
@@ -157,11 +157,11 @@ html.mode-custom [data-view="orig"]{display:none}
 <nav class="top-nav">
   <div style="display:flex;align-items:center;gap:16px;min-width:0">
     <span class="course-code">DP-750</span>
-    <span class="chapter-title-nav">Monitoring, troubleshooting a optimalizace</span>
+    <span class="chapter-title-nav">Monitor, troubleshoot, and optimize workloads</span>
   </div>
   <div class="nav-links">
-    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="en/dp750_13_monitoring.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div><button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
-    <a href="dp750_14_fabric_prehled.html" class="next">Průřez Microsoft Fabric →</a>
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="cs/dp750_13_monitoring.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_14_fabric_prehled.html" class="next">Microsoft Fabric overview →</a>
   </div>
 </nav>
 
@@ -169,46 +169,46 @@ html.mode-custom [data-view="orig"]{display:none}
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="sidebar-title">Obsah kapitoly</div>
-    <a href="#sec-monitoring-spotreby" class="toc-item active" data-section="sec-monitoring-spotreby">Monitoring a řízení spotřeby clusterů</a>
-    <a href="#sec-lakeflow-jobs" class="toc-item" data-section="sec-lakeflow-jobs">Troubleshooting a oprava Lakeflow Jobs</a>
-    <a href="#sec-spark-ui" class="toc-item" data-section="sec-spark-ui">Troubleshooting Spark jobs a notebooků</a>
-    <a href="#sec-skew-spill-shuffle" class="toc-item" data-section="sec-skew-spill-shuffle">Caching, skew, spill a shuffle</a>
-    <a href="#sec-log-analytics" class="toc-item" data-section="sec-log-analytics">Log streaming do Azure Log Analytics</a>
-    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 13: Monitor, Troubleshoot, and Optimize Workloads (45 minut)</a>
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-monitoring-spotreby" class="toc-item active" data-section="sec-monitoring-spotreby">Monitoring and managing cluster consumption</a>
+    <a href="#sec-lakeflow-jobs" class="toc-item" data-section="sec-lakeflow-jobs">Troubleshooting and repairing Lakeflow Jobs</a>
+    <a href="#sec-spark-ui" class="toc-item" data-section="sec-spark-ui">Troubleshooting Spark jobs and notebooks</a>
+    <a href="#sec-skew-spill-shuffle" class="toc-item" data-section="sec-skew-spill-shuffle">Caching, skew, spill, and shuffle</a>
+    <a href="#sec-log-analytics" class="toc-item" data-section="sec-log-analytics">Log streaming into Azure Log Analytics</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 13: Monitor, Troubleshoot, and Optimize Workloads (45 minutes)</a>
   </aside>
 
   <main class="main">
     <div class="chapter-hero">
-      <div class="hero-tag">DP-750 · Kapitola 13</div>
-      <h1>Monitoring, troubleshooting a optimalizace</h1>
-      <div class="hero-subtitle">Spotřeba clusterů, opravy Lakeflow Jobs, Spark UI, caching, skew, spill, shuffle a Log Analytics</div>
+      <div class="hero-tag">DP-750 · Chapter 13</div>
+      <h1>Monitor, troubleshoot, and optimize workloads</h1>
+      <div class="hero-subtitle">Cluster consumption, repairing Lakeflow Jobs, Spark UI, caching, skew, spill, shuffle, and Log Analytics</div>
       <div class="hero-meta"><span>🗂 Monitoring</span></div>
     </div>
 
 <div class="objectives">
-  <h3>Cíle kapitoly</h3>
+  <h3>Chapter objectives</h3>
   <ul>
-    <li>Monitorovat spotřebu clusterů pomocí metrik, system tables a budgets a nastavit auto-termination s autoscalingem.</li>
-    <li>Diagnostikovat selhané běhy Lakeflow Jobs a opravit je funkcí repair run bez opakování celého jobu.</li>
-    <li>Číst Spark UI — orientovat se ve struktuře job → stage → task a najít úzká hrdla i příčiny selhání.</li>
-    <li>Rozpoznat a vyřešit data skew, memory spill a nadměrný shuffle (broadcast join, AQE, salting).</li>
-    <li>Popsat streaming diagnostických logů do Azure Log Analytics a dotazovat je pomocí KQL.</li>
+    <li>Monitor cluster consumption with metrics, system tables, and budgets, and set up auto-termination with autoscaling.</li>
+    <li>Diagnose failed Lakeflow Jobs runs and fix them with repair run, without repeating the whole job.</li>
+    <li>Read the Spark UI — find your way around the job → stage → task structure and locate bottlenecks and failure causes.</li>
+    <li>Recognize and resolve data skew, memory spill, and excessive shuffle (broadcast join, AQE, salting).</li>
+    <li>Describe streaming diagnostic logs into Azure Log Analytics and query them with KQL.</li>
   </ul>
 </div>
 
 <div class="section" id="sec-monitoring-spotreby">
   <div class="section-header">
     <div class="section-num">13.1</div>
-    <h2>Monitoring a řízení spotřeby clusterů</h2>
+    <h2>Monitoring and managing cluster consumption</h2>
   </div>
 
-  <p>Provoz lakehouse v produkci není jen o tom, že pipeline doběhne. Je o tom, že doběhne <strong>za rozumné peníze</strong> a že se o problému dozvíte dřív než finanční oddělení. Jediný zapomenutý interaktivní cluster běžící přes víkend umí vygenerovat překvapivě vysoký účet — a naopak poddimenzovaný cluster znamená pomalé joby a nedodržená SLA. Cílem monitoringu není minimalizovat náklady za každou cenu, ale <strong>napasovat zdroje přesně na workload</strong>.</p>
+  <p>Running a lakehouse in production is not only about the pipeline finishing. It is about it finishing <strong>for reasonable money</strong> and about you learning of a problem before the finance department does. A single forgotten interactive cluster running over the weekend can generate a surprisingly high bill — and an undersized cluster, conversely, means slow jobs and missed SLAs. The goal of monitoring is not to minimize cost at any price, but to <strong>fit the resources exactly to the workload</strong>.</p>
 
-  <p>Azure Databricks nabízí tři vrstvy pozorovatelnosti, které se doplňují: okamžité metriky ve workspace, historická data v <strong>system tables</strong> a centralizované logy v Azure Log Analytics.</p>
+  <p>Azure Databricks offers three complementary layers of observability: immediate metrics in the workspace, historical data in <strong>system tables</strong>, and centralized logs in Azure Log Analytics.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 320" role="img" aria-label="Monitorovací stack Azure Databricks. Workspace s clustery, joby a SQL warehousy posílá data do tří kanálů: Metrics UI pro okamžitý stav, system tables v Unity Catalogu pro historii nákladů a diagnostic settings, které streamují logy do Azure Log Analytics pro KQL dotazy a alerty.">
+    <svg viewBox="0 0 820 320" role="img" aria-label="The Azure Databricks monitoring stack. A workspace with clusters, jobs, and SQL warehouses sends data into three channels: the Metrics UI for the immediate state, system tables in Unity Catalog for cost history, and diagnostic settings that stream logs into Azure Log Analytics for KQL queries and alerts.">
       <defs>
         <marker id="arr13a" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
           <path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/>
@@ -218,11 +218,11 @@ html.mode-custom [data-view="orig"]{display:none}
       <rect x="20" y="60" width="200" height="200" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
       <text x="120" y="88" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Databricks workspace</text>
       <rect x="40" y="105" width="160" height="38" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
-      <text x="120" y="129" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Clustery (all-purpose, job)</text>
+      <text x="120" y="129" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Clusters (all-purpose, job)</text>
       <rect x="40" y="153" width="160" height="38" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
       <text x="120" y="177" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Lakeflow Jobs</text>
       <rect x="40" y="201" width="160" height="38" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
-      <text x="120" y="225" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SQL warehousy</text>
+      <text x="120" y="225" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SQL warehouses</text>
       <!-- arrows to channels -->
       <line x1="220" y1="105" x2="300" y2="95" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
       <line x1="220" y1="160" x2="300" y2="165" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
@@ -230,7 +230,7 @@ html.mode-custom [data-view="orig"]{display:none}
       <!-- channel 1 -->
       <rect x="305" y="65" width="210" height="60" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
       <text x="410" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Metrics UI</text>
-      <text x="410" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">CPU · paměť · síť · Spark tasky</text>
+      <text x="410" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">CPU · memory · network · Spark tasks</text>
       <!-- channel 2 -->
       <rect x="305" y="140" width="210" height="60" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
       <text x="410" y="165" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">System tables</text>
@@ -238,43 +238,43 @@ html.mode-custom [data-view="orig"]{display:none}
       <!-- channel 3 -->
       <rect x="305" y="215" width="210" height="60" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
       <text x="410" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Diagnostic settings</text>
-      <text x="410" y="260" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">audit + diagnostické eventy</text>
+      <text x="410" y="260" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">audit + diagnostic events</text>
       <!-- arrows to outputs -->
       <line x1="515" y1="95" x2="595" y2="95" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
       <line x1="515" y1="170" x2="595" y2="170" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
       <line x1="515" y1="245" x2="595" y2="245" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13a)"/>
       <!-- outputs -->
       <rect x="600" y="65" width="200" height="60" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
-      <text x="700" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Okamžitý stav</text>
-      <text x="700" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">right-sizing, bottlenecky</text>
+      <text x="700" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Immediate state</text>
+      <text x="700" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">right-sizing, bottlenecks</text>
       <rect x="600" y="140" width="200" height="60" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
-      <text x="700" y="165" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Náklady a historie</text>
-      <text x="700" y="185" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">SQL dotazy, budgets, chargeback</text>
+      <text x="700" y="165" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Cost and history</text>
+      <text x="700" y="185" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">SQL queries, budgets, chargeback</text>
       <rect x="600" y="215" width="200" height="60" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
       <text x="700" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Azure Log Analytics</text>
-      <text x="700" y="260" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">KQL dotazy, alerty, dashboardy</text>
-      <text x="410" y="35" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Tři vrstvy pozorovatelnosti</text>
+      <text x="700" y="260" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">KQL queries, alerts, dashboards</text>
+      <text x="410" y="35" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Three layers of observability</text>
     </svg>
-    <figcaption>Monitorovací stack: workspace generuje metriky a eventy, které tečou do tří kanálů — Metrics UI pro okamžitý stav, system tables pro historii a náklady, diagnostic settings pro centrální logy v Azure Log Analytics.</figcaption>
+    <figcaption>The monitoring stack: the workspace generates metrics and events that flow into three channels — the Metrics UI for the immediate state, system tables for history and cost, and diagnostic settings for central logs in Azure Log Analytics.</figcaption>
   </figure>
 
-  <h3>Metriky clusterů a SQL warehousů</h3>
-  <p>Nativní rozhraní metrik najdete u každého all-purpose i job clusteru: <code class="inline">Compute</code> → vybraný cluster → záložka <code class="inline">Metrics</code>. Zobrazuje tři kategorie: <strong>hardware metrics</strong> (CPU, paměť, síťová propustnost), <strong>Spark metrics</strong> (aktivní/selhané/dokončené tasky, shuffle read a write) a <strong>GPU metrics</strong> u ML runtime. Data lze filtrovat až 30 dní zpětně a přepínat mezi agregovaným pohledem a jednotlivými uzly — to se hodí, když podezříváte jeden konkrétní worker.</p>
-  <p>SQL warehousy mají vlastní záložku <code class="inline">Monitoring</code>: živé statistiky (běžící a čekající dotazy, počet clusterů), graf <strong>peak query count</strong> a historii dotazů s filtrem na dlouho běžící dotazy. Pokud graf běžících clusterů dlouhodobě sedí na maximu autoscalingu, warehouse nestíhá.</p>
+  <h3>Cluster and SQL warehouse metrics</h3>
+  <p>You will find the native metrics interface on every all-purpose and job cluster: <code class="inline">Compute</code> → the chosen cluster → the <code class="inline">Metrics</code> tab. It shows three categories: <strong>hardware metrics</strong> (CPU, memory, network throughput), <strong>Spark metrics</strong> (active/failed/completed tasks, shuffle read and write), and <strong>GPU metrics</strong> on the ML runtime. The data can be filtered up to 30 days back and you can switch between the aggregated view and individual nodes — handy when you suspect one particular worker.</p>
+  <p>SQL warehouses have their own <code class="inline">Monitoring</code> tab: live statistics (running and queued queries, cluster count), a <strong>peak query count</strong> chart, and query history with a filter for long-running queries. If the running-clusters chart sits at the autoscaling maximum for long periods, the warehouse is not keeping up.</p>
 
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> serverless compute pro notebooky a joby nemá záložku Metrics — místo ní se používají query insights. Cíl je stejný, cesta jiná.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> serverless compute for notebooks and jobs has no Metrics tab — query insights are used instead. The goal is the same, the route is different.</div></div>
 
-  <h3>Auto-termination a autoscaling</h3>
-  <p>Monitoring odhaluje vzory, konfigurace na ně reaguje. <strong>Auto-termination</strong> vypne cluster po zadané době nečinnosti — pro vývojová prostředí je obvyklých 30–60 minut. Cluster je „nečinný", až když doběhly všechny příkazy včetně Spark jobů, Structured Streamingu a JDBC volání. <strong>Autoscaling</strong> dynamicky přidává a ubírá workery mezi nastaveným minimem a maximem; podle Learn modulu tím lze proti fixní velikosti ušetřit řádově 20–40 % nákladů (skutečná úspora závisí na profilu workloadu).</p>
+  <h3>Auto-termination and autoscaling</h3>
+  <p>Monitoring reveals the patterns, configuration reacts to them. <strong>Auto-termination</strong> shuts a cluster down after a given period of inactivity — 30–60 minutes is usual for development environments. A cluster is "inactive" only once all commands have finished, including Spark jobs, Structured Streaming, and JDBC calls. <strong>Autoscaling</strong> dynamically adds and removes workers between the configured minimum and maximum; according to the Learn module this can save roughly 20–40 % of cost compared with a fixed size (the real saving depends on the workload profile).</p>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> auto-termination nesleduje aktivitu legacy DStreams. Pokud takový workload ještě provozujete, buď auto-termination vypněte, nebo (lépe) migrujte na Structured Streaming.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> auto-termination does not track the activity of legacy DStreams. If you still run such a workload, either turn auto-termination off or (better) migrate to Structured Streaming.</div></div>
 
-  <h3>Budgets a system tables pro náklady</h3>
-  <p>Reálnou útratu sledujte přes <strong>budgets</strong> v account console (finanční cíle + e-mailové notifikace při překročení, filtrovatelné per tým/projekt/workspace) a hlavně přes system table <code class="inline">system.billing.usage</code>, kterou lze dotazovat přímo SQL. Kdo čeká, že náklady „nějak dopočítá z faktury", bude překvapen — bez tagů a system tables se zpětná atribuce nákladů dělá velmi špatně.</p>
+  <h3>Budgets and system tables for cost</h3>
+  <p>Track the real spend through <strong>budgets</strong> in the account console (financial targets + email notifications on overrun, filterable per team/project/workspace) and above all through the <code class="inline">system.billing.usage</code> system table, which can be queried directly with SQL. Anyone expecting to "somehow work the cost out from the invoice" will be surprised — without tags and system tables, attributing costs retrospectively is very hard.</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm">-- denni trend spotreby DBU</span>
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- daily DBU consumption trend</span>
 <span class="kw">SELECT</span> <span class="col">usage_date</span>, <span class="fn">sum</span>(<span class="col">usage_quantity</span>) <span class="kw">AS</span> <span class="col">dbus_consumed</span>
 <span class="kw">FROM</span> <span class="tbl">system.billing.usage</span>
 <span class="kw">WHERE</span> <span class="col">sku_name</span> <span class="op">=</span> <span class="str">"STANDARD_ALL_PURPOSE_COMPUTE"</span>
@@ -283,8 +283,8 @@ html.mode-custom [data-view="orig"]{display:none}
   </div>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm">-- ktere joby spotrebovaly nejvic DBU (kandidati na optimalizaci)</span>
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- which jobs consumed the most DBUs (candidates for optimization)</span>
 <span class="kw">SELECT</span> <span class="col">usage_metadata.job_id</span> <span class="kw">AS</span> <span class="col">job_id</span>,
        <span class="fn">sum</span>(<span class="col">usage_quantity</span>) <span class="kw">AS</span> <span class="col">total_dbus</span>
 <span class="kw">FROM</span> <span class="tbl">system.billing.usage</span>
@@ -293,77 +293,77 @@ html.mode-custom [data-view="orig"]{display:none}
 <span class="kw">ORDER BY</span> <span class="col">total_dbus</span> <span class="kw">DESC</span></pre>
   </div>
 
-  <p>Joinem na <code class="inline">system.compute.clusters</code> zjistíte, čí clustery pálí nejvíc DBU (<code class="inline">owned_by</code>), a přes <code class="inline">custom_tags</code> rozpočítáte náklady na projekty. <strong>Tagy</strong> se propagují z clusterů a workspace do billing záznamů — ale jen od okamžiku, kdy je nastavíte. Zpětně historii neotagujete.</p>
+  <p>Joining <code class="inline">system.compute.clusters</code> tells you whose clusters burn the most DBUs (<code class="inline">owned_by</code>), and <code class="inline">custom_tags</code> lets you split costs across projects. <strong>Tags</strong> propagate from clusters and the workspace into the billing records — but only from the moment you set them. You cannot tag history retrospectively.</p>
 
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> zaveďte tagovací konvenci (business unit, projekt, prostředí) hned na začátku projektu a vynuťte ji cluster policy. Měsíční revize nákladového reportu pak zabere minuty, ne dny.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> introduce a tagging convention (business unit, project, environment) at the very start of a project and enforce it with a cluster policy. A monthly review of the cost report then takes minutes, not days.</div></div>
 
   <div class="collapsible">
-    <div class="collapsible-header">Serverless a účtování — na co si dát pozor<span class="chevron">▼</span></div>
+    <div class="collapsible-header">Serverless and billing — what to watch out for<span class="chevron">▼</span></div>
     <div class="collapsible-body">
-      <p>Serverless compute má odlišný model účtování. V <code class="inline">system.billing.usage</code> jej izolujete filtrem <code class="inline">product_features.is_serverless = true</code>; sloupec <code class="inline">identity_metadata.run_as</code> říká, pod jakou identitou workload běžel. Kvůli distribuované architektuře může jeden serverless běh vygenerovat <strong>více billing záznamů</strong> — vždy agregujte přes <code class="inline">SUM()</code>, nikdy nespoléhejte na „jeden řádek = jeden běh". Pro budgets potřebujete oprávnění account admina; workspace admin je typicky jen vidí.</p>
+      <p>Serverless compute has a different billing model. In <code class="inline">system.billing.usage</code> you isolate it with the filter <code class="inline">product_features.is_serverless = true</code>; the <code class="inline">identity_metadata.run_as</code> column says which identity the workload ran under. Because of the distributed architecture, one serverless run can generate <strong>several billing records</strong> — always aggregate with <code class="inline">SUM()</code>, never rely on "one row = one run". For budgets you need account admin permissions; a workspace admin typically only sees them.</p>
     </div>
   </div>
 
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/2-monitor-manage-cluster-consumption#track-costs-with-budgets-and-system-tables" target="_blank" rel="noopener">Track costs with budgets and system tables</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/2-monitor-manage-cluster-consumption#monitor-sql-warehouse-performance" target="_blank" rel="noopener">Monitor SQL warehouse performance</a> (EN)</span></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/2-monitor-manage-cluster-consumption#track-costs-with-budgets-and-system-tables" target="_blank" rel="noopener">Track costs with budgets and system tables</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/2-monitor-manage-cluster-consumption#monitor-sql-warehouse-performance" target="_blank" rel="noopener">Monitor SQL warehouse performance</a></span></div>
 </div>
 
 <div class="section" id="sec-lakeflow-jobs">
   <div class="section-header">
     <div class="section-num">13.2</div>
-    <h2>Troubleshooting a oprava Lakeflow Jobs</h2>
+    <h2>Troubleshooting and repairing Lakeflow Jobs</h2>
   </div>
 
-  <p>Když selže orchestrovaný job, první otázka nezní „proč", ale „<strong>kde</strong>". Stav celého běhu přitom Azure Databricks odvozuje od <strong>leaf tasků</strong> — tasků bez navazujících závislostí. Z toho plyne i na první pohled zvláštní stav „Succeeded with failures": nějaký task uprostřed DAGu selhal, ale všechny leaf tasky doběhly.</p>
+  <p>When an orchestrated job fails, the first question is not "why" but "<strong>where</strong>". Azure Databricks derives the state of the whole run from the <strong>leaf tasks</strong> — the tasks with no downstream dependencies. That is where the seemingly odd "Succeeded with failures" state comes from: a task in the middle of the DAG failed, but all the leaf tasks finished.</p>
 
   <table>
-    <tr><th>Stav běhu</th><th>Význam</th></tr>
-    <tr><td><strong>Failed</strong></td><td>Jeden nebo více leaf tasků nedoběhlo úspěšně.</td></tr>
-    <tr><td><strong>Succeeded with failures</strong></td><td>Některé tasky selhaly, ale všechny leaf tasky uspěly.</td></tr>
-    <tr><td><strong>Skipped</strong></td><td>Běh se nespustil — překročen limit souběžných běhů (job/workspace).</td></tr>
-    <tr><td><strong>Timed Out</strong></td><td>Běh překročil nastavenou maximální dobu trvání.</td></tr>
-    <tr><td><strong>Canceled</strong></td><td>Běh zastavil uživatel nebo automatizace.</td></tr>
+    <tr><th>Run state</th><th>Meaning</th></tr>
+    <tr><td><strong>Failed</strong></td><td>One or more leaf tasks did not finish successfully.</td></tr>
+    <tr><td><strong>Succeeded with failures</strong></td><td>Some tasks failed, but all leaf tasks succeeded.</td></tr>
+    <tr><td><strong>Skipped</strong></td><td>The run did not start — the concurrent run limit (job/workspace) was exceeded.</td></tr>
+    <tr><td><strong>Timed Out</strong></td><td>The run exceeded the configured maximum duration.</td></tr>
+    <tr><td><strong>Canceled</strong></td><td>The run was stopped by a user or by automation.</td></tr>
   </table>
 
-  <p>Jednotlivé tasky mohou být navíc <strong>Disabled</strong> — buď je vypnete ručně, nebo je Lakeflow Jobs vypne automaticky, protože je vypnutý upstream task. V DAG view je poznáte podle ikony přeškrtnutého kolečka.</p>
+  <p>Individual tasks can additionally be <strong>Disabled</strong> — either you turn them off by hand, or Lakeflow Jobs turns them off automatically because an upstream task is disabled. In the DAG view you recognize them by the crossed-out circle icon.</p>
 
-  <h3>Kde to spadlo: matrix view</h3>
-  <p>Diagnostika začíná v <code class="inline">Jobs &amp; Pipelines</code> → detail jobu → záložka <code class="inline">Runs</code>. <strong>Matrix view</strong> zobrazuje historii běhů jako mřížku, kde každá buňka je stav jednoho tasku v jednom běhu:</p>
+  <h3>Where it broke: the matrix view</h3>
+  <p>Diagnosis starts in <code class="inline">Jobs &amp; Pipelines</code> → the job detail → the <code class="inline">Runs</code> tab. The <strong>matrix view</strong> shows the run history as a grid where every cell is the state of one task in one run:</p>
   <ol>
-    <li>Najeďte myší na červený (selhaný) task — uvidíte metadata včetně chybové zprávy.</li>
-    <li>Klikněte na task a otevřete <strong>Task run details</strong> s kompletním výstupem a logy.</li>
-    <li>Hledejte vzor: stejný task selhává opakovaně → problém v kódu či konfiguraci tasku. Selhání „skáčou" náhodně po různých tascích → spíš problém clusteru nebo zdrojů.</li>
+    <li>Hover over a red (failed) task — you will see the metadata including the error message.</li>
+    <li>Click the task and open <strong>Task run details</strong> with the complete output and logs.</li>
+    <li>Look for a pattern: the same task failing repeatedly → a problem in the task's code or configuration. Failures "jumping" randomly between different tasks → more likely a cluster or resource problem.</li>
   </ol>
 
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> tlačítko <code class="inline">Diagnose Error</code> v Jobs UI nechá chybovou zprávu analyzovat asistentem (Genie) a navrhne řešení běžných problémů. Dobrý první krok, ne náhrada porozumění.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> the <code class="inline">Diagnose Error</code> button in the Jobs UI has the error message analyzed by the assistant (Genie) and suggests solutions for common problems. A good first step, not a substitute for understanding.</div></div>
 
-  <h3>Repair run: oprava bez opakování celého jobu</h3>
-  <p>Nejcennější nástroj této sekce: <strong>repair run</strong> znovu spustí <em>jen selhané tasky a jejich potomky</em>, ne celý job. U pipeline, kde tři hodiny běžící transformace uspěla a selhal až finální export, je to rozdíl mezi třemi hodinami a třemi minutami compute času.</p>
+  <h3>Repair run: fixing without repeating the whole job</h3>
+  <p>The most valuable tool in this section: <strong>repair run</strong> re-runs <em>only the failed tasks and their descendants</em>, not the whole job. For a pipeline where a three-hour transformation succeeded and only the final export failed, that is the difference between three hours and three minutes of compute time.</p>
   <ol>
-    <li>Otevřete selhaný běh (sloupec <code class="inline">Start time</code> nebo matrix view).</li>
-    <li>Zvolte <code class="inline">Repair run</code> — dialog ukáže seznam tasků, které se znovu spustí.</li>
-    <li>Volitelně upravte parametry tasků — přepis platí jen pro tento repair běh.</li>
-    <li>Potvrďte; matrix view po dokončení přidá nový sloupec s výsledky opravy.</li>
+    <li>Open the failed run (the <code class="inline">Start time</code> column or the matrix view).</li>
+    <li>Choose <code class="inline">Repair run</code> — the dialog shows the list of tasks that will be re-run.</li>
+    <li>Optionally adjust the task parameters — the override applies to this repair run only.</li>
+    <li>Confirm; once finished, the matrix view adds a new column with the repair results.</li>
   </ol>
 
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> repair je dostupný jen pro joby se dvěma a více tasky. Pokud tasky sdílejí job cluster, oprava vytvoří novou instanci clusteru (např. <code class="inline">my_job_cluster_v1</code>). Disabled task se při repairu normálně přeskakuje — vynutíte ho explicitním zahrnutím do repair požadavku.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> repair is available only for jobs with two or more tasks. If the tasks share a job cluster, the repair creates a new cluster instance (e.g. <code class="inline">my_job_cluster_v1</code>). A disabled task is normally skipped during a repair — you force it by including it explicitly in the repair request.</div></div>
 
-  <h3>Zastavení, restart a proaktivní monitoring</h3>
-  <p>Aktivní běh zastavíte tlačítkem stop v záložce <code class="inline">Runs</code> (hromadně přes <code class="inline">Cancel runs</code> / <code class="inline">Cancel all queued runs</code>). Kontinuální joby, které opakovaně selhávají, přecházejí do <strong>exponential backoff</strong> — Databricks čeká mezi pokusy stále déle. Po opravě příčiny použijte <code class="inline">Restart run</code>: zruší aktivní běh, vynuluje čekací interval a spustí nový běh hned.</p>
-  <p>Reaktivní hašení doplňte prevencí: <strong>notifikace</strong> (e-mail, Slack, webhook) na selhání jobu, pravidelná revize matrix view a dotazy nad schématem <code class="inline">system.lakeflow</code>, kde najdete historii jobů a běhů napříč účtem — trendy v době běhu odhalí degradaci dřív, než z ní bude incident.</p>
+  <h3>Stopping, restarting, and proactive monitoring</h3>
+  <p>You stop an active run with the stop button in the <code class="inline">Runs</code> tab (in bulk through <code class="inline">Cancel runs</code> / <code class="inline">Cancel all queued runs</code>). Continuous jobs that fail repeatedly go into <strong>exponential backoff</strong> — Databricks waits longer and longer between attempts. Once the cause is fixed, use <code class="inline">Restart run</code>: it cancels the active run, resets the waiting interval, and starts a new run immediately.</p>
+  <p>Complement reactive firefighting with prevention: <strong>notifications</strong> (email, Slack, webhook) on job failure, a regular review of the matrix view, and queries against the <code class="inline">system.lakeflow</code> schema, where you will find the history of jobs and runs across the account — trends in run duration reveal degradation before it becomes an incident.</p>
 
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/3-troubleshoot-repair-lakeflow-jobs#repair-failed-job-runs" target="_blank" rel="noopener">Repair failed job runs</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/3-troubleshoot-repair-lakeflow-jobs#fix-common-failure-causes" target="_blank" rel="noopener">Fix common failure causes</a> (EN)</span></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/3-troubleshoot-repair-lakeflow-jobs#repair-failed-job-runs" target="_blank" rel="noopener">Repair failed job runs</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/3-troubleshoot-repair-lakeflow-jobs#fix-common-failure-causes" target="_blank" rel="noopener">Fix common failure causes</a></span></div>
 </div>
 
 <div class="section" id="sec-spark-ui">
   <div class="section-header">
     <div class="section-num">13.3</div>
-    <h2>Troubleshooting Spark jobs a notebooků</h2>
+    <h2>Troubleshooting Spark jobs and notebooks</h2>
   </div>
 
-  <p>Jobs UI vám řekne, <em>který task</em> selhal. Když ale potřebujete zjistit <em>proč je pomalý</em>, musíte o vrstvu níž — do <strong>Spark UI</strong>. K tomu je potřeba rozumět tomu, jak Spark práci strukturuje.</p>
+  <p>The Jobs UI tells you <em>which task</em> failed. But when you need to find out <em>why it is slow</em>, you have to go a layer down — into the <strong>Spark UI</strong>. For that you need to understand how Spark structures the work.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 340" role="img" aria-label="Anatomie Spark jobu. Akce v notebooku spustí job, který se dělí na stage 1 a stage 2. Každá stage obsahuje tasky běžící paralelně nad jednotlivými partitions. Mezi stagemi je shuffle boundary, kde se data serializují, zapisují na disk, přenášejí po síti a deserializují.">
+    <svg viewBox="0 0 820 340" role="img" aria-label="The anatomy of a Spark job. An action in a notebook starts a job that is split into stage 1 and stage 2. Each stage contains tasks running in parallel over individual partitions. Between the stages is a shuffle boundary where data is serialized, written to disk, transferred over the network, and deserialized.">
       <defs>
         <marker id="arr13b" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
           <path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/>
@@ -371,16 +371,16 @@ html.mode-custom [data-view="orig"]{display:none}
       </defs>
       <!-- action -->
       <rect x="20" y="40" width="170" height="52" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
-      <text x="105" y="62" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">Akce v notebooku</text>
+      <text x="105" y="62" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">An action in a notebook</text>
       <text x="105" y="80" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">df.write, count(), display()</text>
       <line x1="105" y1="92" x2="105" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arr13b)"/>
-      <text x="115" y="118" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">spustí</text>
+      <text x="115" y="118" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">starts</text>
       <!-- job container -->
       <rect x="20" y="135" width="780" height="180" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
       <text x="45" y="162" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Job</text>
       <!-- stage 1 -->
       <rect x="45" y="175" width="290" height="120" rx="8" fill="#ffffff" stroke="#1a3a6b"/>
-      <text x="190" y="198" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Stage 1 — čtení + filtr</text>
+      <text x="190" y="198" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Stage 1 — read + filter</text>
       <rect x="60" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
       <text x="90" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 1</text>
       <rect x="128" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
@@ -389,15 +389,15 @@ html.mode-custom [data-view="orig"]{display:none}
       <text x="226" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 3</text>
       <rect x="264" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
       <text x="294" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 4</text>
-      <text x="190" y="270" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">1 task = 1 partition, běží paralelně</text>
+      <text x="190" y="270" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">1 task = 1 partition, running in parallel</text>
       <!-- shuffle boundary -->
       <line x1="390" y1="175" x2="390" y2="300" stroke="#e8721c" stroke-width="2" stroke-dasharray="6,4"/>
       <text x="390" y="168" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">shuffle boundary</text>
-      <text x="390" y="312" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">serializace → disk → síť → deserializace</text>
+      <text x="390" y="312" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">serialization → disk → network → deserialization</text>
       <line x1="335" y1="225" x2="440" y2="225" stroke="#e8721c" stroke-width="2" marker-end="url(#arr13b)"/>
       <!-- stage 2 -->
       <rect x="445" y="175" width="330" height="120" rx="8" fill="#ffffff" stroke="#1a3a6b"/>
-      <text x="610" y="198" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Stage 2 — join / agregace</text>
+      <text x="610" y="198" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Stage 2 — join / aggregation</text>
       <rect x="470" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
       <text x="500" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 1</text>
       <rect x="540" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
@@ -406,71 +406,71 @@ html.mode-custom [data-view="orig"]{display:none}
       <text x="640" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 3</text>
       <rect x="680" y="210" width="60" height="30" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
       <text x="710" y="230" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">task 4</text>
-      <text x="610" y="270" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">stage = úsek bez přesunu dat mezi uzly</text>
+      <text x="610" y="270" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">a stage = a span with no data movement between nodes</text>
     </svg>
-    <figcaption>Anatomie Spark jobu: akce spustí job, ten se dělí na stages oddělené shuffle boundary a každá stage běží jako sada paralelních tasků nad partitions.</figcaption>
+    <figcaption>The anatomy of a Spark job: an action starts a job, the job splits into stages separated by a shuffle boundary, and each stage runs as a set of parallel tasks over partitions.</figcaption>
   </figure>
 
-  <h3>Tři kategorie selhání</h3>
-  <p>Příčiny selhání Spark jobů spadají do tří rodin: <strong>chyby v kódu</strong> (syntaxe, špatné transformace, schema mismatch — chybová zpráva obvykle míří přímo na problém), <strong>nedostatek zdrojů</strong> (out-of-memory, pomalý shuffle, opakovaně selhávající tasky) a <strong>problémy prostředí</strong> (cluster nenastartoval kvůli limitům subscription, reclaim spot instancí, nedostupný externí zdroj). První kategorie se řeší v kódu, druhá kombinací konfigurace clusteru a optimalizace, třetí často mimo Databricks.</p>
+  <h3>Three categories of failure</h3>
+  <p>The causes of Spark job failures fall into three families: <strong>code errors</strong> (syntax, wrong transformations, schema mismatch — the error message usually points straight at the problem), <strong>lack of resources</strong> (out-of-memory, slow shuffle, repeatedly failing tasks), and <strong>environment problems</strong> (a cluster that did not start because of subscription limits, spot instance reclaim, an unavailable external source). The first category is fixed in code, the second by a combination of cluster configuration and optimization, the third often outside Databricks.</p>
 
-  <h3>Postup ve Spark UI</h3>
-  <p>Spark UI otevřete ze stránky clusteru (záložka <code class="inline">Spark UI</code>). Vyšetřování začněte na <strong>Jobs Timeline</strong> a hledejte tři vzory:</p>
+  <h3>How to work through the Spark UI</h3>
+  <p>You open the Spark UI from the cluster page (the <code class="inline">Spark UI</code> tab). Start the investigation on the <strong>Jobs Timeline</strong> and look for three patterns:</p>
   <ul>
-    <li><strong>Selhané joby</strong> (červený indikátor) — klik zobrazí selhanou stage a konkrétní důvod, včetně odkazů na chyby na úrovni tasků.</li>
-    <li><strong>Dlouho běžící joby</strong> — job výrazně delší než ostatní je první kandidát na drill-down do stages.</li>
-    <li><strong>Mezery v timeline</strong> — krátké pauzy jsou normální (driver koordinuje), ale mezera delší než minutu uprostřed pipeline naznačuje přetížený driver nebo poruchu clusteru.</li>
+    <li><strong>Failed jobs</strong> (a red indicator) — clicking shows the failed stage and the specific reason, including links to task-level errors.</li>
+    <li><strong>Long-running jobs</strong> — a job markedly longer than the others is the first candidate for a drill-down into the stages.</li>
+    <li><strong>Gaps in the timeline</strong> — short pauses are normal (the driver coordinating), but a gap of more than a minute in the middle of a pipeline suggests an overloaded driver or a cluster failure.</li>
   </ul>
-  <p>V problematickém jobu otevřete nejdelší stage a čtěte metriky tasků: sloupce <code class="inline">Input</code>, <code class="inline">Output</code>, <code class="inline">Shuffle Read</code> a <code class="inline">Shuffle Write</code> ukazují, kolik dat se kde hýbe.</p>
+  <p>In a problematic job, open the longest stage and read the task metrics: the <code class="inline">Input</code>, <code class="inline">Output</code>, <code class="inline">Shuffle Read</code>, and <code class="inline">Shuffle Write</code> columns show how much data is moving where.</p>
 
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> diagnostická zkratka — stage s <strong>jediným taskem</strong> znamená nedostatečnou paralelizaci (často po <code class="inline">coalesce(1)</code> nebo úzkém čtení), zatímco <strong>nerovnoměrné doby tasků</strong> ve stejné stagi ukazují na data skew (viz sekce 13.4).</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> a diagnostic shortcut — a stage with a <strong>single task</strong> means insufficient parallelization (often after a <code class="inline">coalesce(1)</code> or a narrow read), while <strong>uneven task durations</strong> within the same stage point to data skew (see section 13.4).</div></div>
 
-  <h3>Metriky clusteru a driver vs. workery</h3>
-  <p>Spark UI doplňte pohledem do záložky <code class="inline">Metrics</code> clusteru. Vizualizace <strong>Server load distribution</strong> barví uzly podle zátěže: červená = přetížený, modrá = nevytížený. Klasický vzor: <strong>červený driver, modří workeři</strong> — driver je přetížený (typicky sběr velkých výsledků do notebooku, tisíce malých tasků, nebo single-threaded Python kód) a potřebuje větší instanci, nebo úpravu kódu. Vysoké shuffle objemy s pomalým během zase značí síťové úzké hrdlo — řešením je dřívější filtrování, broadcast join nebo repartitioning.</p>
+  <h3>Cluster metrics and driver vs. workers</h3>
+  <p>Complement the Spark UI with a look at the cluster's <code class="inline">Metrics</code> tab. The <strong>Server load distribution</strong> visualization colors the nodes by load: red = overloaded, blue = underused. The classic pattern: a <strong>red driver and blue workers</strong> — the driver is overloaded (typically collecting large results into the notebook, thousands of tiny tasks, or single-threaded Python code) and needs a bigger instance or a code change. High shuffle volumes with a slow run, in turn, point to a network bottleneck — the answer is earlier filtering, a broadcast join, or repartitioning.</p>
 
-  <h3>Restart clusteru</h3>
-  <p>Vyčerpané zdroje, zaseknuté executory nebo zastaralý image někdy vyřeší jen restart. Před ním zkontrolujte <code class="inline">Event log</code> clusteru (selhání akvizice instancí, reclaim spotů, terminace executorů) a restartujte přes UI, nebo CLI:</p>
+  <h3>Restarting a cluster</h3>
+  <p>Exhausted resources, stuck executors, or an outdated image are sometimes only solved by a restart. Before doing it, check the cluster's <code class="inline">Event log</code> (instance acquisition failures, spot reclaims, executor terminations) and restart through the UI or the CLI:</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm"># restart clusteru pres Databricks CLI</span>
+    <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># restart a cluster with the Databricks CLI</span>
 databricks clusters restart CLUSTER_ID
 
-<span class="cm"># CLUSTER_ID zjistite napr. z</span>
+<span class="cm"># you can find CLUSTER_ID with</span>
 databricks clusters list</pre>
   </div>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> restart clusteru ukončí běžící joby a <strong>vymaže historii Spark UI</strong>. Diagnostické informace si uložte předem. U dlouhoběžících streaming clusterů zvažte plánované restarty v maintenance oknech, ať běží na aktuálních images.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> restarting a cluster terminates running jobs and <strong>wipes the Spark UI history</strong>. Save the diagnostic information beforehand. For long-running streaming clusters, consider scheduled restarts during maintenance windows so they run on current images.</div></div>
 </div>
 
 <div class="section" id="sec-skew-spill-shuffle">
   <div class="section-header">
     <div class="section-num">13.4</div>
-    <h2>Caching, skew, spill a shuffle</h2>
+    <h2>Caching, skew, spill, and shuffle</h2>
   </div>
 
-  <p>Dotaz, který včera běžel deset minut, dnes běží hodinu. Většina takových záhad se dá vystopovat ke čtyřem vzorům: <strong>caching problémy</strong>, <strong>data skew</strong>, <strong>memory spill</strong> a <strong>nadměrný shuffle</strong>. Nejsou nezávislé — skew typicky způsobuje spill a obojí zhoršuje shuffle. Proto se vyšetřují společně.</p>
+  <p>A query that ran for ten minutes yesterday runs for an hour today. Most such mysteries can be traced to four patterns: <strong>caching problems</strong>, <strong>data skew</strong>, <strong>memory spill</strong>, and <strong>excessive shuffle</strong>. They are not independent — skew typically causes spill and both make shuffle worse. That is why they are investigated together.</p>
 
   <table>
-    <tr><th>Nástroj</th><th>Co ukazuje</th><th>Kde ho najdete</th></tr>
-    <tr><td><strong>DAG</strong></td><td>Exekuční plán, pořadí operátorů, exchange (shuffle) uzly</td><td>Spark UI / query profile</td></tr>
-    <tr><td><strong>Spark UI</strong></td><td>Metriky jobů, stages a tasků, spill, shuffle read/write</td><td>Stránka clusteru → Spark UI</td></tr>
-    <tr><td><strong>Query profile</strong></td><td>Rozpad SQL dotazu po operátorech (čas, řádky, paměť)</td><td>Query History → See query profile</td></tr>
+    <tr><th>Tool</th><th>What it shows</th><th>Where to find it</th></tr>
+    <tr><td><strong>DAG</strong></td><td>The execution plan, operator order, exchange (shuffle) nodes</td><td>Spark UI / query profile</td></tr>
+    <tr><td><strong>Spark UI</strong></td><td>Job, stage, and task metrics, spill, shuffle read/write</td><td>The cluster page → Spark UI</td></tr>
+    <tr><td><strong>Query profile</strong></td><td>A breakdown of a SQL query by operator (time, rows, memory)</td><td>Query History → See query profile</td></tr>
   </table>
 
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> začněte DAGem pro celkový obraz toku a teprve pak jděte do Spark UI či query profilu na konkrétní stage, kde se tráví čas.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> start with the DAG for the overall picture of the flow and only then go into the Spark UI or the query profile for the specific stage where the time is spent.</div></div>
 
   <h3>Caching: disk cache vs. Spark cache</h3>
-  <p>Azure Databricks automaticky cachuje Parquet soubory na lokálních discích workerů — tzv. <strong>disk cache</strong> (dříve Delta cache). Funguje transparentně; jestli je zapnutá, ověříte konfigurací <code class="inline">spark.databricks.io.cache.enabled</code>. Vedle toho existuje klasická <strong>Spark cache</strong> (<code class="inline">.cache()</code> / <code class="inline">.persist()</code>), která vyžaduje ruční správu. Dva protipóly problémů: <em>under-caching</em> (opakované čtení stejných dat z remote storage — ve Spark UI vysoké <code class="inline">Input</code> u stále stejných stages) a <em>over-caching</em> (cache ukusuje paměť potřebnou pro zpracování a přispívá k OOM). Kdo čeká, že <code class="inline">.cache()</code> je vždy zrychlení, bude překvapen — necachovaná data, která se nikdy znovu nepřečtou, jsou jen zaplacená paměť; a nezapomínejte na <code class="inline">.unpersist()</code>.</p>
+  <p>Azure Databricks automatically caches Parquet files on the local disks of the workers — the so-called <strong>disk cache</strong> (formerly Delta cache). It works transparently; you can check whether it is on with the <code class="inline">spark.databricks.io.cache.enabled</code> configuration. Alongside it there is the classic <strong>Spark cache</strong> (<code class="inline">.cache()</code> / <code class="inline">.persist()</code>), which requires manual management. Two opposite problems: <em>under-caching</em> (repeatedly reading the same data from remote storage — a high <code class="inline">Input</code> on the same stages over and over in the Spark UI) and <em>over-caching</em> (the cache eats the memory needed for processing and contributes to OOM). Anyone expecting <code class="inline">.cache()</code> to always be a speed-up will be surprised — cached data that is never read again is just paid-for memory; and do not forget <code class="inline">.unpersist()</code>.</p>
 
-  <h3>Data skew: pár tasků dře, zbytek čeká</h3>
-  <p><strong>Data skew</strong> = některé partitions jsou výrazně větší než ostatní. Pár tasků pak běží mnohonásobně déle a celý cluster čeká na opozdilce. Typické příčiny: nerovnoměrná distribuce klíčů v joinech a agregacích (jeden zákazník v 90 % záznamů), <code class="inline">NULL</code> hodnoty směřující do jedné partition, časové partitionování s „těžkými" posledními dny.</p>
+  <h3>Data skew: a few tasks toil, the rest wait</h3>
+  <p><strong>Data skew</strong> = some partitions are markedly larger than the others. A few tasks then run many times longer and the whole cluster waits for the stragglers. The typical causes: an uneven distribution of keys in joins and aggregations (one customer in 90 % of the records), <code class="inline">NULL</code> values all heading into one partition, time-based partitioning with "heavy" recent days.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 300" role="img" aria-label="Vizualizace data skew. Vlevo panel Před: osm tasků, sedm krátkých pruhů a jeden extrémně dlouhý červený pruh přesahující čárkovanou linii 75. percentilu — celá stage čeká na nejpomalejší task. Vpravo panel Po s AQE nebo saltingem: osm zhruba stejně dlouhých pruhů, stage končí dřív.">
+    <svg viewBox="0 0 820 300" role="img" aria-label="A visualization of data skew. On the left the Before panel: eight tasks, seven short bars and one extremely long red bar crossing the dashed 75th percentile line — the whole stage waits for the slowest task. On the right the After panel with AQE or salting: eight roughly equal bars, and the stage finishes sooner.">
       <!-- left panel -->
       <rect x="20" y="30" width="380" height="250" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
-      <text x="210" y="58" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Před: skew</text>
+      <text x="210" y="58" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Before: skew</text>
       <!-- bars -->
       <rect x="50" y="80" width="90" height="16" rx="4" fill="#1a3a6b"/>
       <rect x="50" y="102" width="75" height="16" rx="4" fill="#1a3a6b"/>
@@ -480,14 +480,14 @@ databricks clusters list</pre>
       <rect x="50" y="190" width="70" height="16" rx="4" fill="#1a3a6b"/>
       <rect x="50" y="212" width="85" height="16" rx="4" fill="#1a3a6b"/>
       <rect x="50" y="234" width="320" height="16" rx="4" fill="#ef4444"/>
-      <text x="270" y="230" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#ef4444">task 8: Max ≫ 75. percentil</text>
+      <text x="270" y="230" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#ef4444">task 8: Max ≫ 75th percentile</text>
       <!-- percentile line -->
       <line x1="160" y1="72" x2="160" y2="258" stroke="#e8721c" stroke-width="2" stroke-dasharray="5,4"/>
-      <text x="166" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">75. percentil</text>
-      <text x="210" y="272" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">doba běhu tasku → stage čeká na nejpomalejší</text>
+      <text x="166" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">75th percentile</text>
+      <text x="210" y="272" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">task duration → the stage waits for the slowest one</text>
       <!-- right panel -->
       <rect x="420" y="30" width="380" height="250" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
-      <text x="610" y="58" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#22c55e">Po: AQE / salting</text>
+      <text x="610" y="58" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#22c55e">After: AQE / salting</text>
       <rect x="450" y="80" width="105" height="16" rx="4" fill="#22c55e"/>
       <rect x="450" y="102" width="95" height="16" rx="4" fill="#22c55e"/>
       <rect x="450" y="124" width="110" height="16" rx="4" fill="#22c55e"/>
@@ -497,48 +497,48 @@ databricks clusters list</pre>
       <rect x="450" y="212" width="103" height="16" rx="4" fill="#22c55e"/>
       <rect x="450" y="234" width="112" height="16" rx="4" fill="#22c55e"/>
       <line x1="575" y1="72" x2="575" y2="258" stroke="#6b7280" stroke-width="2" stroke-dasharray="5,4"/>
-      <text x="581" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">konec stage</text>
-      <text x="610" y="272" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">rovnoměrné partitions → paralelismus se využije</text>
+      <text x="581" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">end of stage</text>
+      <text x="610" y="272" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">even partitions → the parallelism is actually used</text>
     </svg>
-    <figcaption>Data skew ve Spark UI: jeden přetížený task drží celou stage; po rozbití skewed partitions (AQE, salting) tasky končí zhruba současně.</figcaption>
+    <figcaption>Data skew in the Spark UI: one overloaded task holds up the whole stage; once the skewed partitions are broken up (AQE, salting) the tasks finish at roughly the same time.</figcaption>
   </figure>
 
-  <p>Diagnóza: ve Spark UI otevřete detail stage a sekci <strong>Summary Metrics</strong>. Dokumentace: <em>„If the Max is more than 50% higher than the 75th percentile, you likely have skew."</em> Řešení v pořadí, v jakém je zkoušet:</p>
+  <p>The diagnosis: in the Spark UI open the stage detail and the <strong>Summary Metrics</strong> section. From the documentation: <em>"If the Max is more than 50% higher than the 75th percentile, you likely have skew."</em> The remedies, in the order you should try them:</p>
   <ul>
-    <li><strong>Adaptive Query Execution (AQE)</strong> — za běhu rozbíjí skewed partitions při joinech. Na moderních Databricks Runtime je zapnutá; ověřte konfiguraci.</li>
-    <li><strong>Broadcast join</strong> — malou tabulku rozešlete na všechny executory a skew v shuffle joinu úplně obejdete.</li>
-    <li><strong>Salting</strong> — ruční přidání náhodné složky ke klíči, když automatika nestačí (viz odbočka níže).</li>
+    <li><strong>Adaptive Query Execution (AQE)</strong> — breaks skewed partitions apart at run time during joins. It is enabled on modern Databricks Runtimes; verify the configuration.</li>
+    <li><strong>Broadcast join</strong> — send the small table to every executor and sidestep skew in a shuffle join entirely.</li>
+    <li><strong>Salting</strong> — manually adding a random component to the key when the automation is not enough (see the aside below).</li>
   </ul>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm"># overeni klicovych konfiguraci</span>
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># check the key configurations</span>
 spark.conf.<span class="fn">get</span>(<span class="str">"spark.databricks.io.cache.enabled"</span>)          <span class="cm"># disk cache</span>
 spark.conf.<span class="fn">get</span>(<span class="str">"spark.databricks.optimizer.adaptive.enabled"</span>) <span class="cm"># AQE</span>
 
-<span class="cm"># shuffle partitions nechat ridit dynamicky</span>
+<span class="cm"># let shuffle partitions be managed dynamically</span>
 spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.shuffle.partitions"</span>, <span class="str">"auto"</span>)</pre>
   </div>
 
-  <h3>Memory spill: paměť došla, jede se přes disk</h3>
-  <p><strong>Spill</strong> nastává, když se mezivýsledky nevejdou do paměti a Spark je odkládá na disk — každý bajt se zapíše a znovu přečte. V detailu stage hledejte metriky <code class="inline">Shuffle Spill (Memory)</code> a <code class="inline">Shuffle Spill (Disk)</code>: <strong>jakákoli nenulová hodnota</strong> znamená tlak na paměť. Nápravy: zvýšit počet partitions (menší data na task — proto <code class="inline">"auto"</code> výše), workery s vyšším poměrem paměti na jádro, a hlavně zmenšit zpracovávaná data (výběr sloupců, časné filtrování).</p>
+  <h3>Memory spill: memory ran out, going through disk</h3>
+  <p><strong>Spill</strong> happens when intermediate results do not fit in memory and Spark puts them on disk — every byte is written and read again. In the stage detail, look for the <code class="inline">Shuffle Spill (Memory)</code> and <code class="inline">Shuffle Spill (Disk)</code> metrics: <strong>any non-zero value</strong> means memory pressure. The remedies: increase the number of partitions (less data per task — hence the <code class="inline">"auto"</code> above), workers with a higher memory-to-core ratio, and above all reduce the data being processed (column selection, early filtering).</p>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> spill je často jen symptom skew — příliš velká partition se nevejde do paměti a přeteče na disk. Řešte nejdřív skew; spill tím obvykle zmizí sám.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> spill is often only a symptom of skew — an overly large partition does not fit in memory and overflows to disk. Fix the skew first; the spill usually disappears on its own.</div></div>
 
-  <h3>Shuffle: nejdražší operace ve Sparku</h3>
-  <p><strong>Shuffle</strong> přesouvá data mezi uzly při joinech, agregacích a repartitioningu. Zahrnuje serializaci, zápis na disk, síťový přenos a deserializaci — proto je to typicky nejdražší část dotazu. Ve Spark UI ho čtete ze sloupců <code class="inline">Shuffle Read</code> / <code class="inline">Shuffle Write</code>; v DAGu a query profilu se zobrazuje jako <strong>Exchange</strong> uzly. Když shuffle read výrazně převyšuje velikost vstupních dat, hýbete daty zbytečně.</p>
+  <h3>Shuffle: the most expensive operation in Spark</h3>
+  <p><strong>Shuffle</strong> moves data between nodes during joins, aggregations, and repartitioning. It involves serialization, writing to disk, network transfer, and deserialization — which is why it is typically the most expensive part of a query. In the Spark UI you read it from the <code class="inline">Shuffle Read</code> / <code class="inline">Shuffle Write</code> columns; in the DAG and the query profile it appears as <strong>Exchange</strong> nodes. When shuffle read markedly exceeds the size of the input data, you are moving data around needlessly.</p>
   <ul>
-    <li><strong>Filtrujte co nejdřív</strong> — do shuffle pošlete jen data, která opravdu potřebujete.</li>
-    <li><strong>Broadcast join</strong> pro malé tabulky — Learn modul uvádí výchozí limit pro automatický broadcast cca 30 MB (AQE navíc umí sort-merge join překlopit na broadcast za běhu, když malou tabulku odhalí až runtime statistika); přesné prahy pro váš runtime ověřte v dokumentaci.</li>
-    <li><strong>Nerepartitionujte zbytečně</strong> — každé <code class="inline">repartition()</code> je plný shuffle.</li>
-    <li><strong>Kolokujte data</strong> — tabulky často joinované přes stejný klíč partitionujte/bucketujte stejně.</li>
+    <li><strong>Filter as early as possible</strong> — send only the data you really need into the shuffle.</li>
+    <li><strong>Broadcast join</strong> for small tables — the Learn module gives a default automatic broadcast limit of about 30 MB (and AQE can also flip a sort-merge join to a broadcast at run time when runtime statistics reveal a small table); verify the exact thresholds for your runtime in the documentation.</li>
+    <li><strong>Do not repartition needlessly</strong> — every <code class="inline">repartition()</code> is a full shuffle.</li>
+    <li><strong>Co-locate data</strong> — partition/bucket tables that are frequently joined on the same key in the same way.</li>
   </ul>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
     <pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
 
-<span class="cm"># explicitni broadcast male dimenzni tabulky</span>
+<span class="cm"># explicit broadcast of a small dimension table</span>
 result = (fact_df
     .<span class="fn">join</span>(F.<span class="fn">broadcast</span>(dim_df), <span class="str">"customer_id"</span>)
     .<span class="fn">groupBy</span>(<span class="str">"region"</span>)
@@ -546,56 +546,56 @@ result = (fact_df
   </div>
 
   <div class="collapsible">
-    <div class="collapsible-header">Salting: ruční rozbití skewed klíče<span class="chevron">▼</span></div>
+    <div class="collapsible-header">Salting: breaking up a skewed key by hand<span class="chevron">▼</span></div>
     <div class="collapsible-body">
-      <p>Když AQE nestačí (extrémní skew v agregaci), přidejte ke klíči náhodnou „sůl" — klíč se rozpadne na N podklíčů, agregujete dvoufázově:</p>
+      <p>When AQE is not enough (extreme skew in an aggregation), add a random "salt" to the key — the key splits into N sub-keys and you aggregate in two phases:</p>
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
-        <pre><span class="cm"># faze 1: agregace pres klic + sul (rozlozi skewed klic na 8 tasku)</span>
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="cm"># phase 1: aggregate by key + salt (spreads the skewed key across 8 tasks)</span>
 salted = (df
     .<span class="fn">withColumn</span>(<span class="str">"salt"</span>, (F.<span class="fn">rand</span>() <span class="op">*</span> <span class="num">8</span>).<span class="fn">cast</span>(<span class="str">"int"</span>))
     .<span class="fn">groupBy</span>(<span class="str">"customer_id"</span>, <span class="str">"salt"</span>)
     .<span class="fn">agg</span>(F.<span class="fn">sum</span>(<span class="str">"amount"</span>).<span class="fn">alias</span>(<span class="str">"partial"</span>)))
 
-<span class="cm"># faze 2: finalni agregace uz nad malymi mezisoucty</span>
+<span class="cm"># phase 2: the final aggregation over the small subtotals</span>
 final = salted.<span class="fn">groupBy</span>(<span class="str">"customer_id"</span>).<span class="fn">agg</span>(F.<span class="fn">sum</span>(<span class="str">"partial"</span>))</pre>
       </div>
-      <p>Daň za salting je složitější kód a dvojitá agregace — proto je až třetí volbou po AQE a broadcast joinu.</p>
+      <p>The price of salting is more complex code and a double aggregation — which is why it is only the third choice after AQE and a broadcast join.</p>
     </div>
   </div>
 
-  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> diagnostický postup — <strong>1)</strong> Summary Metrics: Max vs. 75. percentil → skew, <strong>2)</strong> Spill (Memory/Disk) &gt; 0 → tlak na paměť, <strong>3)</strong> Shuffle Read ≫ Input → zbytečné přesuny dat, <strong>4)</strong> vysoký Input u opakovaných čtení → caching. Opravy: AQE, broadcast, salting, časné filtrování, „auto" shuffle partitions.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> the diagnostic procedure — <strong>1)</strong> Summary Metrics: Max vs. the 75th percentile → skew, <strong>2)</strong> Spill (Memory/Disk) &gt; 0 → memory pressure, <strong>3)</strong> Shuffle Read ≫ Input → needless data movement, <strong>4)</strong> a high Input on repeated reads → caching. The fixes: AQE, broadcast, salting, early filtering, "auto" shuffle partitions.</div></div>
 
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/5-resolve-cache-skew-spill-shuffle#investigate-data-skew" target="_blank" rel="noopener">Investigate data skew</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/5-resolve-cache-skew-spill-shuffle#investigate-shuffle-issues" target="_blank" rel="noopener">Investigate shuffle issues</a> (EN)</span></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/5-resolve-cache-skew-spill-shuffle#investigate-data-skew" target="_blank" rel="noopener">Investigate data skew</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/5-resolve-cache-skew-spill-shuffle#investigate-shuffle-issues" target="_blank" rel="noopener">Investigate shuffle issues</a></span></div>
 </div>
 
 <div class="section" id="sec-log-analytics">
   <div class="section-header">
     <div class="section-num">13.5</div>
-    <h2>Log streaming do Azure Log Analytics</h2>
+    <h2>Log streaming into Azure Log Analytics</h2>
   </div>
 
-  <p>Jakmile firma provozuje víc než jeden workspace, prohledávání logů „workspace po workspace" přestane škálovat. <strong>Log streaming do Azure Log Analytics</strong> centralizuje audit a diagnostické logy z celého prostředí do jednoho místa, kde je dotazujete přes <strong>KQL (Kusto Query Language)</strong>, stavíte nad nimi alerty a dashboardy.</p>
+  <p>As soon as a company runs more than one workspace, searching logs "workspace by workspace" stops scaling. <strong>Log streaming into Azure Log Analytics</strong> centralizes audit and diagnostic logs from the whole environment into one place, where you query them with <strong>KQL (Kusto Query Language)</strong> and build alerts and dashboards on top of them.</p>
 
-  <p>Tok dat: workspace generuje audit/diagnostické eventy (vytvoření clusteru, běh jobu, spuštění notebooku, změna oprávnění) → <strong>Azure diagnostic settings</strong> je zachytí a routují → Log Analytics je uloží do tabulek per služba → vy dotazujete KQL. Diagnostic settings typicky konfiguruje platformní administrátor v Azure portálu; datový inženýr logy hlavně konzumuje.</p>
+  <p>The data flow: the workspace generates audit/diagnostic events (cluster creation, job run, notebook execution, permission change) → <strong>Azure diagnostic settings</strong> capture and route them → Log Analytics stores them in per-service tables → you query with KQL. Diagnostic settings are typically configured by the platform administrator in the Azure portal; a data engineer mostly consumes the logs.</p>
 
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> diagnostické logy vyžadují <strong>Premium plán</strong> Azure Databricks a v Log Analytics se objevují typicky do ~15 minut od události. Pro dotazování audit logů uvnitř Databricks je preferovanou cestou system table <code class="inline">system.access.audit</code> — Log Analytics volte, když potřebujete cross-service monitoring, KQL alerty nebo integraci s Azure Monitor.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> diagnostic logs require the <strong>Premium plan</strong> of Azure Databricks and typically appear in Log Analytics within ~15 minutes of the event. For querying audit logs inside Databricks the preferred route is the <code class="inline">system.access.audit</code> system table — choose Log Analytics when you need cross-service monitoring, KQL alerts, or integration with Azure Monitor.</div></div>
 
   <table>
-    <tr><th>Tabulka</th><th>Obsah</th></tr>
-    <tr><td><code class="inline">DatabricksClusters</code></td><td>Vytváření, terminace, resizing a konfigurace clusterů</td></tr>
-    <tr><td><code class="inline">DatabricksJobs</code></td><td>Vytváření jobů, běhy, selhání, změny plánování</td></tr>
-    <tr><td><code class="inline">DatabricksNotebook</code></td><td>Spouštění a úpravy notebooků</td></tr>
-    <tr><td><code class="inline">DatabricksSQL</code></td><td>Operace SQL warehousů a dotazů</td></tr>
-    <tr><td><code class="inline">DatabricksTables</code></td><td>Vytváření/mazání tabulek, přístupy, změny oprávnění</td></tr>
-    <tr><td><code class="inline">DatabricksSecrets</code></td><td>Přístupy k secret scopes a secrets</td></tr>
+    <tr><th>Table</th><th>Contents</th></tr>
+    <tr><td><code class="inline">DatabricksClusters</code></td><td>Cluster creation, termination, resizing, and configuration</td></tr>
+    <tr><td><code class="inline">DatabricksJobs</code></td><td>Job creation, runs, failures, schedule changes</td></tr>
+    <tr><td><code class="inline">DatabricksNotebook</code></td><td>Notebook execution and edits</td></tr>
+    <tr><td><code class="inline">DatabricksSQL</code></td><td>SQL warehouse and query operations</td></tr>
+    <tr><td><code class="inline">DatabricksTables</code></td><td>Table creation/deletion, access, permission changes</td></tr>
+    <tr><td><code class="inline">DatabricksSecrets</code></td><td>Access to secret scopes and secrets</td></tr>
   </table>
 
-  <p>Každá tabulka sdílí standardní sloupce: <code class="inline">TimeGenerated</code>, <code class="inline">OperationName</code>, <code class="inline">Identity</code>, <code class="inline">SourceIPAddress</code>, <code class="inline">RequestParams</code> a <code class="inline">Response</code>. Vyšetřování selhání jobů tedy začíná v <code class="inline">DatabricksJobs</code>, bezpečnostní incident v <code class="inline">DatabricksSecrets</code> a <code class="inline">DatabricksTables</code>.</p>
+  <p>Every table shares a standard set of columns: <code class="inline">TimeGenerated</code>, <code class="inline">OperationName</code>, <code class="inline">Identity</code>, <code class="inline">SourceIPAddress</code>, <code class="inline">RequestParams</code>, and <code class="inline">Response</code>. So investigating job failures starts in <code class="inline">DatabricksJobs</code>, and a security incident in <code class="inline">DatabricksSecrets</code> and <code class="inline">DatabricksTables</code>.</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">KQL</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm">// ktere operace jobu selhaly za poslednich 7 dni a kdy se selhani kumuluji</span>
+    <div class="code-header"><span class="code-lang">KQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">// which job operations failed in the last 7 days and when the failures cluster</span>
 <span class="tbl">DatabricksJobs</span>
 <span class="op">|</span> <span class="kw">where</span> <span class="col">TimeGenerated</span> <span class="op">&gt;</span> <span class="fn">ago</span>(<span class="num">7d</span>)
 <span class="op">|</span> <span class="kw">where</span> <span class="col">Response</span> <span class="kw">contains</span> <span class="str">"error"</span> <span class="kw">or</span> <span class="col">Response</span> <span class="kw">contains</span> <span class="str">"failed"</span>
@@ -603,11 +603,11 @@ final = salted.<span class="fn">groupBy</span>(<span class="str">"customer_id"</
 <span class="op">|</span> <span class="kw">order by</span> <span class="col">FailureCount</span> <span class="kw">desc</span></pre>
   </div>
 
-  <p>Z dotazu je jeden krok k <strong>alertu</strong>: v Log Analytics zvolíte <code class="inline">New alert rule</code>, nastavíte podmínku a <strong>action group</strong> (e-mail, SMS, mobilní aplikace, ITSM integrace). Typické scénáře: víc než pět selhání jobů za hodinu, operace nad tabulkami mimo pracovní dobu, nezvyklá vlna vytváření clusterů (utržená automatizace).</p>
+  <p>From a query it is one step to an <strong>alert</strong>: in Log Analytics you choose <code class="inline">New alert rule</code>, set the condition and an <strong>action group</strong> (email, SMS, mobile app, ITSM integration). The typical scenarios: more than five job failures in an hour, table operations outside business hours, an unusual wave of cluster creation (runaway automation).</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">KQL</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm">// alert: vice nez 5 selhani jobu za poslednich 60 minut</span>
+    <div class="code-header"><span class="code-lang">KQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">// alert: more than 5 job failures in the last 60 minutes</span>
 <span class="tbl">DatabricksJobs</span>
 <span class="op">|</span> <span class="kw">where</span> <span class="col">TimeGenerated</span> <span class="op">&gt;</span> <span class="fn">ago</span>(<span class="num">1h</span>)
 <span class="op">|</span> <span class="kw">where</span> <span class="col">Response</span> <span class="kw">contains</span> <span class="str">"error"</span> <span class="kw">or</span> <span class="col">Response</span> <span class="kw">contains</span> <span class="str">"failed"</span>
@@ -615,38 +615,38 @@ final = salted.<span class="fn">groupBy</span>(<span class="str">"customer_id"</
 <span class="op">|</span> <span class="kw">where</span> <span class="col">FailureCount</span> <span class="op">&gt;</span> <span class="num">5</span></pre>
   </div>
 
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> osvědčený postup křížového vyšetřování — selhaný běh najděte v <code class="inline">DatabricksJobs</code>, stav podkladového clusteru ověřte v <code class="inline">DatabricksClusters</code> a pokud job spouští notebook, dohledejte detail v <code class="inline">DatabricksNotebook</code>. Časté autoscaling eventy zase prozradí poddimenzovanou výchozí konfiguraci.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> a proven cross-investigation approach — find the failed run in <code class="inline">DatabricksJobs</code>, check the state of the underlying cluster in <code class="inline">DatabricksClusters</code>, and if the job runs a notebook, track the detail down in <code class="inline">DatabricksNotebook</code>. Frequent autoscaling events, in turn, reveal an undersized default configuration.</div></div>
 
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/6-implement-log-streaming-azure-analytics#query-logs-with-kusto-query-language" target="_blank" rel="noopener">Query logs with Kusto Query Language</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/6-implement-log-streaming-azure-analytics#create-alerts-for-proactive-monitoring" target="_blank" rel="noopener">Create alerts for proactive monitoring</a> (EN)</span></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/6-implement-log-streaming-azure-analytics#query-logs-with-kusto-query-language" target="_blank" rel="noopener">Query logs with Kusto Query Language</a> · <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/6-implement-log-streaming-azure-analytics#create-alerts-for-proactive-monitoring" target="_blank" rel="noopener">Create alerts for proactive monitoring</a></span></div>
 </div>
 
 <div class="section" id="sec-lab">
   <div class="section-header">
     <div class="section-num">13.6</div>
-    <h2>Lab 13: Monitor, Troubleshoot, and Optimize Workloads (45 minut)</h2>
+    <h2>Lab 13: Monitor, Troubleshoot, and Optimize Workloads (45 minutes)</h2>
   </div>
 
-  <p>Scénář: reportovací dotaz, který dřív končil za pár minut, náhle běží násobně déle — cluster vypadá vytížený, ale většina tasků končí rychle a pár se vleče. V labu si <strong>syntetické skew a shuffle workloady</strong> nejdřív sami vyrobíte (skewed groupBy, sort-merge join), problémy diagnostikujete ve Spark UI (Summary Metrics, DAG, Exchange uzly) a pak je opravíte pomocí broadcast joinů, AQE a redukce shuffle.</p>
+  <p>The scenario: a reporting query that used to finish in a few minutes suddenly runs many times longer — the cluster looks busy, but most tasks finish quickly and a few drag on. In the lab you will first create the <strong>synthetic skew and shuffle workloads</strong> yourself (a skewed groupBy, a sort-merge join), diagnose the problems in the Spark UI (Summary Metrics, DAG, Exchange nodes), and then fix them with broadcast joins, AQE, and shuffle reduction.</p>
 
-  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/13-monitor-troubleshoot-optimize-workloads-azure-databricks.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
-     <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/13-monitor-troubleshoot-optimize-workloads-azure-databricks.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/monitor-troubleshoot-optimize-workloads-azure-databricks/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> lab vyžaduje klasický cluster (ne serverless) s <strong>vypnutým Photonem</strong> (<code class="inline">spark.databricks.photon.enabled false</code>). Dokumentace labu: <em>„When enabled, it optimises shuffle and skew handling automatically, which masks the performance problems this lab is designed to demonstrate."</em></div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> the lab requires a classic cluster (not serverless) with <strong>Photon disabled</strong> (<code class="inline">spark.databricks.photon.enabled false</code>). From the lab documentation: <em>"When enabled, it optimises shuffle and skew handling automatically, which masks the performance problems this lab is designed to demonstrate."</em></div></div>
 
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
 
-  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Podle čeho v Summary Metrics stage poznáte data skew a jaké je orientační pravidlo pro poměr Max vs. 75. percentil? <strong>2)</strong> Které tasky znovu spustí repair run u selhaného Lakeflow Jobu? <strong>3)</strong> Proč broadcast join eliminuje shuffle velké tabulky a co ho podle výchozích limitů omezuje?</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> What in a stage's Summary Metrics tells you there is data skew, and what is the rule of thumb for the ratio of Max to the 75th percentile? <strong>2)</strong> Which tasks does a repair run re-run on a failed Lakeflow Job? <strong>3)</strong> Why does a broadcast join eliminate the shuffle of a large table, and what limits it under the default settings?</div></div>
 </div>
 
     <div class="footer-nav">
-      <a href="dp750_12_dev_lifecycle.html">← Vývojový lifecycle</a>
-      <span style="color:var(--text-muted);font-size:13px">Kapitola 13 z 16</span>
-      <a href="dp750_14_fabric_prehled.html" style="margin-left:auto">Průřez Microsoft Fabric →</a>
+      <a href="dp750_12_dev_lifecycle.html">← Development lifecycle</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 13 of 16</span>
+      <a href="dp750_14_fabric_prehled.html" style="margin-left:auto">Microsoft Fabric overview →</a>
     </div>
   </main>
 </div>
 
-<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
 /* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
    tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
 function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}

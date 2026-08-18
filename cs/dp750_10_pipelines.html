@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Návrh a implementace datových pipelines — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Návrh a implementace datových pipelines</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="../dp750_10_pipelines.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div><button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_11_lakeflow_jobs.html" class="next">Lakeflow Jobs →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-poradi-operaci" class="toc-item active" data-section="sec-poradi-operaci">Návrh pořadí operací v pipeline</a>
+    <a href="#sec-notebook-vs-lakeflow" class="toc-item" data-section="sec-notebook-vs-lakeflow">Volba: notebook, nebo deklarativní pipeline?</a>
+    <a href="#sec-logika-jobu" class="toc-item" data-section="sec-logika-jobu">Návrh logiky Lakeflow jobu</a>
+    <a href="#sec-error-handling" class="toc-item" data-section="sec-error-handling">Error handling v pipelines a jobech</a>
+    <a href="#sec-pipeline-z-notebooku" class="toc-item" data-section="sec-pipeline-z-notebooku">Pipeline z notebooků</a>
+    <a href="#sec-lakeflow-deklarativni" class="toc-item" data-section="sec-lakeflow-deklarativni">Deklarativní pipelines: orchestrace a inkrementální zpracování</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 10: Design and implement data pipelines with Azure Databricks (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 10</div>
+      <h1>Návrh a implementace datových pipelines</h1>
+      <div class="hero-subtitle">Pořadí operací, notebook vs. Lakeflow Pipelines, návrh jobů a error handling</div>
+      <div class="hero-meta"><span>🗂 Plnění dat do Unity Catalogu, ETL a Pipelines</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Navrhnout pořadí operací pipeline od ingestu po servírování podle <strong>medallion architektury</strong>.</li>
+    <li>Rozhodnout mezi notebooky a <strong>Lakeflow Spark Declarative Pipelines</strong> podle povahy workloadu.</li>
+    <li>Navrhnout logiku <strong>Lakeflow jobu</strong>: závislosti tasků, podmínky, iterace a parametry.</li>
+    <li>Implementovat error handling: retry policies, idempotentní operace a karanténu (dead-letter).</li>
+    <li>Postavit pipeline z notebooků i deklarativně přes streaming tables a materialized views.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-poradi-operaci">
+  <div class="section-header">
+    <div class="section-num">10.1</div>
+    <h2>Návrh pořadí operací v pipeline</h2>
+  </div>
+  <p>Datová pipeline není jeden skript, ale sekvence fází, kde každá staví na validovaném výstupu předchozí. Learn modul rozlišuje šest fází: <strong>ingest → clean &amp; validate → transform → load → serve → monitor</strong>. První čtyři se přirozeně mapují na vrstvy <strong>medallion architektury</strong>, kterou znáte z předchozích kapitol — bronze uchovává surová data pro případné přepracování, silver čistí a validuje, gold agreguje pro spotřebu.</p>
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Diagram medallion pipeline jako DAG tasků. Task ingest_bronze plní bronze vrstvu, na něj navazuje clean_silver se silver vrstvou, dále quality_gate rozhodující podle kvality dat, a nakonec aggregate_gold plnící gold vrstvu, ze které čtou BI a ML konzumenti. Pod tokem je vyznačen monitoring všech fází.">
+      <defs>
+        <marker id="arr10a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="10" y="40" width="120" height="80" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="70" y="70" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Zdroje</text>
+      <text x="70" y="88" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">soubory, DB,</text>
+      <text x="70" y="104" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">message queues</text>
+      <rect x="170" y="40" width="150" height="80" rx="8" fill="#ffffff" stroke="#a16207" stroke-width="2"/>
+      <text x="245" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#a16207">ingest_bronze</text>
+      <text x="245" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">surová data 1:1,</text>
+      <text x="245" y="102" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">inkrementálně</text>
+      <rect x="360" y="40" width="150" height="80" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+      <text x="435" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">clean_silver</text>
+      <text x="435" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">dedup, NULL filtry,</text>
+      <text x="435" y="102" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">typy, validace</text>
+      <rect x="550" y="40" width="110" height="80" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="605" y="70" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">quality_gate</text>
+      <text x="605" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">if/else task</text>
+      <rect x="695" y="40" width="115" height="80" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="752" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">aggregate_gold</text>
+      <text x="752" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">joiny, agregace,</text>
+      <text x="752" y="102" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">metriky pro BI</text>
+      <line x1="130" y1="80" x2="164" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10a)"/>
+      <line x1="320" y1="80" x2="354" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10a)"/>
+      <line x1="510" y1="80" x2="544" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10a)"/>
+      <line x1="660" y1="80" x2="689" y2="80" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10a)"/>
+      <text x="245" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#a16207">BRONZE</text>
+      <text x="435" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#6b7280">SILVER</text>
+      <text x="752" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#e8721c">GOLD</text>
+      <rect x="170" y="175" width="490" height="50" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="415" y="196" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">quality_gate → nevyhovuje: notifikace + karanténa, gold se nespustí</text>
+      <text x="415" y="214" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">např. {{tasks.quality_check.values.invalid_count}} &gt; 100</text>
+      <line x1="605" y1="120" x2="605" y2="169" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr10a)"/>
+      <rect x="10" y="250" width="800" height="40" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="410" y="275" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Monitor &amp; optimize — doba běhu, objemy záznamů, trendy kvality, náklady (průběžně, nad všemi fázemi)</text>
+    </svg>
+    <figcaption>Medallion pipeline jako DAG tasků: ingest do bronze, čištění do silver, quality gate jako podmíněné větvení a agregace do gold; monitoring běží nad všemi fázemi.</figcaption>
+  </figure>
+  <p>Z návrhu pořadí operací plynou tři praktická pravidla. Za prvé: <strong>ingest zachovává surovou podobu</strong> — transformace při ingestu vám vezme možnost přehrát zpracování jinak. Za druhé: <strong>čištění patří před transformace</strong> — joiny a agregace nad nevalidními daty produkují nevalidní výsledky s mnohem horší dohledatelností. Za třetí: <strong>inkrementální zpracování od začátku</strong> — full reload je pohodlný na vývoj, ale drahý v provozu.</p>
+  <p>Fáze load a serve řeší, jak data dopravit ke konzumentům: volba mezi full refresh, inkrementálním appendem a merge patternem, partitioning cílových tabulek, optimalizované views a řízení přístupu. Poslední fáze — monitoring — není „až se to dodělá": metriky délky běhu, objemů a kvality patří do návrhu od prvního dne.</p>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> při návrhu kreslete pipeline odzadu — od gold tabulky, kterou konzument potřebuje, zpět ke zdrojům. Vyhnete se „bronzovým jezerům", která nikdo nečte, a každý task v DAGu bude mít zdůvodnitelného odběratele.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/2-design-order-operations-pipeline" target="_blank" rel="noopener">Design order of operations for a pipeline</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-notebook-vs-lakeflow">
+  <div class="section-header">
+    <div class="section-num">10.2</div>
+    <h2>Volba: notebook, nebo deklarativní pipeline?</h2>
+  </div>
+  <p>Azure Databricks nabízí dvě cesty, jak pipeline napsat. <strong>Notebooky</strong> jsou procedurální: krok za krokem říkáte, <em>jak</em> se má co spočítat, a máte plnou kontrolu nad každým detailem — error handlingem, cachováním, pořadím operací. <strong>Deklarativní pipelines</strong> to obracejí: popíšete <em>co</em> má vzniknout (tabulky a jejich definice) a framework sám odvodí závislosti, pořadí spouštění, checkpointy i retry logiku. Základní jednotkou deklarativní pipeline je <strong>flow</strong> — čte ze zdroje, transformuje a zapisuje do tabulky či sinku.</p>
+  <table>
+    <tr><th>Kritérium</th><th>Notebook</th><th>Deklarativní pipeline</th></tr>
+    <tr><td>Řízení běhu</td><td>plná kontrola vývojáře</td><td>orchestraci řídí systém</td></tr>
+    <tr><td>Standardní ETL</td><td>upovídaný kód</td><td>stručné deklarace</td></tr>
+    <tr><td>Kvalita dat</td><td>ruční validace</td><td>vestavěné expectations (viz kapitola 9)</td></tr>
+    <tr><td>Lineage a monitoring</td><td>externí nástroje</td><td>automaticky součástí</td></tr>
+    <tr><td>Nároky na tým</td><td>programátorské dovednosti</td><td>zvládnutelné i čistě v SQL</td></tr>
+    <tr><td>Typický scénář</td><td>custom logika, ML, explorace</td><td>produkční, opakovatelné ETL</td></tr>
+  </table>
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Rozhodovací strom volby mezi notebookem a deklarativní pipeline. První otázka: vyžaduje úloha procedurální logiku jako větvení, volání API či speciální knihovny? Pokud ano, notebook. Pokud ne, druhá otázka: jde o opakovatelné ETL s požadavkem na kvalitu a lineage? Pokud ano, deklarativní pipeline, jinak zvážit hybrid.">
+      <defs>
+        <marker id="arr10b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="280" y="15" width="260" height="60" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="34" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Potřebuje úloha procedurální logiku?</text>
+      <text x="410" y="51" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">větvení, smyčky přes API,</text>
+      <text x="410" y="66" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">custom retry, ML knihovny</text>
+      <rect x="60" y="120" width="230" height="70" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="175" y="147" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Notebook (+ Lakeflow Job)</text>
+      <text x="175" y="167" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">plná kontrola, vlastní error handling,</text>
+      <text x="175" y="182" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">explorace a prototypy po buňkách</text>
+      <rect x="470" y="120" width="290" height="60" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="615" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Opakovatelné ETL do produkce?</text>
+      <text x="615" y="165" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">kvalita, lineage, monitoring „zadarmo"</text>
+      <rect x="470" y="220" width="290" height="65" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="615" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#22c55e">Deklarativní pipeline</text>
+      <text x="615" y="265" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">streaming tables + materialized views,</text>
+      <text x="615" y="279" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">expectations, auto-orchestrace</text>
+      <rect x="60" y="220" width="230" height="65" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="175" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Hybrid</text>
+      <text x="175" y="263" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">notebooky pro preprocessing a ML,</text>
+      <text x="175" y="278" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">deklarativní pipeline pro jádro ETL</text>
+      <line x1="310" y1="75" x2="200" y2="114" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10b)"/>
+      <text x="235" y="95" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">ano</text>
+      <line x1="510" y1="75" x2="600" y2="114" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10b)"/>
+      <text x="580" y="95" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">ne</text>
+      <line x1="615" y1="180" x2="615" y2="214" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10b)"/>
+      <text x="640" y="202" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">ano</text>
+      <line x1="464" y1="160" x2="230" y2="214" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10b)"/>
+      <text x="330" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">jednorázové / smíšené</text>
+    </svg>
+    <figcaption>Rozhodovací strom: procedurální logika a explorace vedou k notebooku, opakovatelné produkční ETL k deklarativní pipeline; v praxi je běžný hybrid obou.</figcaption>
+  </figure>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> nejde o volbu „buď – anebo" na úrovni celé firmy. Běžný vzor je hybrid: deklarativní pipeline drží páteřní ETL (ingest, čištění, agregace) a notebooky obsluhují kroky, které se deklarativně vyjadřují špatně — volání externích API, ML skórování, jednorázové migrace. Oba typy pak spojí jeden Lakeflow Job.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/3-choose-notebook-lakeflow-pipelines#compare-the-approaches" target="_blank" rel="noopener">Compare the approaches</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/3-choose-notebook-lakeflow-pipelines#make-your-decision" target="_blank" rel="noopener">Make your decision</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-logika-jobu">
+  <div class="section-header">
+    <div class="section-num">10.3</div>
+    <h2>Návrh logiky Lakeflow jobu</h2>
+  </div>
+  <p><strong>Lakeflow Job</strong> je orchestrátor: skládá tasky (notebooky, SQL, pipelines, skripty…) do <strong>DAGu</strong> — orientovaného acyklického grafu, který určuje pořadí spouštění i šíření chyb. Nezávislé tasky mohou běžet paralelně (rychlejší, ale náročnější na compute — workspace navíc limituje počet souběžných tasků), závislé sériově.</p>
+  <p>O tom, kdy se task spustí vzhledem k výsledkům předchůdců, rozhoduje <strong>Run if</strong> podmínka:</p>
+  <table>
+    <tr><th>Podmínka</th><th>Task se spustí…</th></tr>
+    <tr><td>All succeeded</td><td>jen když všechny upstream tasky uspěly (výchozí)</td></tr>
+    <tr><td>At least one succeeded</td><td>když uspěl aspoň jeden upstream task</td></tr>
+    <tr><td>None failed</td><td>když žádný neselhal (přeskočené nevadí)</td></tr>
+    <tr><td>All done</td><td>po doběhnutí všech, bez ohledu na výsledek — typicky cleanup</td></tr>
+    <tr><td>At least one failed</td><td>když aspoň jeden selhal — typicky notifikace o chybě</td></tr>
+    <tr><td>All failed</td><td>jen když selhaly všechny</td></tr>
+  </table>
+  <p>Vedle Run if podmínek existují dva speciální řídicí tasky. <strong>If/else condition task</strong> větví běh podle hodnot dat — např. výraz <code class="inline">{{tasks.quality_check.values.invalid_count}} &gt; 100</code> pošle běh do nápravné větve místo do gold agregace. <strong>For each task</strong> aplikuje stejnou logiku na každý prvek pole (seznam regionů, souborů, tabulek) bez kopírování definic tasků; souběžnost iterací je konfigurovatelná.</p>
+  <p><strong>Parametry</strong> dělají job znovupoužitelným: v tascích na ně saháte přes <code class="inline">{{job.parameters.&lt;nazev&gt;}}</code>, k dispozici jsou i dynamické reference jako <code class="inline">{{job.trigger.time.iso_date}}</code> (čas plánovaného spuštění) a <code class="inline">{{backfill.iso_datetime}}</code> pro backfill běhy. Typické kategorie: datumové parametry (plánované běhy i backfill), prostředí (dev/staging/prod) a řízení chování (velikost dávky, formát výstupu).</p>
+  <div class="collapsible">
+    <div class="collapsible-header">Volba compute podle typu tasku<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Learn modul doporučuje: notebooky a Python skripty → <strong>serverless jobs compute</strong>; SQL dotazy a soubory → <strong>serverless SQL warehouse</strong>; deklarativní pipelines → <strong>serverless pipeline compute</strong>; JAR → serverless nebo classic jobs compute; Spark Submit (legacy varianta JARu) → pouze classic jobs compute. Serverless odbourává správu clusterů, klasický compute dává detailní kontrolu konfigurace. Tasky mohou sdílet cluster (rychlejší start) nebo běžet izolovaně. Dostupnost serverless variant ve vašem regionu ověřte v dokumentaci.</p>
+    </div>
+  </div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> task jde v jobu dočasně <strong>zakázat</strong> (disable) — přeskočí se za běhu, ale konfigurace a historie zůstávají. Při ladění je to výrazně bezpečnější než task mazat a znovu vyklikávat.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/4-design-task-logic-lakeflow-job#implement-iterative-processing-with-for-each" target="_blank" rel="noopener">Implement iterative processing with For each</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/4-design-task-logic-lakeflow-job#select-compute-resources-for-tasks" target="_blank" rel="noopener">Select compute resources for tasks</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-error-handling">
+  <div class="section-header">
+    <div class="section-num">10.4</div>
+    <h2>Error handling v pipelines a jobech</h2>
+  </div>
+  <p>Odpovědnost za chyby je rozdělená: platforma sama řeší infrastrukturní problémy (výpadky uzlů clusteru), na vás zbývají chyby datové a aplikační. Na úrovni jobu máte čtyři nástroje: <strong>retry policies</strong> (počet pokusů a interval; u continuous jobů se automaticky uplatňuje exponenciální backoff), <strong>timeouty</strong> (očekávaná a maximální doba běhu — brání nekonečně visícím taskům; u streamingu navíc thresholdy backlog metrik), <strong>notifikace</strong> (e-mail, Slack, Teams, PagerDuty, webhook) a <strong>podmíněné závislosti</strong> z předchozí sekce (větev „At least one failed" = notifikace a úklid).</p>
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="Diagram smyčky error handlingu. Task běží; při selhání se rozlišuje přechodná chyba, která jde do retry s exponenciálním backoffem a limitem pokusů, a datová chyba, která posílá nevalidní záznamy do karanténní dead-letter tabulky. Po vyčerpání pokusů následuje notifikace týmu. Úspěšný běh pokračuje díky idempotenci bezpečně i po opakování.">
+      <defs>
+        <marker id="arr10c" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
+        <marker id="arr10g" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#22c55e"/></marker>
+        <marker id="arr10r" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#ef4444"/></marker>
+        <marker id="arr10o" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
+      </defs>
+      <rect x="30" y="110" width="160" height="70" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="110" y="138" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Běh tasku</text>
+      <text x="110" y="158" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">idempotentní zápis</text>
+      <rect x="270" y="110" width="150" height="70" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+      <text x="345" y="140" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Výsledek?</text>
+      <rect x="600" y="20" width="190" height="60" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="695" y="45" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">✓ Úspěch</text>
+      <text x="695" y="65" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">downstream tasky pokračují</text>
+      <rect x="480" y="110" width="180" height="70" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="570" y="135" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">Přechodná chyba</text>
+      <text x="570" y="153" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">síť, timeout, throttling</text>
+      <text x="570" y="169" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">→ retry + backoff</text>
+      <rect x="480" y="220" width="180" height="70" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
+      <text x="570" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">Datová chyba</text>
+      <text x="570" y="263" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">nevalidní záznamy</text>
+      <text x="570" y="279" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">→ karanténa (dead-letter)</text>
+      <rect x="700" y="130" width="110" height="150" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="755" y="158" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Notifikace</text>
+      <text x="755" y="180" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">e-mail, Teams,</text>
+      <text x="755" y="196" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">PagerDuty…</text>
+      <text x="755" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">mute až do</text>
+      <text x="755" y="238" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">posledního</text>
+      <text x="755" y="254" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">retry pokusu</text>
+      <line x1="190" y1="145" x2="264" y2="145" stroke="#6b7280" stroke-width="2" marker-end="url(#arr10c)"/>
+      <line x1="420" y1="120" x2="594" y2="55" stroke="#22c55e" stroke-width="2" marker-end="url(#arr10g)"/>
+      <text x="490" y="80" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">OK</text>
+      <line x1="420" y1="145" x2="474" y2="145" stroke="#e8721c" stroke-width="2" marker-end="url(#arr10o)"/>
+      <line x1="400" y1="180" x2="474" y2="245" stroke="#ef4444" stroke-width="2" marker-end="url(#arr10r)"/>
+      <path d="M 480 145 C 380 60, 180 60, 116 104" fill="none" stroke="#e8721c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr10o)"/>
+      <text x="290" y="52" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">retry (max N pokusů, prodlužovaný interval)</text>
+      <line x1="660" y1="165" x2="694" y2="180" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr10c)"/>
+      <text x="662" y="205" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">po vyčerpání</text>
+      <line x1="660" y1="250" x2="694" y2="240" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr10c)"/>
+      <text x="410" y="310" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Idempotence zaručuje, že opakovaný běh nevytvoří duplicity — retry je pak bezpečný</text>
+    </svg>
+    <figcaption>Smyčka error handlingu: přechodné chyby řeší retry s backoffem, datové chyby karanténa (dead-letter), vyčerpané pokusy končí notifikací; idempotence dělá opakování bezpečným.</figcaption>
+  </figure>
+  <p>V notebooku doplňujete granulární úroveň: <code class="inline">try/except</code> nad <code class="inline">PySparkException</code> umí rozlišit třídu chyby a reagovat cíleně, a vlastní retry funkce pokryje volání, na která job-level retry nedosáhne:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">from</span> pyspark.errors <span class="kw">import</span> PySparkException
+<span class="kw">import</span> time
+
+<span class="kw">try</span>:
+    df = spark.read.<span class="fn">table</span>(<span class="str">"source_data"</span>)
+    df.<span class="fn">filter</span>(<span class="str">"amount &gt; 0"</span>).write.<span class="fn">mode</span>(<span class="str">"append"</span>).<span class="fn">saveAsTable</span>(<span class="str">"target_data"</span>)
+<span class="kw">except</span> PySparkException <span class="kw">as</span> e:
+    <span class="cm"># getCondition() od PySpark 4.0; na starsich runtimech getErrorClass()</span>
+    <span class="kw">if</span> e.<span class="fn">getCondition</span>() <span class="op">==</span> <span class="str">"TABLE_OR_VIEW_NOT_FOUND"</span>:
+        <span class="fn">print</span>(<span class="str">f"Source table not found: {e.getMessageParameters()['relationName']}"</span>)
+    <span class="kw">else</span>:
+        <span class="kw">raise</span>
+
+<span class="cm"># vlastni retry s exponencialnim backoffem</span>
+<span class="kw">def</span> <span class="fn">run_with_retry</span>(operation, max_retries<span class="op">=</span><span class="num">3</span>, base_delay<span class="op">=</span><span class="num">10</span>):
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(max_retries <span class="op">+</span> <span class="num">1</span>):
+        <span class="kw">try</span>:
+            <span class="kw">return</span> <span class="fn">operation</span>()
+        <span class="kw">except</span> Exception <span class="kw">as</span> e:
+            <span class="kw">if</span> attempt <span class="op">==</span> max_retries:
+                <span class="kw">raise</span>
+            delay = base_delay <span class="op">*</span> (<span class="num">2</span> <span class="op">**</span> attempt)
+            time.<span class="fn">sleep</span>(delay)</pre>
+  </div>
+  <p>Klíčový koncept, bez kterého je každý retry nebezpečný, je <strong>idempotence</strong>: opakované spuštění téhož kroku nesmí vyrobit duplicitní data. Prakticky toho dosáhnete přes <code class="inline">MERGE</code> místo slepého <code class="inline">INSERT</code>, přes streaming checkpointy (exactly-once), nebo přes „delete &amp; insert" partiotion patternu. Pro nevalidní záznamy, které nemá smysl opakovat, slouží <strong>dead-letter / karanténní tabulka</strong> — stejný pattern, jaký jsme v kapitole 9 stavěli pro typové chyby.</p>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> u task notifikací zapněte <strong>„Mute notifications until the last retry"</strong>. Jinak vám tři retry pokusy vygenerují tři poplachy, tým si na ně zvykne — a čtvrtý, skutečný, už nikdo neřeší. Alert fatigue je reálné provozní riziko.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> dokumentace doporučuje „fail fast" u narušené integrity dat a záměrné testování chyb během vývoje — schválně podstrčte pipeline rozbitý soubor a ověřte, že retry, karanténa i notifikace opravdu fungují. Error handling, který nikdy neběžel, není error handling.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/5-design-error-handling-pipelines#configure-job-level-error-handling" target="_blank" rel="noopener">Configure job-level error handling</a> · <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/5-design-error-handling-pipelines#apply-error-handling-best-practices" target="_blank" rel="noopener">Apply error handling best practices</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-pipeline-z-notebooku">
+  <div class="section-header">
+    <div class="section-num">10.5</div>
+    <h2>Pipeline z notebooků</h2>
+  </div>
+  <p>Nejpřímější cesta k pipeline: každou fázi napíšete jako notebook a v <strong>Jobs &amp; Pipelines</strong> je poskládáte do jobu. Task typu Notebook dostane cestu k notebooku, compute a parametry; závislosti nastavíte polem <strong>Depends on</strong> — a DAG se vykreslí sám. Typický výsledek je přesně trojice z labu: <code class="inline">ingest_bronze</code> → <code class="inline">clean_silver</code> → <code class="inline">aggregate_gold</code>.</p>
+  <p>Aby byly notebooky znovupoužitelné, parametrizujte je přes widgety a výsledky předávejte navazujícím taskům přes task values:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># precteni parametru predaneho z jobu</span>
+processing_date = dbutils.widgets.<span class="fn">get</span>(<span class="str">"processing_date"</span>)
+environment = dbutils.widgets.<span class="fn">get</span>(<span class="str">"environment"</span>)
+
+<span class="cm"># predani hodnoty navazujicim taskum (napr. pro quality gate)</span>
+dbutils.jobs.taskValues.<span class="fn">set</span>(key<span class="op">=</span><span class="str">"invalid_count"</span>, value<span class="op">=</span>invalid_count)
+
+<span class="cm"># signalizace vysledku do jobu</span>
+<span class="kw">try</span>:
+    records = <span class="fn">process_data</span>()
+    dbutils.notebook.<span class="fn">exit</span>(<span class="str">f"SUCCESS: Processed {records} records"</span>)
+<span class="kw">except</span> Exception <span class="kw">as</span> e:
+    dbutils.notebook.<span class="fn">exit</span>(<span class="str">f"FAILED: {str(e)}"</span>)</pre>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> notebook má limit výstupu — 20 MB celkem, 8 MB na buňku. Produkční notebooky by měly logovat metriky (počty záznamů, časy), ne vypisovat data. Na <code class="inline">display(df)</code> v produkčním jobu zapomeňte.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> závislosti definujte jen tam, kde skutečně jsou. Každá zbytečná hrana v DAGu zabíjí paralelismus — pokud dvě silver tabulky na sobě nezávisí, nechte je běžet vedle sebe.</div></div>
+</div>
+
+<div class="section" id="sec-lakeflow-deklarativni">
+  <div class="section-header">
+    <div class="section-num">10.6</div>
+    <h2>Deklarativní pipelines: orchestrace a inkrementální zpracování</h2>
+  </div>
+  <p>Deklarativní přístup obrací perspektivu: místo orchestrace, checkpointů a závislostí deklarujete tabulky a framework se postará o zbytek. Tři hlavní přínosy: <strong>automatická orchestrace</strong> (systém odvodí pořadí z závislostí mezi tabulkami), <strong>inkrementální zpracování</strong> (streaming tables zpracují každý záznam právě jednou, materialized views přepočítávají jen změny) a <strong>vestavěné retry</strong> na úrovni Spark tasku, flow i pipeline.</p>
+  <p>Stavební kameny jsou dva. <strong>Streaming table</strong> je Delta tabulka pro append-only ingest — ideální pro čtení z cloud storage (přes Auto Loader) nebo message queues. <strong>Materialized view</strong> obsluhuje transformace — joiny, agregace — a zůstává synchronizovaná se změnami upstream tabulek.</p>
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-10-sql"><span class="tab-icon">🗄️</span>SQL</button>
+      <button class="tab-btn" data-tab="tab-10-py"><span class="tab-icon">🐍</span>Python</button>
+    </div>
+    <div class="tab-panel" id="tab-10-sql">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm">-- streaming table: inkrementalni ingest z volume</span>
+<span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">customers_bronze</span>
+<span class="kw">AS SELECT</span> * <span class="kw">FROM STREAM</span> <span class="fn">read_files</span>(
+  <span class="str">"/Volumes/main/raw_data/customers"</span>,
+  format <span class="op">=&gt;</span> <span class="str">"json"</span>
+);
+
+<span class="cm">-- materialized view: join synchronizovany s upstream zmenami</span>
+<span class="kw">CREATE OR REFRESH MATERIALIZED VIEW</span> <span class="tbl">customer_transactions</span>
+<span class="kw">AS SELECT</span> c.<span class="col">customer_id</span>, c.<span class="col">customer_name</span>, c.<span class="col">region</span>,
+          t.<span class="col">transaction_date</span>, t.<span class="col">amount</span>
+<span class="kw">FROM</span> <span class="tbl">customers</span> c
+<span class="kw">INNER JOIN</span> <span class="tbl">transactions</span> t <span class="kw">ON</span> c.<span class="col">customer_id</span> <span class="op">=</span> t.<span class="col">customer_id</span>;</pre>
+      </div>
+    </div>
+    <div class="tab-panel" id="tab-10-py">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="kw">from</span> pyspark <span class="kw">import</span> pipelines <span class="kw">as</span> dp
+
+@dp.table
+<span class="kw">def</span> <span class="fn">customers_bronze</span>():
+    <span class="kw">return</span> (spark.readStream.<span class="fn">format</span>(<span class="str">"cloudFiles"</span>)
+        .<span class="fn">option</span>(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
+        .<span class="fn">option</span>(<span class="str">"cloudFiles.inferColumnTypes"</span>, <span class="str">"true"</span>)
+        .<span class="fn">load</span>(<span class="str">"/Volumes/main/raw_data/customers"</span>))
+
+@dp.materialized_view
+<span class="kw">def</span> <span class="fn">regional_sales</span>():
+    customers = spark.read.<span class="fn">table</span>(<span class="str">"customers"</span>)
+    transactions = spark.read.<span class="fn">table</span>(<span class="str">"transactions"</span>)
+    <span class="kw">return</span> (customers.<span class="fn">join</span>(transactions, on<span class="op">=</span><span class="str">"customer_id"</span>, how<span class="op">=</span><span class="str">"inner"</span>)
+        .<span class="fn">groupBy</span>(<span class="str">"region"</span>).<span class="fn">agg</span>({<span class="str">"amount"</span>: <span class="str">"sum"</span>}))</pre>
+      </div>
+    </div>
+  </div>
+  <p>Kvalitu dat v deklarativní pipeline hlídají <strong>expectations</strong> — kompletně rozebrané v kapitole 9 (sekce 9.5): <code class="inline">EXPECT</code> jen eviduje, <code class="inline">ON VIOLATION DROP ROW</code> filtruje, <code class="inline">ON VIOLATION FAIL UPDATE</code> zastaví flow. Vývoj podporuje <strong>Lakeflow Pipelines Editor</strong> s validací přes dry run, selektivním spouštěním, vizualizací závislostí a náhledem dat; rozsah funkcí editoru se vyvíjí, aktuální stav ověřte v dokumentaci.</p>
+  <div class="collapsible">
+    <div class="collapsible-header">Častý omyl: „materialized view = obyčejné view"<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Kdo čeká chování klasického view (dotaz vyhodnocovaný při každém čtení), bude překvapen: materialized view v Lakeflow je <em>předpočítaná</em> tabulka, kterou pipeline udržuje aktuální vůči upstream změnám — kde to jde, inkrementálně. Čtení je proto rychlé i nad velkými joiny; cenou je, že data jsou tak čerstvá, jak čerstvý je poslední běh/refresh pipeline.</p>
+    </div>
+  </div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> pořadí operací určuje medallion (ingest → clean → transform → load → serve → monitor). Notebooky volte pro procedurální logiku, deklarativní pipelines pro opakovatelné ETL — a klidně oboje v jednom Lakeflow Jobu. DAG s Run if podmínkami, parametry, retry, idempotencí a karanténou dělá z pipeline produkční systém, ne skript spouštěný s modlitbou.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/7-create-pipeline-lakeflow-declarative#develop-pipelines-with-the-lakeflow-pipelines-editor" target="_blank" rel="noopener">Develop pipelines with the Lakeflow Pipelines Editor</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">10.7</div>
+    <h2>Lab 10: Design and implement data pipelines with Azure Databricks (45 minut)</h2>
+  </div>
+  <p>Pro hotelovou platformu <strong>GlobStay</strong> (pět hotelů, noční dávky rezervací z property management systémů) postavíte medallion pipeline Bronze → Silver → Gold: parametrizované notebooky s deduplikací, NULL filtry a validací dat, pak orchestraci v Lakeflow Jobu — retry policies, quality gate s podmíněným větvením a notifikace při selhání.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/10-design-implement-data-pipelines.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/design-implement-data-pipelines/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Kterou Run if podmínku použijete pro task, který má poslat notifikaci jen při selhání některého upstream tasku? <strong>2)</strong> Proč musí být task s retry policy idempotentní a jak toho u zápisu do Delta tabulky dosáhnete? <strong>3)</strong> Kdy sáhnete po notebooku a kdy po Lakeflow Declarative Pipeline — a jak oba přístupy zkombinujete v jednom jobu?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_09_data_quality.html">← Data quality constraints</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 10 z 16</span>
+      <a href="dp750_11_lakeflow_jobs.html" style="margin-left:auto">Lakeflow Jobs →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

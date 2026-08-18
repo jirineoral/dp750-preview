@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Migrace z Oracle — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Migrace z Oracle</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="../dp750_16_migrace_oracle.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div><button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-strategie" class="toc-item active" data-section="sec-strategie">Strategie migrace: z EDW do lakehouse</a>
+    <a href="#sec-lakebridge" class="toc-item" data-section="sec-lakebridge">Lakebridge a další nástroje</a>
+    <a href="#sec-mapovani" class="toc-item" data-section="sec-mapovani">Mapování Oracle konceptů na Databricks</a>
+    <a href="#sec-zrady" class="toc-item" data-section="sec-zrady">Typické zrady migrace</a>
+    <a href="#sec-zdroje" class="toc-item" data-section="sec-zdroje">Shrnutí a tipy na zdroje</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 16</div>
+      <h1>Migrace z Oracle</h1>
+      <div class="hero-subtitle">Přístupy k migraci EDW do lakehouse, Lakebridge, mapování konceptů a tipy na zdroje</div>
+      <div class="hero-meta"><span>🗂 Pod čarou — mimo MOC</span><span>➕ Vlastní modul mimo oficiální MOC</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Popsat fáze migrace Oracle DWH do Databricks a rozhodnout mezi lift-and-shift a redesignem.</li>
+    <li>Vysvětlit, k čemu slouží Databricks Lakebridge (analyzer, converter, reconcile) a kdy sáhnout po ADF či Lakeflow Connect.</li>
+    <li>Zmapovat klíčové Oracle koncepty (PL/SQL, materialized views, sekvence, indexy, hinty) na jejich lakehouse ekvivalenty.</li>
+    <li>Vyjmenovat typické zrady migrace — od NULL vs prázdný řetězec po transakční sémantiku.</li>
+    <li>Vědět, kde hledat oficiální migration guides a nástroje.</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-strategie">
+  <div class="section-header">
+    <div class="section-num">16.1</div>
+    <h2>Strategie migrace: z EDW do lakehouse</h2>
+  </div>
+  <p>Migrace Oracle datového skladu do Databricks není jeden velký přesun, ale <strong>fázovaný projekt</strong>. Databricks i praxe partnerů se shodují na stejné kostře: <strong>assessment</strong> (inventura objektů, závislostí a workloadů), <strong>konverze schématu a kódu</strong>, <strong>přenos a synchronizace dat</strong>, <strong>validace</strong> (rekonsiliace výsledků proti Oracle) a teprve nakonec <strong>cutover</strong> — přepnutí konzumentů a vypnutí staré platformy. Fáze se navíc iterují po doménách: nemigruje se „celý sklad", ale postupně datamarty či subject areas podle rizika a byznysové hodnoty.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 310" role="img" aria-label="Fázový diagram migrace Oracle do Databricks: pět fází od assessmentu přes konverzi schématu a kódu, synchronizaci dat a validaci až po cutover. Pod každou fází je uveden typický nástroj — Lakebridge Analyzer, Lakebridge Converter, ADF nebo Lakeflow Connect, Lakebridge Reconcile a runbook s rollback plánem. Z validace vede zpětná šipka do konverze, protože se iteruje.">
+      <defs>
+        <marker id="arr16" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#1a3a6b"/>
+        </marker>
+        <marker id="arr16o" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#e8721c"/>
+        </marker>
+      </defs>
+      <rect x="10" y="60" width="140" height="80" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="80" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">1. Assessment</text>
+      <text x="80" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">inventura objektů,</text>
+      <text x="80" y="125" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">složitost, TCO</text>
+
+      <line x1="150" y1="100" x2="176" y2="100" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16)"/>
+
+      <rect x="178" y="60" width="140" height="80" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="248" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">2. Konverze</text>
+      <text x="248" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">schema (DDL),</text>
+      <text x="248" y="125" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">PL/SQL, ETL kod</text>
+
+      <line x1="318" y1="100" x2="344" y2="100" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16)"/>
+
+      <rect x="346" y="60" width="140" height="80" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="416" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">3. Data sync</text>
+      <text x="416" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">historicky load</text>
+      <text x="416" y="125" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">+ inkrementy / CDC</text>
+
+      <line x1="486" y1="100" x2="512" y2="100" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16)"/>
+
+      <rect x="514" y="60" width="140" height="80" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="584" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">4. Validace</text>
+      <text x="584" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">reconcile dat,</text>
+      <text x="584" y="125" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">paralelni beh</text>
+
+      <line x1="654" y1="100" x2="680" y2="100" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16)"/>
+
+      <rect x="682" y="60" width="128" height="80" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="746" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#22c55e">5. Cutover</text>
+      <text x="746" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">prepnuti BI,</text>
+      <text x="746" y="125" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">decommission</text>
+
+      <path d="M 584 60 L 584 30 L 248 30 L 248 58" fill="none" stroke="#e8721c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr16o)"/>
+      <text x="416" y="22" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8721c">iterace: rozdily → oprava konverze</text>
+
+      <rect x="10" y="175" width="800" height="46" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="80" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">Lakebridge</text>
+      <text x="80" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Analyzer</text>
+      <text x="248" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">Lakebridge</text>
+      <text x="248" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Converter</text>
+      <text x="416" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">ADF / Lakeflow</text>
+      <text x="416" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Connect (Oracle)</text>
+      <text x="584" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">Lakebridge</text>
+      <text x="584" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Reconcile</text>
+      <text x="746" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="bold" fill="#1a3a6b">Runbook</text>
+      <text x="746" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">+ rollback plan</text>
+
+      <text x="410" y="255" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">Migruje se po domenach (datamart po datamartu), ne „big bang" — kazda domena projde vsemi fazemi.</text>
+      <rect x="150" y="270" width="520" height="0" fill="none"/>
+    </svg>
+    <figcaption>Pět fází migrace Oracle → Databricks s typickými nástroji; validace se iteruje zpět do konverze, dokud rekonsiliace nesedí.</figcaption>
+  </figure>
+
+  <p>Zásadní strategické rozhodnutí je <strong>lift-and-shift vs redesign</strong>. Lift-and-shift (přeložit kód 1:1, zachovat struktury) je rychlejší a levnější na projekt, ale přenáší do lakehouse i dvacet let technického dluhu — a některé Oracle konstrukty stejně 1:1 nepřeložíte. Redesign (přepis na medallion architekturu, deklarativní pipelines, viz kapitoly 7 a 10) dá dlouhodobě lepší výsledek, ale stojí víc analýzy. V praxi vítězí hybrid: <em>core</em> tabulky a ETL lift-and-shift s automatickým převodem, nejbolavější a nejhodnotnější části (staging logika v PL/SQL balíčcích, MV kaskády) redesign.</p>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Nemigrujte mrtvolu. Assessment typicky ukáže, že 30–50 % objektů ve starém DWH nikdo roky nepoužil. Nejlevnější migrace je ta, kterou neuděláte — mrtvé tabulky a joby vyřaďte ze scope hned na začátku.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Cutover plánujte s obdobím <strong>paralelního běhu</strong> — obě platformy živé, reporty se porovnávají. Bez něj zjistíte rozdíly až od uživatelů. A mějte rollback plán: dokud běží synchronizace dat z Oracle, návrat je levný.</div></div>
+</div>
+
+<div class="section" id="sec-lakebridge">
+  <div class="section-header">
+    <div class="section-num">16.2</div>
+    <h2>Lakebridge a další nástroje</h2>
+  </div>
+  <p><strong>Lakebridge</strong> je bezplatný open-source migrační toolkit od Databricks Labs (ohlášen v červnu 2025; vznikl spojením akvizice BladeBridge a interního projektu Remorph). Pokrývá tři fáze migrace a Oracle podporuje ve všech:</p>
+  <table>
+    <tr><th>Komponenta</th><th>Fáze</th><th>Co dělá pro Oracle</th></tr>
+    <tr><td><strong>Analyzer</strong></td><td>assessment</td><td>projde data dictionary (ALL_OBJECTS, ALL_TAB_COLUMNS…) a zdrojové skripty; spočítá inventuru, složitost a odhad pracnosti</td></tr>
+    <tr><td><strong>Converter</strong> (transpiler)</td><td>konverze</td><td>překládá Oracle SQL a PL/SQL do Databricks SQL / Spark SQL; engine BladeBridge (zralý, nosný právě pro Oracle a legacy ETL), Morpheus (deterministický SQL-only transpiler, cílí hlavně na Snowflake a Redshift) a Switch (LLM-powered, tzv. agentic converter)</td></tr>
+    <tr><td><strong>Reconcile</strong></td><td>validace</td><td>porovná zdrojová a cílová data (row counts, hash, agregáty) a vygeneruje report rozdílů</td></tr>
+  </table>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 380" role="img" aria-label="Tok nástrojů Lakebridge ve třech fázích. První fáze Assessment obsahuje Profiler, který sbírá metadata a statistiky ze zdrojové databáze, a Analyzer, který vytvoří inventuru objektů a odhad složitosti. Druhá fáze Transpile nabízí tři enginy: pravidlový BladeBridge nosný pro Oracle, deterministický SQL-only Morpheus a LLM-powered Switch. Třetí fáze Reconcile porovnává schéma a hashe řádků, případně hodnoty přes join sloupce. Z fáze Reconcile vede zpětná přerušovaná šipka do Transpile. Dole je rozdělení práce: nástroj automaticky zvládne DDL, SELECT a DML, JOIN syntaxi a většinu PL/SQL procedur, zatímco ručně zůstává dynamické SQL, DBMS balíčky, kurzorová logika a ladění výkonu.">
+      <defs>
+        <marker id="arr16b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#1a3a6b"/>
+        </marker>
+        <marker id="arr16bo" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#e8721c"/>
+        </marker>
+      </defs>
+
+      <rect x="10" y="50" width="240" height="205" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="130" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">1. Assessment</text>
+      <rect x="25" y="90" width="210" height="65" rx="8" fill="#e8f0fb" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="130" y="112" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Profiler</text>
+      <text x="130" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">metadata a statistiky</text>
+      <text x="130" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">ze zdrojove DB</text>
+      <rect x="25" y="170" width="210" height="65" rx="8" fill="#e8f0fb" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="130" y="192" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Analyzer</text>
+      <text x="130" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">inventura objektu,</text>
+      <text x="130" y="225" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">slozitost, odhad prace</text>
+
+      <line x1="252" y1="152" x2="286" y2="152" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16b)"/>
+
+      <rect x="290" y="50" width="240" height="205" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">2. Transpile</text>
+      <rect x="305" y="90" width="210" height="40" rx="8" fill="#e8f0fb" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="410" y="107" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">BladeBridge</text>
+      <text x="410" y="122" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">pravidlovy, nosny pro Oracle</text>
+      <rect x="305" y="145" width="210" height="40" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="410" y="162" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Morpheus</text>
+      <text x="410" y="177" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">deterministicky, SQL-only</text>
+      <rect x="305" y="200" width="210" height="40" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="410" y="217" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Switch</text>
+      <text x="410" y="232" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">LLM-powered (agentic)</text>
+
+      <line x1="532" y1="152" x2="566" y2="152" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16b)"/>
+
+      <rect x="570" y="50" width="240" height="205" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="690" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">3. Reconcile</text>
+      <rect x="585" y="90" width="210" height="65" rx="8" fill="#e8f0fb" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="690" y="112" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">schema / row</text>
+      <text x="690" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">typy sloupcu a hash</text>
+      <text x="690" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">radku bez join klice</text>
+      <rect x="585" y="170" width="210" height="65" rx="8" fill="#e8f0fb" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="690" y="192" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">data / all</text>
+      <text x="690" y="210" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">porovnani hodnot</text>
+      <text x="690" y="225" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">pres join sloupce</text>
+
+      <path d="M 690 50 L 690 25 L 410 25 L 410 47" fill="none" stroke="#e8721c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr16bo)"/>
+      <text x="550" y="19" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">rozdily → oprava pravidel → nova iterace</text>
+
+      <rect x="10" y="275" width="390" height="75" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="26" y="297" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#15803d">Automaticky (nastroj)</text>
+      <text x="26" y="316" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">DDL, SELECT a DML, ANSI JOIN misto (+), ROWNUM,</text>
+      <text x="26" y="333" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">vetsina PL/SQL procedur, inventura a reporty</text>
+
+      <rect x="420" y="275" width="390" height="75" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="436" y="297" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">Rucne (vas tym)</text>
+      <text x="436" y="316" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">dynamicke SQL, DBMS_* balicky, kurzorova logika,</text>
+      <text x="436" y="333" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">ladeni vykonu, semanticke rozdily, opravneni</text>
+
+      <text x="410" y="371" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">Lakebridge neprenasi data — na historicky load a CDC pouzijte ADF nebo Lakeflow Connect.</text>
+    </svg>
+    <figcaption>Tři fáze Lakebridge a jejich nástroje; dolní pás ukazuje, kde končí automatika a začíná ruční práce vývojářů.</figcaption>
+  </figure>
+
+  <p>Instaluje se jako CLI přes <code class="inline">databricks labs install lakebridge</code>. Realistické očekávání od converteru: Databricks uvádí automatizaci až 80 % pracnosti; u Oracle počítejte spíš se 70–80 % podle složitosti PL/SQL — zbytek (dynamické SQL, DBMS_* balíčky, kurzorová logika) je ruční práce. Přesný stav podpory jednotlivých enginů ověřte v dokumentaci, projekt se vyvíjí rychle.</p>
+  <p>Celý cyklus se dá projet z příkazové řádky:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># instalace CLI a transpileru (vyzaduje Databricks CLI a profil)</span>
+databricks labs install lakebridge
+databricks labs lakebridge install-transpile
+
+<span class="cm"># 1) assessment: inventura a slozitost zdroje -> Excel report</span>
+databricks labs lakebridge analyze \
+    --source-directory <span class="str">/migrace/oracle/src</span> \
+    --report-file <span class="str">/migrace/reports/oracle-inventory.xlsx</span> \
+    --source-tech <span class="str">oracle</span>
+
+<span class="cm"># 2) transpile: prevod Oracle SQL a PL/SQL do Databricks SQL</span>
+databricks labs lakebridge transpile \
+    --input-source <span class="str">/migrace/oracle/src</span> \
+    --output-folder <span class="str">/migrace/databricks/out</span> \
+    --source-dialect <span class="str">oracle</span> \
+    --error-file-path <span class="str">/migrace/reports/errors.log</span>
+
+<span class="cm"># 3) reconcile: konfigurace a porovnani zdroje s cilem</span>
+databricks labs lakebridge configure-reconcile
+databricks labs lakebridge reconcile
+
+<span class="cm"># presne nazvy a hodnoty prepinacu overte pres --help,</span>
+<span class="cm"># CLI se mezi verzemi meni</span></pre>
+  </div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Výstup transpileru je <strong>návrh, ne hotový kód</strong>. Každý vygenerovaný soubor patří do code review a do gitu — jinak po pár iteracích nikdo nepozná, co je strojový překlad a co ruční oprava.</div></div>
+  <p>Na <strong>přenos dat</strong> Lakebridge není — tam patří:</p>
+  <ul>
+    <li><strong>Azure Data Factory</strong> s Oracle konektorem (self-hosted integration runtime pro on-prem) — klasika pro historický load i plánované inkrementy. Berte ji jako orchestrátor a „přistávací dráhu" do bronze vrstvy, ne jako transformační engine (viz kapitola 7).</li>
+    <li><strong>Lakeflow Connect</strong> — managed Oracle konektory: query-based konektor (dotazuje zdroj přes watermark sloupec) a integrovaný <strong>CDC konektor</strong> postavený na Oracle LogMiner přes JDBC (bez GoldenGate/XStream). Obě varianty jsou k srpnu 2026 v Beta / Public Preview — dostupnost ve vašem regionu a přesný stav ověřte v dokumentaci, než na nich postavíte produkční migraci.</li>
+    <li><strong>Lakehouse Federation</strong> — dotazování Oracle „na místě" bez kopírování; hodí se během přechodného období na porovnávání a na dosud nemigrované tabulky.</li>
+  </ul>
+  <div class="collapsible">
+    <div class="collapsible-header">Co Lakebridge nepřevede<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Ruční práci si spolehlivě drží: <strong>dynamické SQL</strong> (<code class="inline">EXECUTE IMMEDIATE</code> skládané za běhu), volání <strong>DBMS_* balíčků</strong> (DBMS_LOB, UTL_FILE), Java stored procedures, kurzorová a řídicí logika bez množinového ekvivalentu a všechno kolem výkonu — hinty, partition strategie, statistiky. Lakebridge navíc <strong>nepřenáší data</strong>, nemigruje <strong>oprávnění</strong> (Oracle role a granty → Unity Catalog privileges) ani <strong>BI vrstvu</strong> (reporty, semantické modely). Aktuální rozsah podpory pro Oracle ověřte v release notes projektu.</p>
+    </div>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Lakebridge je projekt Databricks Labs — bez formální produktové SLA podpory. Pro velké migrace Databricks nabízí program s partnery a professional services; toolkit ale můžete použít zdarma sami.</div></div>
+</div>
+
+<div class="section" id="sec-mapovani">
+  <div class="section-header">
+    <div class="section-num">16.3</div>
+    <h2>Mapování Oracle konceptů na Databricks</h2>
+  </div>
+  <p>Než se pustíte do jednotlivých objektů, pomůže vidět mapování po vrstvách:</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 400" role="img" aria-label="Mapování vrstev Oracle EDW na Databricks lakehouse. Vlevo jsou čtyři vrstvy Oracle: staging tabulky plněné SQL Loaderem a external tables, PL/SQL ETL s balíčky a kurzory řízené DBMS_SCHEDULERem, materialized views s MV logy a fast refresh, a star schema s indexy, partitions a hinty. Vpravo jsou odpovídající vrstvy Databricks: bronze s raw daty z Auto Loaderu nebo Lakeflow Connect, silver postavená na deklarativních pipelines s expectations, gold s materialized views a streaming tables, a gold dimenzionální model s liquid clusteringem a AQE. Mezi vrstvami vedou šipky s popisem typu převodu.">
+      <defs>
+        <marker id="arr16c" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#1a3a6b"/>
+        </marker>
+      </defs>
+
+      <text x="165" y="30" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Oracle EDW</text>
+      <text x="655" y="30" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#e8721c">Databricks lakehouse</text>
+
+      <rect x="20" y="45" width="290" height="70" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="165" y="72" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Staging tabulky</text>
+      <text x="165" y="92" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">SQL*Loader, external tables,</text>
+      <text x="165" y="107" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">denni davky do stage schematu</text>
+
+      <rect x="20" y="130" width="290" height="70" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="165" y="157" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">PL/SQL ETL</text>
+      <text x="165" y="177" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">balicky, kurzory, procedury,</text>
+      <text x="165" y="192" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">joby v DBMS_SCHEDULER</text>
+
+      <rect x="20" y="215" width="290" height="70" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="165" y="242" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Materialized views</text>
+      <text x="165" y="262" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">MV logy, fast refresh,</text>
+      <text x="165" y="277" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">kaskady agregatu</text>
+
+      <rect x="20" y="300" width="290" height="70" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="165" y="327" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Star schema (dim / fact)</text>
+      <text x="165" y="347" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">indexy, range partitions,</text>
+      <text x="165" y="362" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">hinty, rucni statistiky</text>
+
+      <line x1="316" y1="80" x2="506" y2="80" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16c)"/>
+      <text x="411" y="72" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">1:1 lift, bez transformace</text>
+
+      <line x1="316" y1="165" x2="506" y2="165" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16c)"/>
+      <text x="411" y="157" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">kurzory → mnozinovy SQL</text>
+
+      <line x1="316" y1="250" x2="506" y2="250" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16c)"/>
+      <text x="411" y="242" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">MV → MV, refresh ridi engine</text>
+
+      <line x1="316" y1="335" x2="506" y2="335" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr16c)"/>
+      <text x="411" y="327" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">layout misto indexu a hintu</text>
+
+      <rect x="510" y="45" width="290" height="70" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="655" y="72" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Bronze — raw</text>
+      <text x="655" y="92" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">Auto Loader, Lakeflow Connect,</text>
+      <text x="655" y="107" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">data tak, jak prisla</text>
+
+      <rect x="510" y="130" width="290" height="70" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="655" y="157" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Silver — pipelines</text>
+      <text x="655" y="177" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">deklarativni Lakeflow pipelines,</text>
+      <text x="655" y="192" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">expectations misto rucnich kontrol</text>
+
+      <rect x="510" y="215" width="290" height="70" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="655" y="242" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Gold — MV a streaming tables</text>
+      <text x="655" y="262" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">inkrementalni refresh bez MV logu,</text>
+      <text x="655" y="277" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">zavislosti resi engine</text>
+
+      <rect x="510" y="300" width="290" height="70" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="2"/>
+      <text x="655" y="327" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Gold — dimenzionalni model</text>
+      <text x="655" y="347" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">liquid clustering, AQE,</text>
+      <text x="655" y="362" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">predictive optimization</text>
+
+      <text x="410" y="392" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">Mapovani neni 1:1 — jedna PL/SQL procedura casto skonci jako nekolik kroku jedne pipeline.</text>
+    </svg>
+    <figcaption>Vrstvy Oracle EDW a jejich protějšky v lakehouse; nejvíc práce je uprostřed — přepis PL/SQL ETL do deklarativních pipelines.</figcaption>
+  </figure>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Vrstvy nemapujte mechanicky. Staging → bronze sedí skoro vždycky, ale jeden PL/SQL balíček se běžně rozpadne do několika kroků silver pipeline a naopak tři kaskádové MV nahradí jediná materialized view nad silver.</div></div>
+
+  <p>Největší mentální posun: v lakehouse neexistují B-tree indexy, sekvence s triggery ani optimizer hinty. Jejich <em>funkci</em> přebírají jiné mechanismy:</p>
+  <table>
+    <tr><th>Oracle</th><th>Databricks</th><th>Poznámka</th></tr>
+    <tr><td>PL/SQL procedury, balíčky</td><td>SQL Scripting (BEGIN…END), SQL/Python UDF, notebooky + Lakeflow Jobs</td><td>SQL Scripting a <code class="inline">CREATE PROCEDURE</code> jsou GA (DBR 17.0+) — nejbližší náhrada PL/SQL procedur; balíčkovou strukturu ale nemají, tu nahraďte schématy a notebooky</td></tr>
+    <tr><td>Materialized views (fast refresh)</td><td><code class="inline">CREATE MATERIALIZED VIEW</code> / streaming tables</td><td>refresh řídí Lakeflow pipeline; inkrementálnost zajišťuje engine, ne MV logy</td></tr>
+    <tr><td>SEQUENCE + trigger</td><td><code class="inline">GENERATED ALWAYS AS IDENTITY</code></td><td>hodnoty nejsou gapless ani nutně souvislé; MV identity nepodporují</td></tr>
+    <tr><td>NUMBER(p,s)</td><td>DECIMAL(38,s), BIGINT, DOUBLE</td><td>oba mají max. 38 číslic přesnosti, ale NUMBER má plovoucí scale a širší rozsah (−84 až 127). <code class="inline">NUMBER</code> bez p/s se přes JDBC typicky mapuje na <code class="inline">DECIMAL(38,10)</code> — u finančních sloupců scale zvolte vědomě</td></tr>
+    <tr><td>DATE, TIMESTAMP</td><td>TIMESTAMP (příp. DATE)</td><td>Oracle DATE obsahuje i čas! Převod na čistý DATE ztrácí data</td></tr>
+    <tr><td>VARCHAR2, CLOB</td><td>STRING</td><td>bez délkového limitu; kontroly délky řešte constraints/expectations</td></tr>
+    <tr><td>B-tree/bitmap indexy</td><td>liquid clustering, Z-ORDER, data skipping</td><td>viz sekce 6.9; predictive optimization ladí layout samo</td></tr>
+    <tr><td>Range/hash partitioning</td><td>liquid clustering (preferované) / partitioning</td><td>statické partition schéma nekopírujte 1:1 — hrozí over-partitioning</td></tr>
+    <tr><td>Optimizer hinty (/*+ … */)</td><td>AQE (Adaptive Query Execution)</td><td>hinty se při konverzi zahazují; AQE řeší skew a join strategie za běhu</td></tr>
+    <tr><td>DBMS_SCHEDULER</td><td>Lakeflow Jobs</td><td>viz kapitola 11</td></tr>
+  </table>
+  <p>Dvě rychlé ukázky. Typická PL/SQL procedura „smaž a nahraj agregát" se v Databricks zjednoduší na <code class="inline">MERGE</code> nebo ještě lépe na deklarativní materialized view:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- Oracle: PL/SQL procedura + MV log + fast refresh</span>
+<span class="cm">-- Databricks: deklarativni MV, refresh ridi engine</span>
+<span class="kw">CREATE MATERIALIZED VIEW</span> <span class="tbl">main.gold.sales_daily</span>
+<span class="kw">AS SELECT</span> <span class="col">order_date</span>, <span class="fn">sum</span>(<span class="col">amount</span>) <span class="kw">AS</span> <span class="col">total_amount</span>
+<span class="kw">FROM</span> <span class="tbl">main.silver.orders</span>
+<span class="kw">GROUP BY</span> <span class="col">order_date</span>;</pre>
+  </div>
+  <p>A náhrada sekvence s triggerem za identity sloupec:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- misto CREATE SEQUENCE cust_seq + BEFORE INSERT trigger:</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">silver.customers</span> (
+  <span class="col">customer_sk</span> <span class="kw">BIGINT</span> <span class="kw">GENERATED ALWAYS AS IDENTITY</span>,
+  <span class="col">customer_id</span> <span class="kw">STRING</span>,
+  <span class="col">valid_from</span>  <span class="kw">TIMESTAMP</span>
+);</pre>
+  </div>
+  <p>A nejčastější antipattern celé migrace — kurzorová smyčka, která se musí přepsat množinově:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- Oracle: radek po radku, jeden UPDATE na kazdou objednavku</span>
+<span class="cm">--   FOR r IN (SELECT order_id, amount FROM orders) LOOP</span>
+<span class="cm">--     UPDATE order_stats SET total = total + r.amount WHERE id = r.order_id;</span>
+<span class="cm">--   END LOOP;</span>
+
+<span class="cm">-- Databricks: jeden mnozinovy MERGE misto smycky</span>
+<span class="kw">MERGE INTO</span> <span class="tbl">main.gold.order_stats</span> <span class="kw">AS</span> t
+<span class="kw">USING</span> (
+  <span class="kw">SELECT</span> <span class="col">order_id</span>, <span class="fn">sum</span>(<span class="col">amount</span>) <span class="kw">AS</span> <span class="col">amount</span>
+  <span class="kw">FROM</span> <span class="tbl">main.silver.orders</span>
+  <span class="kw">GROUP BY</span> <span class="col">order_id</span>
+) <span class="kw">AS</span> s
+<span class="kw">ON</span> t.<span class="col">id</span> <span class="op">=</span> s.<span class="col">order_id</span>
+<span class="kw">WHEN MATCHED THEN UPDATE SET</span> t.<span class="col">total</span> <span class="op">=</span> t.<span class="col">total</span> <span class="op">+</span> s.<span class="col">amount</span>
+<span class="kw">WHEN NOT MATCHED THEN INSERT</span> (<span class="col">id</span>, <span class="col">total</span>) <span class="kw">VALUES</span> (s.<span class="col">order_id</span>, s.<span class="col">amount</span>);</pre>
+  </div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Kurzorovou smyčku převedenou 1:1 na Python <code class="inline">for</code> cyklus nad <code class="inline">collect()</code> uvidíte v každé neopatrné migraci — a z minutového jobu se stane hodinový. Vždy hledejte množinový přepis: MERGE, window funkce, agregace.</div></div>
+  <div class="collapsible">
+    <div class="collapsible-header">Co s hierarchickými dotazy (CONNECT BY) a starou (+) syntaxí?<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><code class="inline">CONNECT BY PRIOR</code> nemá přímý ekvivalent — přepisuje se na <strong>rekurzivní CTE</strong> (<code class="inline">WITH RECURSIVE</code>), které Databricks SQL podporuje (stav ověřte v dokumentaci pro vaši verzi DBR). Stará Oracle outer-join syntaxe <code class="inline">(+)</code> se musí přepsat na ANSI <code class="inline">LEFT/RIGHT JOIN</code> — to zvládá Lakebridge Converter automaticky. <code class="inline">ROWNUM</code> se překládá na <code class="inline">LIMIT</code> nebo window funkci <code class="inline">row_number()</code> — pozor, sémantika není identická (ROWNUM se v Oracle vyhodnocuje před ORDER BY).</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm">-- Oracle: SELECT employee_id, manager_id, LEVEL FROM employees</span>
+<span class="cm">--         START WITH manager_id IS NULL</span>
+<span class="cm">--         CONNECT BY PRIOR employee_id = manager_id;</span>
+
+<span class="cm">-- Databricks: rekurzivni CTE v ANSI syntaxi</span>
+<span class="kw">WITH RECURSIVE</span> org (<span class="col">employee_id</span>, <span class="col">manager_id</span>, <span class="col">lvl</span>) <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="col">employee_id</span>, <span class="col">manager_id</span>, <span class="num">1</span>
+  <span class="kw">FROM</span> <span class="tbl">main.silver.employees</span>
+  <span class="kw">WHERE</span> <span class="col">manager_id</span> <span class="kw">IS NULL</span>
+  <span class="kw">UNION ALL</span>
+  <span class="kw">SELECT</span> e.<span class="col">employee_id</span>, e.<span class="col">manager_id</span>, o.<span class="col">lvl</span> <span class="op">+</span> <span class="num">1</span>
+  <span class="kw">FROM</span> <span class="tbl">main.silver.employees</span> e
+  <span class="kw">JOIN</span> org o <span class="kw">ON</span> e.<span class="col">manager_id</span> <span class="op">=</span> o.<span class="col">employee_id</span>
+)
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> org;</pre>
+      </div>
+      <p>Rekurzivní CTE přibyly do Databricks relativně nedávno (DBSQL 2025.20 / DBR 17.0, v době ohlášení Public Preview) a mají zabudované pojistky proti nekonečné rekurzi — <strong>dostupnost i limity pro vaši verzi runtime ověřte v dokumentaci</strong>. Pokud je nemáte k dispozici, obvyklé náhrady jsou předpočítaný <code class="inline">path</code> sloupec v dimenzi (hierarchii zploštíte při loadu) nebo iterativní zpracování v PySparku s pevným počtem úrovní.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-zrady">
+  <div class="section-header">
+    <div class="section-num">16.4</div>
+    <h2>Typické zrady migrace</h2>
+  </div>
+  <p>Automatický převod přepíše syntaxi, ale sémantické rozdíly musíte pohlídat sami. Tohle jsou ty, na kterých se migrace z Oracle spálí nejčastěji:</p>
+  <ul>
+    <li><strong>NULL vs prázdný řetězec.</strong> Oracle notoricky zachází s <code class="inline">''</code> jako s NULL. Ve Spark SQL je prázdný řetězec regulérní hodnota různá od NULL. Každé <code class="inline">WHERE col IS NULL</code>, konkatenace a join klíč s textovými sloupci může po migraci vracet jiné výsledky.</li>
+    <li><strong>Implicitní konverze typů.</strong> Oracle tiše převádí string ↔ number ↔ date podle NLS nastavení session. Spark má vlastní (a v ANSI módu přísnější) pravidla — dotazy spoléhající na implicitní <code class="inline">TO_DATE</code> spadnou nebo vrátí NULL. Formátovací masky <code class="inline">TO_CHAR</code>/<code class="inline">TO_DATE</code> se navíc liší od masek <code class="inline">date_format()</code>.</li>
+    <li><strong>Oracle DATE má čas.</strong> Bezmyšlenkovitý převod na Spark <code class="inline">DATE</code> ořízne časovou složku — a inkrementální loady postavené na porovnávání „dat" se rozbijí.</li>
+    <li><strong>Transakční sémantika.</strong> Delta Lake garantuje ACID na úrovni jedné tabulky; multi-statement transakce přes více tabulek à la <code class="inline">BEGIN…COMMIT</code> v PL/SQL nemají přímý ekvivalent. Logiku „všechno nebo nic" přes více tabulek je nutné přestavět (idempotentní kroky, orchestraci a případné kompenzace řeší pipeline). Stav multi-table transactions ověřte v dokumentaci — oblast se vyvíjí.</li>
+    <li><strong>MERGE rozdíly.</strong> Delta <code class="inline">MERGE</code> selže, pokud více zdrojových řádků matchuje jeden cílový — Oracle v témže případě hlásí <code class="inline">ORA-30926</code>, takže chování je v jádru stejné. Rozdíl je v tom, že na tuhle chybu se v Oracle často naráželo až v produkci a týmy si zvykly ji obcházet v ETL; po migraci ji Delta odhalí znovu. Zdroj před MERGE deduplikujte (<code class="inline">row_number() = 1</code>).</li>
+    <li><strong>Řazení a case sensitivity.</strong> Jiné výchozí collation, jiné řazení NULL hodnot (<code class="inline">NULLS FIRST/LAST</code> explicitně!), citlivost identifikátorů na velikost písmen.</li>
+  </ul>
+  <p>Na úrovni jednotlivých funkcí je převod přímočarý — zrádné jsou až formátovací masky:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- Oracle</span>
+<span class="kw">SELECT</span> <span class="fn">NVL</span>(<span class="col">discount</span>, <span class="num">0</span>)                                <span class="kw">AS</span> <span class="col">discount</span>,
+       <span class="fn">DECODE</span>(<span class="col">status</span>, <span class="str">'A'</span>, <span class="str">'aktivni'</span>,
+                      <span class="str">'C'</span>, <span class="str">'zavreno'</span>, <span class="str">'ostatni'</span>)  <span class="kw">AS</span> <span class="col">status_txt</span>,
+       <span class="fn">TO_DATE</span>(<span class="col">order_dt_txt</span>, <span class="str">'DD.MM.YYYY'</span>)          <span class="kw">AS</span> <span class="col">order_date</span>
+<span class="kw">FROM</span> <span class="tbl">stage.orders</span>;
+
+<span class="cm">-- Databricks SQL</span>
+<span class="kw">SELECT</span> <span class="fn">coalesce</span>(<span class="col">discount</span>, <span class="num">0</span>)                           <span class="kw">AS</span> <span class="col">discount</span>,
+       <span class="kw">CASE</span> <span class="col">status</span> <span class="kw">WHEN</span> <span class="str">'A'</span> <span class="kw">THEN</span> <span class="str">'aktivni'</span>
+                   <span class="kw">WHEN</span> <span class="str">'C'</span> <span class="kw">THEN</span> <span class="str">'zavreno'</span>
+                   <span class="kw">ELSE</span> <span class="str">'ostatni'</span> <span class="kw">END</span>            <span class="kw">AS</span> <span class="col">status_txt</span>,
+       <span class="fn">to_date</span>(<span class="col">order_dt_txt</span>, <span class="str">'dd.MM.yyyy'</span>)          <span class="kw">AS</span> <span class="col">order_date</span>
+<span class="kw">FROM</span> <span class="tbl">main.silver.orders</span>;</pre>
+  </div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Všimněte si masky. Oracle <code class="inline">'DD.MM.YYYY'</code> odpovídá ve Sparku <code class="inline">'dd.MM.yyyy'</code> — velké <code class="inline">D</code> je tu den v roce a velké <code class="inline">Y</code> week-based rok. Transpiler to většinou ošetří, ručně psané dotazy analytiků ne.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Právě kvůli těmto rozdílům není rekonsiliace „nice to have". Pouštějte Lakebridge Reconcile (nebo vlastní porovnání row counts + hash + klíčové agregáty) na každou migrovanou tabulku a report rozdílů řešte před cutoverem, ne po něm.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Založte si „sémantický regres" — sadu 20–50 byznysově kritických dotazů (top reporty, uzávěrkové sestavy) a jejich očekávaných výsledků z Oracle. Spouštějte ji po každé iteraci konverze. Chytí rozdíly, které row-count rekonsiliace nevidí.</div></div>
+  <div class="collapsible">
+    <div class="collapsible-header">Validace a rekonsiliace dat po migraci<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Lakebridge Reconcile nabízí čtyři typy reportu: <code class="inline">schema</code> (jména a datové typy sloupců), <code class="inline">row</code> (hash celého řádku, nepotřebuje join klíč), <code class="inline">data</code> (porovnání hodnot přes join sloupce, s detailem neshod) a <code class="inline">all</code> (data + schema). Osvědčený postup: nejdřív <code class="inline">schema</code> na všechny tabulky — chytí špatně namapované <code class="inline">NUMBER</code> a <code class="inline">DATE</code>, pak <code class="inline">row</code> na plný objem a teprve u tabulek s neshodami <code class="inline">data</code> s join klíčem.</p>
+      <p>Nejčastější provozní past je <strong>pohyblivý cíl</strong>: pokud Oracle mezitím běží dál, porovnávejte proti pevnému bodu — snapshot ve zdroji, watermark, případně time travel v Delta. Jinak strávíte týden honěním rozdílů, které vznikly mezi dvěma čteními. Výsledky reconcile se zapisují do dashboardu nasazeného ve workspace; přesnou strukturu i konfiguraci ověřte v dokumentaci.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-zdroje">
+  <div class="section-header">
+    <div class="section-num">16.5</div>
+    <h2>Shrnutí a tipy na zdroje</h2>
+  </div>
+  <p>Migrace z Oracle je proveditelná a dobře prošlapaná cesta: fázujte po doménách, nechte Lakebridge udělat hrubou práci (assessment, převážná část konverze, rekonsiliace), data tahejte přes ADF nebo Lakeflow Connect a než přepnete uživatele, provozujte paralelní běh. Největší rizika nejsou v syntaxi, ale v sémantice — NULL, typy, transakce.</p>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Berte migraci jako příležitost, ne jen jako přesun. Než něco přepíšete 1:1, zeptejte se, jestli to ještě někdo potřebuje a jestli by to v lakehouse nešlo jednodušeji — deklarativní pipeline místo tří set řádků PL/SQL.</div></div>
+  <p>Kurátorovaný seznam zdrojů (vše EN):</p>
+  <ul>
+    <li><a href="https://databrickslabs.github.io/lakebridge/" target="_blank" rel="noopener"><strong>Lakebridge — dokumentace</strong></a> — instalace, podporované zdroje a enginy, návody pro analyzer/converter/reconcile. Startovní bod pro celý toolkit.</li>
+    <li><a href="https://github.com/databrickslabs/lakebridge" target="_blank" rel="noopener"><strong>Lakebridge — GitHub</strong></a> — zdrojový kód, releases a changelog; sledujte, podpora dialektů přibývá po měsících.</li>
+    <li><a href="https://www.databricks.com/blog/introducing-lakebridge-free-open-data-migration-databricks-sql" target="_blank" rel="noopener"><strong>Introducing Lakebridge (Databricks blog)</strong></a> — ohlášení a architektura toolkitu, kontext akvizice BladeBridge.</li>
+    <li><a href="https://www.databricks.com/blog/navigating-oracle-databricks-migration-tips-seamless-transition" target="_blank" rel="noopener"><strong>Navigating the Oracle to Databricks Migration (Databricks blog)</strong></a> — nejucelenější oficiální text přímo k Oracle: fázování, datové typy, partitioning, anti-patterny.</li>
+    <li><a href="https://docs.databricks.com/aws/en/migration/lakebridge-agentic-converter" target="_blank" rel="noopener"><strong>Lakebridge Agentic Converter (docs)</strong></a> — LLM-powered konverze SQL (engine Switch); hodí se na konstrukce, které pravidlové enginy nezvládnou.</li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/databricks/ingestion/lakeflow-connect/" target="_blank" rel="noopener"><strong>Lakeflow Connect — managed konektory (Microsoft Learn)</strong></a> — přehled database/query-based konektorů včetně Oracle CDC (LogMiner) a jejich release stavů.</li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/data-factory/connector-oracle" target="_blank" rel="noopener"><strong>ADF Oracle connector (Microsoft Learn)</strong></a> — konfigurace self-hosted IR, výkonové ladění paralelního čtení z Oracle.</li>
+    <li><a href="https://www.databricks.com/solutions/migration" target="_blank" rel="noopener"><strong>Databricks Migration hub</strong></a> — rozcestník migračních guides, webinářů a partnerského programu.</li>
+  </ul>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> <strong>1)</strong> Fázujte: assessment → konverze → data sync → validace → cutover, po doménách. <strong>2)</strong> Lakebridge = free toolkit na assessment, konverzi PL/SQL i rekonsiliaci; data řeší ADF / Lakeflow Connect. <strong>3)</strong> Indexy, sekvence a hinty nemigrujete — nahrazují je liquid clustering, identity columns a AQE. <strong>4)</strong> Sémantické zrady (NULL vs '', implicitní konverze, MERGE, transakce) chytá jen důsledná rekonsiliace a paralelní běh.</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_15_pbi_fabric_databricks.html">← Power BI + Fabric + Databricks</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 16 z 16</span>
+      <a href="index.html" style="margin-left:auto">🏠 Rozcestník →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

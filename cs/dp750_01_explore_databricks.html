@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Představení Azure Databricks — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Představení Azure Databricks</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="../dp750_01_explore_databricks.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div><button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_02_compute.html" class="next">Výběr a konfigurace compute →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-co-je-azure-databricks" class="toc-item active" data-section="sec-co-je-azure-databricks">Co je Azure Databricks a jak vzniká workspace</a>
+    <a href="#sec-workspace-ui" class="toc-item" data-section="sec-workspace-ui">Orientace ve workspace UI</a>
+    <a href="#sec-workloady" class="toc-item" data-section="sec-workloady">Tři workloady jedné platformy</a>
+    <a href="#sec-klicove-koncepty" class="toc-item" data-section="sec-klicove-koncepty">Klíčové koncepty: architektura, compute, notebooky</a>
+    <a href="#sec-lakehouse-delta" class="toc-item" data-section="sec-lakehouse-delta">Lakehouse a Delta Lake</a>
+    <a href="#sec-governance" class="toc-item" data-section="sec-governance">Data governance: Unity Catalog a Microsoft Purview</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 1: Explore Azure Databricks (30 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 1</div>
+      <h1>Představení Azure Databricks</h1>
+      <div class="hero-subtitle">Workspace, workloady, klíčové koncepty a governance přes Unity Catalog a Microsoft Purview</div>
+      <div class="hero-meta"><span>🗂 Představení Azure Databricks</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Vysvětlit, co je Azure Databricks, jak se vztahuje k Azure a jak vzniká workspace.</li>
+    <li>Rozlišit tři hlavní workloady platformy — data engineering, SQL analytiku a ML/AI.</li>
+    <li>Popsat klíčové koncepty: workspace, notebook, cluster, SQL warehouse, DBFS vs. volumes, lakehouse a Delta Lake.</li>
+    <li>Vysvětlit roli Unity Catalog a Microsoft Purview v data governance.</li>
+    <li>Zorientovat se ve workspace UI a provést první kroky v notebooku (Lab 1).</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-co-je-azure-databricks">
+  <div class="section-header">
+    <div class="section-num">1.1</div>
+    <h2>Co je Azure Databricks a jak vzniká workspace</h2>
+  </div>
+  <p><strong>Azure Databricks</strong> je cloudová analytická platforma postavená na <strong>Apache Spark</strong>, provozovaná jako first-party služba přímo v Azure — platíte ji přes azurové předplatné, přihlašujete se přes Microsoft Entra ID a integruje se s Azure Data Lake Storage, Key Vault či Power BI. Není to tedy „Spark, který si musíte sami nainstalovat", ale spravovaná platforma pokrývající celý životní cyklus dat: ingesti, transformace, SQL analytiku i machine learning.</p>
+  <p>Základní jednotkou nasazení je <strong>workspace</strong> — izolované prostředí pro definovanou skupinu uživatelů, ve kterém žijí notebooky, clustery, joby i data. Workspace vytvoříte v Azure portálu, nebo automatizovaně přes ARM/Bicep/Terraform šablonu, Azure CLI či PowerShell:</p>
+
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-01-cli"><span class="tab-icon">⌨️</span>Azure CLI</button>
+      <button class="tab-btn" data-tab="tab-01-ps"><span class="tab-icon">🔷</span>PowerShell</button>
+    </div>
+    <div class="tab-panel" id="tab-01-cli">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm"># vytvoreni workspace pres Azure CLI</span>
+az databricks workspace create \
+    --resource-group <span class="str">rg-dp750</span> \
+    --name <span class="str">dbw-citymoves</span> \
+    --location <span class="str">westeurope</span> \
+    --sku <span class="str">premium</span></pre>
+      </div>
+    </div>
+    <div class="tab-panel" id="tab-01-ps">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">POWERSHELL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm"># vytvoreni workspace pres Azure PowerShell</span>
+<span class="fn">New-AzDatabricksWorkspace</span> -Name <span class="str">dbw-citymoves</span> `
+    -ResourceGroupName <span class="str">rg-dp750</span> `
+    -Location <span class="str">westeurope</span> `
+    -ManagedResourceGroupName <span class="str">rg-dbw-managed</span> `
+    -Sku <span class="str">premium</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <p>Při vytváření volíte <strong>region</strong>, <strong>pricing tier</strong> a nově i <strong>typ workspace</strong>:</p>
+  <table>
+    <tr><th>Parametr</th><th>Možnosti</th><th>Poznámka</th></tr>
+    <tr><td>Pricing tier</td><td><strong>Premium</strong> / Trial (14 dní)</td><td>Premium = RBAC, Unity Catalog, Databricks SQL, serverless, Mosaic AI</td></tr>
+    <tr><td>Typ workspace</td><td><strong>Serverless</strong> / Hybrid (Classic)</td><td>Serverless: compute i storage spravuje Databricks — doporučeno pro většinu případů; Hybrid: compute ve vašem předplatném (vlastní síť, on-premises konektivita)</td></tr>
+    <tr><td>Managed Resource Group</td><td>volitelný název</td><td>Azure v ní automaticky spravuje infrastrukturu workspace</td></tr>
+  </table>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> tier <strong>Standard</strong> už pro nové workspaces neexistuje — od dubna 2026 se všechny nové workspaces vytvářejí jako Premium. Ve starších materiálech a StackOverflow odpovědích na Standard ještě narazíte; pro certifikaci i praxi počítejte jen s Premium.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> pro samostudium existuje <strong>Free Edition</strong> — bez časového omezení a bez platební karty, s denními limity a bez klasického compute. Srovnání s trial verzí najdete v dokumentaci Databricks.</div></div>
+</div>
+
+<div class="section" id="sec-workspace-ui">
+  <div class="section-header">
+    <div class="section-num">1.2</div>
+    <h2>Orientace ve workspace UI</h2>
+  </div>
+  <p>Z Azure portálu se do workspace dostanete tlačítkem <code class="inline">Launch Workspace</code>. Workspace UI je webové rozhraní, kde vytváříte a spravujete všechny objekty — notebooky, dotazy, clustery, joby. Levý <strong>sidebar</strong> má společnou část (Workspace, Recents, Catalog, Jobs &amp; Pipelines, Compute, Marketplace) a pak sekce podle produktových oblastí:</p>
+  <table>
+    <tr><th>Oblast</th><th>Položky v sidebaru</th></tr>
+    <tr><td>SQL</td><td>SQL Editor, Queries, Dashboards, Genie, Alerts, Query History, SQL Warehouses</td></tr>
+    <tr><td>Data Engineering</td><td>Job Runs, Data Ingestion</td></tr>
+    <tr><td>Machine Learning</td><td>Playground, Experiments, Features, Models, Serving</td></tr>
+  </table>
+  <p>Tlačítko <code class="inline">+ New</code> je univerzální vstup pro vytváření objektů (notebook, query, job, pipeline, experiment) i compute zdrojů (cluster, SQL warehouse). Horní <strong>vyhledávání</strong> prohledává vše na jednom místě: notebooky, tabulky registrované v Unity Catalog, dashboardy, joby i repozitáře.</p>
+  <p>Součástí platformy je <strong>Databricks Assistant</strong> — v aktuálním UI nahrazený nástupnickým agentním produktem <strong>Genie Code</strong> — AI párový programátor integrovaný přímo v notebooku, dashboardech a editoru souborů. Generuje, vysvětluje a opravuje kód, diagnostikuje chyby jobů a umí odpovídat na dotazy v přirozeném jazyce. Díky metadatům z Unity Catalog zná názvy vašich tabulek a sloupců, takže návrhy odpovídají vašim datům, ne obecným příkladům.</p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Genie Code má i <strong>Agent mode</strong>, který umí autonomně plánovat a provádět vícekrokové úlohy (data engineering, data science, tvorba dashboardů). Rozsah funkcí se rychle vyvíjí — přesný stav ověřte v dokumentaci.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> jazyk UI si každý uživatel přepne sám: uživatelské jméno vpravo nahoře → <code class="inline">Settings</code> → záložka <code class="inline">Preferences</code>. Na kurzu doporučujeme nechat angličtinu — sedí na dokumentaci i na zkouškové otázky.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/explore-azure-databricks/02-azure-databricks#navigating-the-azure-databricks-workspace-ui" target="_blank" rel="noopener">Navigating the Azure Databricks Workspace UI</a> · <a href="https://learn.microsoft.com/en-us/training/modules/explore-azure-databricks/02-azure-databricks#get-help-from-genie-code" target="_blank" rel="noopener">Get help from Genie Code</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-workloady">
+  <div class="section-header">
+    <div class="section-num">1.3</div>
+    <h2>Tři workloady jedné platformy</h2>
+  </div>
+  <p>Azure Databricks pokrývá tři hlavní typy práce s daty nad jednou kopií dat a jedním governance modelem. To je hlavní pointa lakehouse přístupu: data inženýr, analytik i data scientist pracují nad stejnými Delta tabulkami — nekopíruje se nic do odděleného DWH ani do ML sandboxu.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Tři workloady Azure Databricks — Data Engineering, SQL a BI, Machine Learning a AI — stojí vedle sebe nad společnou vrstvou platformy tvořenou Apache Spark, Delta Lake a Unity Catalogem, pod kterou leží Azure Data Lake Storage s jedinou kopií dat.">
+      <defs>
+        <marker id="arr1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="30" y="20" width="240" height="130" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="150" y="45" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Data Engineering</text>
+      <text x="150" y="70" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">notebooky, pipelines, joby</text>
+      <text x="150" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">Python · SQL · Scala · R</text>
+      <text x="150" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">batch i streaming ETL</text>
+      <text x="150" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">clustery / serverless</text>
+      <rect x="290" y="20" width="240" height="130" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="410" y="45" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#e8721c">SQL &amp; BI</text>
+      <text x="410" y="70" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">SQL Editor, dashboardy</text>
+      <text x="410" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">SQL warehouses</text>
+      <text x="410" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">ad-hoc dotazy, reporty</text>
+      <text x="410" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">napojení na Power BI</text>
+      <rect x="550" y="20" width="240" height="130" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="670" y="45" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#15803d">Machine Learning &amp; AI</text>
+      <text x="670" y="70" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">MLflow, experimenty</text>
+      <text x="670" y="90" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">TensorFlow · PyTorch · sklearn</text>
+      <text x="670" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">trénink i serving modelů</text>
+      <text x="670" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">GenAI / LLM workflow</text>
+      <line x1="150" y1="150" x2="150" y2="180" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <line x1="410" y1="150" x2="410" y2="180" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <line x1="670" y1="150" x2="670" y2="180" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <rect x="30" y="185" width="760" height="45" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="410" y="213" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Jedna platforma: Apache Spark · Delta Lake · Unity Catalog</text>
+      <rect x="30" y="245" width="760" height="40" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="410" y="270" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">Azure Data Lake Storage — jediná kopie dat v otevřeném formátu</text>
+    </svg>
+    <figcaption>Tři workloady Azure Databricks sdílejí jednu platformu, jeden governance model a jednu kopii dat v data lake.</figcaption>
+  </figure>
+
+  <p><strong>Data engineering</strong> je jádro tohoto kurzu: kolaborativní vývoj datových pipeline nad Sparkem v jazycích Python, R, Scala a SQL — od průzkumu dat přes transformace až po orchestraci produkčních jobů. <strong>SQL workload</strong> cílí na analytiky: SQL Editor, dashboardy a automatické vizualizace běžící nad <strong>SQL warehouses</strong> — compute optimalizovaným čistě pro SQL dotazy. <strong>Machine learning</strong> workload přidává MLflow pro správu životního cyklu modelů, podporu frameworků jako TensorFlow, PyTorch či scikit-learn a nástroje pro generativní AI.</p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> Databricks SQL a SQL warehouses jsou funkce Premium tieru. Jelikož nové workspaces jsou dnes vždy Premium, v praxi na tento limit narazíte jen u historických Standard workspaces.</div></div>
+</div>
+
+<div class="section" id="sec-klicove-koncepty">
+  <div class="section-header">
+    <div class="section-num">1.4</div>
+    <h2>Klíčové koncepty: architektura, compute, notebooky</h2>
+  </div>
+  <p>Azure Databricks má dvouvrstvou architekturu. <strong>Control plane</strong> je interní vrstva spravovaná Microsoftem/Databricks — běží v ní workspace UI, REST API, orchestrace jobů a metadata. <strong>Compute plane</strong> je vrstva, která skutečně zpracovává data: u <strong>classic compute</strong> běží virtuální stroje clusterů ve <em>vašem</em> Azure předplatném (uvidíte je v managed resource group), u <strong>serverless compute</strong> běží v předplatném Databricks a ve vašem předplatném se neobjeví nic.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 350" role="img" aria-label="Architektura Azure Databricks: nahoře control plane spravovaný Microsoftem a Databricks s workspace UI, REST API, orchestrací jobů a metastorem Unity Catalogu. Pod ním dva compute plane boxy — classic compute ve vašem Azure předplatném s clustery a VNetem, a serverless compute v předplatném Databricks. Oba přistupují k datům v Azure Data Lake Storage.">
+      <defs>
+        <marker id="arr2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="110" y="15" width="600" height="100" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="410" y="38" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Control plane — spravuje Microsoft / Databricks</text>
+      <rect x="130" y="52" width="130" height="45" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="195" y="79" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">Workspace UI</text>
+      <rect x="275" y="52" width="130" height="45" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="340" y="79" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">REST API</text>
+      <rect x="420" y="52" width="130" height="45" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="485" y="72" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">Orchestrace</text>
+      <text x="485" y="88" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">jobů</text>
+      <rect x="565" y="52" width="130" height="45" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="630" y="72" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">Unity Catalog</text>
+      <text x="630" y="88" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">metastore</text>
+      <line x1="230" y1="115" x2="230" y2="155" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <line x1="590" y1="115" x2="590" y2="155" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <rect x="60" y="160" width="340" height="105" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="230" y="183" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Compute plane — classic</text>
+      <text x="230" y="201" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">vaše Azure předplatné (managed RG)</text>
+      <rect x="80" y="212" width="180" height="40" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="170" y="231" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">cluster: driver +</text>
+      <text x="170" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">worker VMs</text>
+      <rect x="275" y="212" width="105" height="40" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="327" y="231" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">VNet, disky,</text>
+      <text x="327" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">NSG</text>
+      <rect x="420" y="160" width="340" height="105" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="590" y="183" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Compute plane — serverless</text>
+      <text x="590" y="201" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">předplatné Databricks</text>
+      <rect x="440" y="212" width="145" height="40" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="512" y="231" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">serverless notebooky</text>
+      <text x="512" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">a joby</text>
+      <rect x="600" y="212" width="140" height="40" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="670" y="231" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">serverless SQL</text>
+      <text x="670" y="245" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">warehouse</text>
+      <line x1="230" y1="265" x2="230" y2="295" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <line x1="590" y1="265" x2="590" y2="295" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <rect x="60" y="300" width="700" height="40" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="410" y="325" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">Azure Data Lake Storage — data ve formátu Delta Lake, governance přes Unity Catalog</text>
+    </svg>
+    <figcaption>Control plane spravuje Microsoft/Databricks; compute plane běží buď ve vašem předplatném (classic), nebo v předplatném Databricks (serverless). Data zůstávají v Azure Data Lake Storage.</figcaption>
+  </figure>
+
+  <p><strong>Cluster</strong> je výpočetní motor: <strong>driver node</strong> koordinuje běh a <strong>worker nodes</strong> provádějí distribuované výpočty; počet workerů může být fixní, nebo řízený autoscalingem. Vedle clusterů existují <strong>SQL warehouses</strong> — compute oddělený od storage a optimalizovaný pro SQL (serverless, pro a classic varianty). Detailní volbě a konfiguraci compute se věnuje celá kapitola 2.</p>
+  <p><strong>Notebook</strong> je interaktivní dokument kombinující spustitelný kód, vizualizace a text. Skládá se z <strong>code cells</strong> a <strong>Markdown cells</strong>; jazyky lze míchat v jednom notebooku pomocí <strong>magic commands</strong>:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># bunka 1 — vychozi jazyk notebooku je Python</span>
+df = spark.read.<span class="fn">csv</span>(<span class="str">"/Volumes/main/default/lab_data/routes.csv"</span>,
+                    header=<span class="kw">True</span>, inferSchema=<span class="kw">True</span>)
+<span class="fn">display</span>(df)
+
+<span class="cm"># bunka 2 — prepnuti na SQL pomoci magic commandu</span>
+%sql
+<span class="kw">SELECT</span> <span class="col">route_type</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="col">pocet</span>
+<span class="kw">FROM</span> <span class="fn">csv</span>.`/Volumes/main/default/lab_data/routes.csv`
+<span class="kw">GROUP BY</span> <span class="col">route_type</span>;
+
+<span class="cm"># bunka 3 — dokumentace v Markdownu</span>
+%md
+## CityMoves Transit — pruzkum dat o linkach</pre>
+  </div>
+
+  <p>Kód na clusteru vykonává <strong>Databricks Runtime</strong> — upravený build Apache Spark s výkonovými optimalizacemi a předinstalovanými knihovnami. Verze runtime procházejí životním cyklem (Legacy → Deprecated → End of Support → End of Life); pro produkci se drží <strong>LTS</strong> verze. Orchestraci zajišťují <strong>Lakeflow Jobs</strong>: job je kontejner pro jednu či více <strong>tasks</strong> (notebook, Spark job, externí kód…) spouštěných podle plánu, na událost nebo ručně.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">DBFS vs. volumes — kam dnes patří soubory<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><strong>DBFS</strong> (Databricks File System) je historická abstrakce nad objektovým úložištěm dostupná přes cesty <code class="inline">dbfs:/</code>. Její kořen (DBFS root) je dnes považován za legacy: nemá governance přes Unity Catalog a Databricks pro ukládání dat doporučuje jiné mechanismy. <strong>Volumes</strong> jsou naopak objekty Unity Catalogu pro ne-tabulková data (soubory CSV, obrázky, modely…) — mají plné řízení přístupu, audit a jednotné cesty <code class="inline">/Volumes/&lt;catalog&gt;/&lt;schema&gt;/&lt;volume&gt;/</code>.</p>
+      <table>
+        <tr><th></th><th>DBFS root (legacy)</th><th>UC volume</th></tr>
+        <tr><td>Governance</td><td>žádná (workspace-level)</td><td>Unity Catalog: granty, audit, lineage</td></tr>
+        <tr><td>Cesta</td><td><code class="inline">dbfs:/FileStore/…</code></td><td><code class="inline">/Volumes/catalog/schema/volume/…</code></td></tr>
+        <tr><td>Doporučení</td><td>nepoužívat pro nová data</td><td>standard pro soubory v lakehouse</td></tr>
+      </table>
+      <p>Kdo přechází ze starších kurzů DP-203: všude, kde jste dřív nahrávali do <code class="inline">/FileStore</code>, dnes nahráváte do volume. Přesný stav omezení DBFS ověřte v dokumentaci.</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> notebooky umí verzování, plánování jako job i souběžnou editaci více uživateli. V praxi je běžné, že tentýž notebook slouží k průzkumu dat i jako produkční task v jobu — hranice mezi „ad-hoc" a „produkce" je tu záměrně nízká.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/explore-azure-databricks/04-key-concepts" target="_blank" rel="noopener">Understand key concepts</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lakehouse-delta">
+  <div class="section-header">
+    <div class="section-num">1.5</div>
+    <h2>Lakehouse a Delta Lake</h2>
+  </div>
+  <p><strong>Lakehouse</strong> je architektura kombinující levné a škálovatelné úložiště data lake s vlastnostmi datového skladu — transakcemi, schématy a governance. Umožňuje to <strong>Delta Lake</strong>: open-source storage framework, který nad objektovým úložištěm (Azure Data Lake Storage) přidává transakční vrstvu. Data se typicky organizují do vrstev tzv. <strong>medallion architektury</strong>:</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 260" role="img" aria-label="Medallion architektura lakehouse: zdrojová data z aplikací, souborů a streamů tečou do bronze vrstvy se surovými daty, odtud do silver vrstvy s vyčištěnými a validovanými daty a dále do gold vrstvy s agregacemi připravenými pro byznys. Z gold vrstvy čtou BI dashboardy, SQL analytika i ML modely.">
+      <defs>
+        <marker id="arr3" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
+      </defs>
+      <rect x="20" y="60" width="140" height="120" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="90" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#374151">Zdroje</text>
+      <text x="90" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">databáze, aplikace</text>
+      <text x="90" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">soubory (CSV, JSON)</text>
+      <text x="90" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">streamy, IoT</text>
+      <line x1="160" y1="120" x2="195" y2="120" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr3)"/>
+      <rect x="200" y="60" width="140" height="120" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+      <text x="270" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#6b7280">Bronze</text>
+      <text x="270" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">surová data</text>
+      <text x="270" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">tak, jak přišla</text>
+      <text x="270" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">plná historie</text>
+      <line x1="340" y1="120" x2="375" y2="120" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr3)"/>
+      <rect x="380" y="60" width="140" height="120" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="450" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Silver</text>
+      <text x="450" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">vyčištěná data</text>
+      <text x="450" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">validace, dedup</text>
+      <text x="450" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">sjednocené schéma</text>
+      <line x1="520" y1="120" x2="555" y2="120" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr3)"/>
+      <rect x="560" y="60" width="140" height="120" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="630" y="85" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Gold</text>
+      <text x="630" y="110" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">agregace, metriky</text>
+      <text x="630" y="130" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">byznys pohledy</text>
+      <text x="630" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#374151">datové produkty</text>
+      <line x1="700" y1="120" x2="735" y2="120" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr3)"/>
+      <rect x="740" y="60" width="60" height="120" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="770" y="100" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">BI</text>
+      <text x="770" y="122" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">SQL</text>
+      <text x="770" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">ML</text>
+      <rect x="200" y="200" width="500" height="38" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="450" y="224" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">Všechny vrstvy = Delta tabulky v Azure Data Lake Storage, řízené Unity Catalogem</text>
+    </svg>
+    <figcaption>Medallion architektura: data postupně zrají z bronze (surová) přes silver (vyčištěná) do gold (byznys agregace) — vše jako Delta tabulky v jednom lakehouse.</figcaption>
+  </figure>
+
+  <p>Klasické data lakes trpěly nekonzistentními daty, částečnými zápisy a problémy se souběžným přístupem. Delta Lake tohle řeší čtyřmi pilíři:</p>
+  <ul>
+    <li><strong>ACID transakce</strong> — spolehlivé čtení i zápis, žádné poloviční soubory po spadlém jobu.</li>
+    <li><strong>Škálovatelná metadata</strong> — tabulky s miliardami souborů bez degradace výkonu.</li>
+    <li><strong>Verzování a time travel</strong> — dotaz na historický stav tabulky, rollback po chybném zápisu.</li>
+    <li><strong>Sjednocený batch a streaming</strong> — tatáž tabulka slouží real-time ingesti i historickým dávkám.</li>
+  </ul>
+  <p>Nad tímto základem poskytují <strong>Delta tables</strong> běžnou tabulkovou abstrakci pro SQL i DataFrame API. Dokumentace: <em>„Delta tables are the default table format in Azure Databricks"</em> — když v Databricks vytvoříte tabulku a neřeknete jinak, je to Delta:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- CREATE TABLE bez USING = automaticky Delta</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">main.default.routes</span> <span class="kw">AS</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="fn">read_files</span>(<span class="str">'/Volumes/main/default/lab_data/routes.csv'</span>);
+
+<span class="cm">-- historie zmen tabulky (time travel)</span>
+<span class="kw">DESCRIBE HISTORY</span> <span class="tbl">main.default.routes</span>;
+
+<span class="cm">-- dotaz na starsi verzi</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tbl">main.default.routes</span> <span class="kw">VERSION AS OF</span> <span class="num">2</span>;</pre>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> kdo čeká, že „lakehouse" je jen marketingové jméno pro data lake, mine hlavní rozdíl: bez transakční vrstvy Delta Lake nemáte garanci, že dva souběžné zápisy nerozbijí tabulku. Právě ACID vlastnosti dělají z lake použitelný sklad.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/explore-azure-databricks/01-introduction#data-lakehouse" target="_blank" rel="noopener">Data Lakehouse</a> · <a href="https://learn.microsoft.com/en-us/training/modules/explore-azure-databricks/04-key-concepts#delta-lake" target="_blank" rel="noopener">Delta Lake</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-governance">
+  <div class="section-header">
+    <div class="section-num">1.6</div>
+    <h2>Data governance: Unity Catalog a Microsoft Purview</h2>
+  </div>
+  <p>Data v organizacích bývají roztříštěná napříč databázemi, sklady a lakes, v různých formátech — a vedle tabulek je třeba spravovat i soubory, ML modely, notebooky či dashboardy. <strong>Unity Catalog</strong> na to odpovídá centralizovanou správou přístupu, vyhledávání, lineage, auditních logů a monitoringu kvality napříč všemi workspaces v regionu.</p>
+  <p>Vrcholem hierarchie je <strong>metastore</strong> — kontejner metadat a oprávnění, typicky jeden na region, sdílený více workspaces. Datové objekty se adresují třemi úrovněmi:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- tri urovne: catalog.schema.objekt</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tbl">citymoves.transit.routes</span>;
+
+<span class="cm">-- opravneni se ridi ANSI SQL granty</span>
+<span class="kw">GRANT CREATE TABLE ON SCHEMA</span> <span class="tbl">citymoves.transit</span> <span class="kw">TO</span> `data-engineers`;
+<span class="kw">GRANT SELECT ON TABLE</span> <span class="tbl">citymoves.transit.routes</span> <span class="kw">TO</span> `analysts`;</pre>
+  </div>
+
+  <ul>
+    <li><strong>Catalog</strong> — nejvyšší úroveň, typicky podle týmu nebo prostředí (dev/test/prod).</li>
+    <li><strong>Schema</strong> (database) — jemnější členění podle projektu či use case.</li>
+    <li><strong>Objekty</strong> — tabulky (managed/external), views, <strong>volumes</strong>, funkce a ML modely.</li>
+  </ul>
+  <p>U <strong>managed tables</strong> spravuje Unity Catalog governance i samotné úložiště (formát Delta Lake jako výchozí, podporován je i Apache Iceberg). U <strong>external tables</strong> řídí jen přístup z Databricks — životní cyklus dat je venku a formát může být i CSV, JSON či Parquet. Oprávnění lze udělovat od metastoru přes catalog a schema až po řádky a sloupce; k objevování slouží <strong>Catalog Explorer</strong> s tagy, komentáři, AI popisky a <strong>lineage</strong> až na úroveň sloupců.</p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> ve většině účtů je Unity Catalog dnes zapnutý automaticky při vytvoření workspace — nemusíte nic instalovat, jen případně doladit volitelné konfigurace. Přesný stav ve vašem tenantu ověřte v admin konzoli.</div></div>
+  <p><strong>Microsoft Purview</strong> pak řeší governance <em>nad rámec</em> Databricks: je to celofiremní katalog pokrývající on-premises systémy, více cloudů i SaaS platformy. Integrace s Unity Catalogem umí ingestovat metadata lakehouse do Purview Data Map, takže máte jeden pohled na data napříč celým prostředím.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Co konkrétně umí Purview scan Azure Databricks<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <ul>
+        <li>Skenovat workspace v public i private síti (managed integration runtime).</li>
+        <li>Skenovat celý Unity Catalog metastore, nebo jen vybrané catalogy; navíc i workspace-level Hive metastore.</li>
+        <li>Extrahovat metadata: metastore, catalogy, schémata, tabulky/views, sloupce.</li>
+        <li>Automaticky klasifikovat citlivá data podle vestavěných i vlastních pravidel.</li>
+        <li>Sledovat lineage — jak se data transformují a přesouvají napříč systémy včetně Databricks.</li>
+        <li>Běžet on-demand nebo plánovaně (denně/týdně/měsíčně).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> Unity Catalog = governance <em>uvnitř</em> Databricks (přístupy, lineage, audit nad daty a AI assety). Purview = governance <em>napříč</em> celou organizací (katalog, klasifikace, compliance). V praxi se doplňují — Purview si metadata z Unity Catalogu stahuje.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/explore-azure-databricks/05-data-governance-using-unity-catalog-and-microsoft-purview#unity-catalog" target="_blank" rel="noopener">Unity Catalog</a> · <a href="https://learn.microsoft.com/en-us/training/modules/explore-azure-databricks/05-data-governance-using-unity-catalog-and-microsoft-purview#microsoft-purview" target="_blank" rel="noopener">Microsoft Purview</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">1.7</div>
+    <h2>Lab 1: Explore Azure Databricks (30 minut)</h2>
+  </div>
+  <p>V roli nového data engineera dopravního podniku <strong>CityMoves Transit</strong> si projdete workspace UI, vytvoříte Unity Catalog volume <code class="inline">lab_data</code>, nahrajete do něj dataset <code class="inline">routes.csv</code> a v notebooku nad serverless compute vyzkoušíte Python, SQL magic commands, Markdown a Databricks Assistant (Genie Code).</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/01-explore-azure-databricks.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/explore-azure-databricks/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Ve které vrstvě (control vs. compute plane) běží notebooky, které jste spouštěli na serverless compute — a v čím předplatném? <strong>2)</strong> Proč jste <code class="inline">routes.csv</code> nahráli do UC volume, a ne do DBFS? <strong>3)</strong> Jakým magic commandem přepnete buňku Python notebooku do SQL a jakým do Markdownu?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <div></div>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 1 z 16</span>
+      <a href="dp750_02_compute.html" style="margin-left:auto">Výběr a konfigurace compute →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

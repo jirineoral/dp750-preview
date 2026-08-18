@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Objekty v Unity Catalogu — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Objekty v Unity Catalogu</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="../dp750_03_objekty_unity_catalog.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div><button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_04_zabezpeceni.html" class="next">Zabezpečení Unity Catalogu →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-namespace-a-naming" class="toc-item active" data-section="sec-namespace-a-naming">Třívrstvý namespace a naming conventions</a>
+    <a href="#sec-vytvoreni-katalogu" class="toc-item" data-section="sec-vytvoreni-katalogu">Vytvoření katalogu</a>
+    <a href="#sec-vytvoreni-schematu" class="toc-item" data-section="sec-vytvoreni-schematu">Vytvoření schématu</a>
+    <a href="#sec-tabulky-a-views" class="toc-item" data-section="sec-tabulky-a-views">Tabulky a views</a>
+    <a href="#sec-volumes" class="toc-item" data-section="sec-volumes">Volumes: governance pro soubory</a>
+    <a href="#sec-ddl-operace" class="toc-item" data-section="sec-ddl-operace">DDL operace: funkce, procedury, ALTER a tagy</a>
+    <a href="#sec-foreign-catalog" class="toc-item" data-section="sec-foreign-catalog">Foreign catalog a Lakehouse Federation</a>
+    <a href="#sec-genie-instructions" class="toc-item" data-section="sec-genie-instructions">AI/BI Genie instructions</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 3: Create and Organize Objects in Unity Catalog (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 3</div>
+      <h1>Objekty v Unity Catalogu</h1>
+      <div class="hero-subtitle">Katalogy, schémata, tabulky, views, volumes, foreign catalogy a AI/BI Genie</div>
+      <div class="hero-meta"><span>🗂 Organizace objektů v Unity Catalogu</span></div>
+    </div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Navrhnout konzistentní naming conventions a používat třívrstvý namespace <code class="inline">catalog.schema.object</code></li>
+    <li>Vytvořit catalog a schema včetně managed storage location a workspace bindings</li>
+    <li>Rozlišit managed a external tabulky, vytvářet views, materialized views a volumes</li>
+    <li>Provádět DDL operace — SQL/Python funkce, procedury, ALTER a governance tagy</li>
+    <li>Připojit externí databázi přes foreign catalog (Lakehouse Federation) a nakonfigurovat AI/BI Genie instructions</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-namespace-a-naming">
+  <div class="section-header">
+    <div class="section-num">3.1</div>
+    <h2>Třívrstvý namespace a naming conventions</h2>
+  </div>
+
+  <p>Vše, co v Unity Catalogu vytvoříte, žije v <strong>třívrstvém namespace</strong>: <code class="inline">catalog.schema.object</code>. Nad těmito třemi vrstvami stojí <strong>metastore</strong> — jeden na region, sdílený všemi workspaces v daném regionu. Metastore sami nevytváříte pro každý projekt; je to střecha, pod kterou stavíte katalogy.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 400" role="img" aria-label="Hierarchie Unity Catalogu: metastore na úrovni regionu obsahuje katalogy, katalog obsahuje schémata a každé schéma obsahuje tabulky, views, volumes a funkce. Dole je ukázka třívrstvého jména prod_catalog.sales.orders.">
+      <defs>
+        <marker id="arr31" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#6b7280"/>
+        </marker>
+      </defs>
+      <rect x="20" y="14" width="780" height="330" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="40" y="40" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Metastore</text>
+      <text x="122" y="40" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">— jeden na region, sdílený všemi workspaces</text>
+      <rect x="45" y="58" width="730" height="270" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="65" y="84" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#1a3a6b">Catalog</text>
+      <text x="128" y="84" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">prod_catalog — hranice izolace, vlastní storage a přístupové politiky</text>
+      <rect x="70" y="100" width="340" height="210" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="88" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Schema — sales</text>
+      <rect x="88" y="142" width="145" height="42" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="160" y="167" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Tables</text>
+      <rect x="247" y="142" width="145" height="42" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="319" y="167" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Views</text>
+      <rect x="88" y="196" width="145" height="42" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="160" y="221" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Volumes</text>
+      <rect x="247" y="196" width="145" height="42" rx="8" fill="#e8f0fb" stroke="#e2e8f0"/>
+      <text x="319" y="221" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Functions</text>
+      <text x="88" y="270" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">tabulky = strukturovaná data,</text>
+      <text x="88" y="286" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">volumes = soubory, funkce = logika</text>
+      <rect x="430" y="100" width="325" height="210" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="448" y="126" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#6b7280">Schema — hr</text>
+      <text x="448" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">další logická jednotka: tým, projekt,</text>
+      <text x="448" y="170" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">doména nebo vrstva medallionu</text>
+      <line x1="592" y1="190" x2="592" y2="240" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr31)" stroke-dasharray="4 3"/>
+      <text x="448" y="266" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">každé schema má vlastní tabulky,</text>
+      <text x="448" y="284" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">views, volumes a funkce</text>
+      <text x="410" y="378" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" text-anchor="middle">
+        <tspan fill="#1a3a6b" font-weight="bold">prod_catalog</tspan><tspan fill="#6b7280">.</tspan><tspan fill="#e8721c" font-weight="bold">sales</tspan><tspan fill="#6b7280">.</tspan><tspan fill="#22c55e" font-weight="bold">orders</tspan>
+        <tspan fill="#6b7280" font-size="12">   — plně kvalifikované jméno objektu</tspan>
+      </text>
+    </svg>
+    <figcaption>Hierarchie Unity Catalogu: metastore (region) → catalog → schema → tabulky, views, volumes a funkce.</figcaption>
+  </figure>
+
+  <p>Než začnete cokoliv vytvářet, dohodněte si <strong>naming conventions</strong>. Unity Catalog má několik tvrdých pravidel, která vám rozhodování zjednoduší:</p>
+
+  <table>
+    <tr><th>Pravidlo</th><th>Detail</th></tr>
+    <tr><td>Délka jména</td><td>max. 255 znaků</td></tr>
+    <tr><td>Velikost písmen</td><td>jména objektů se ukládají jako lowercase; <code class="inline">SalesData</code> = <code class="inline">salesdata</code></td></tr>
+    <tr><td>Zakázané znaky</td><td>tečka, mezera, lomítko, řídicí znaky (tečka odděluje vrstvy namespace)</td></tr>
+    <tr><td>Speciální znaky</td><td>možné přes backticky, např. <code class="inline">`sales-data`</code> — v praxi se jim vyhněte</td></tr>
+    <tr><td>Sloupce</td><td>zachovávají zadanou velikost písmen, dotazy jsou case-insensitive</td></tr>
+  </table>
+
+  <p>Doporučený vzor je <strong>lowercase s podtržítky</strong> (<code class="inline">customer_data</code>, <code class="inline">sales_summary</code>) — camelCase se stejně převede na lowercase a vznikne jen zmatek. Views prefixujte <code class="inline">vw_</code>, dočasné staging tabulky <code class="inline">tmp_</code>. Názvy schémat zarovnejte s vrstvami medallion architektury: <code class="inline">bronze</code>, <code class="inline">silver</code>, <code class="inline">gold</code> — pak z <code class="inline">sales_data.gold.monthly_revenue</code> každý na první pohled pozná, co drží v ruce.</p>
+
+  <p>U katalogů se rozhodujete mezi dvěma strategiemi: <strong>podle domény</strong> (<code class="inline">sales_data</code>, <code class="inline">finance_data</code>) nebo <strong>podle prostředí</strong> (<code class="inline">dev</code>, <code class="inline">test</code>, <code class="inline">prod</code>). Kombinace <code class="inline">{domena}_{prostredi}</code> — tedy <code class="inline">sales_dev</code>, <code class="inline">sales_prod</code> — škáluje nejlépe, ale roste vám počet katalogů, takže potřebujete disciplínu ve správě.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> konvence bez vynucení dlouho nevydrží. Omezte privilegia <code class="inline">CREATE TABLE</code>/<code class="inline">CREATE SCHEMA</code> na konkrétní týmy, validujte jména v CI/CD pipeline a nekonzistence pravidelně hledejte dotazem do <code class="inline">information_schema</code>.</div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> verzování do jména nepatří — <code class="inline">sales_final_report_v1_updated</code> je klasický antipattern. Verze a stav patří do metadat (comments, tagy), ne do identifikátoru.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/2-apply-naming-conventions#design-naming-strategies-for-environment-isolation" target="_blank" rel="noopener">Design naming strategies for environment isolation</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/2-apply-naming-conventions#implement-conventions-across-your-organization" target="_blank" rel="noopener">Implement conventions across your organization</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-vytvoreni-katalogu">
+  <div class="section-header">
+    <div class="section-num">3.2</div>
+    <h2>Vytvoření katalogu</h2>
+  </div>
+
+  <p><strong>Catalog</strong> je nejvyšší kontejner a primární jednotka <strong>izolace dat</strong>: každý katalog může mít vlastní storage location, bezpečnostní hranice i přístupové politiky. K vytvoření potřebujete být <strong>metastore admin</strong>, nebo mít privilegium <strong>CREATE CATALOG</strong>. Každý nový katalog automaticky dostane dvě schémata: <code class="inline">default</code> a <code class="inline">information_schema</code>.</p>
+
+  <div class="tabs">
+    <div class="tab-list">
+      <button class="tab-btn" data-tab="tab-03-catalog-sql"><span class="tab-icon">🗄️</span>SQL</button>
+      <button class="tab-btn" data-tab="tab-03-catalog-ui"><span class="tab-icon">🖱️</span>Catalog Explorer</button>
+    </div>
+    <div class="tab-panel" id="tab-03-catalog-sql">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm">-- katalog s dedikovanym managed storage</span>
+<span class="kw">CREATE CATALOG IF NOT EXISTS</span> <span class="tbl">prod_catalog</span>
+<span class="kw">MANAGED LOCATION</span> <span class="str">'abfss://prod-data@mystorageaccount.dfs.core.windows.net/catalog-root'</span>
+<span class="kw">COMMENT</span> <span class="str">'Production catalog with dedicated ADLS Gen2 storage'</span>;</pre>
+      </div>
+      <p><code class="inline">IF NOT EXISTS</code> dělá skript idempotentní — můžete ho pouštět opakovaně bez chyby.</p>
+    </div>
+    <div class="tab-panel" id="tab-03-catalog-ui">
+      <p>V UI: <strong>Catalog</strong> v levé navigaci → <strong>Create catalog</strong> → jméno + typ <strong>Standard</strong> → volitelně managed storage location → <strong>Create</strong>. Po vytvoření nastavte <strong>workspace bindings</strong> — nový katalog je defaultně viditelný ze <em>všech</em> workspaces připojených k metastore. Produkční katalog omezte jen na produkční workspace.</p>
+    </div>
+  </div>
+
+  <p><strong>Managed storage location</strong> určuje, kam Unity Catalog fyzicky ukládá soubory managed tabulek a volumes v katalogu. Bez ní padají managed objekty do defaultního úložiště metastore — a pokud metastore default nemá, je <code class="inline">MANAGED LOCATION</code> při vytvoření katalogu povinná. K jejímu nastavení potřebujete existující <strong>external location</strong> a privilegium <strong>CREATE MANAGED STORAGE</strong>.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> defaultní viditelnost katalogu ze všech workspaces je častý provozní faul. Dev workspace, který „vidí" na <code class="inline">prod_catalog</code>, je jedno špatné <code class="inline">USE CATALOG</code> od incidentu. Workspace bindings nastavte hned po vytvoření katalogu.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> dedikovaný managed storage per katalog řeší i compliance — citlivá data drží ve storage accountu a regionu, který odpovídá regulatorním požadavkům, a fyzicky je izoluje od ostatních katalogů.</div></div>
+</div>
+
+<div class="section" id="sec-vytvoreni-schematu">
+  <div class="section-header">
+    <div class="section-num">3.3</div>
+    <h2>Vytvoření schématu</h2>
+  </div>
+
+  <p><strong>Schema</strong> je druhá vrstva namespace a organizuje data uvnitř katalogu do logických celků — typicky jeden use case, projekt nebo tým. V Databricks narazíte i na termín „database": <code class="inline">CREATE DATABASE</code> je alias pro <code class="inline">CREATE SCHEMA</code>, jde o totéž. K vytvoření potřebujete <strong>USE CATALOG</strong> a <strong>CREATE SCHEMA</strong> na nadřazeném katalogu.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">CREATE SCHEMA IF NOT EXISTS</span> <span class="tbl">prod_catalog.customer_analytics</span>
+<span class="kw">COMMENT</span> <span class="str">'Customer behavior and segmentation analysis'</span>;
+
+<span class="cm">-- schema s vlastnim ulozistem (napr. finance kvuli compliance)</span>
+<span class="kw">CREATE SCHEMA IF NOT EXISTS</span> <span class="tbl">prod_catalog.financial_data</span>
+<span class="kw">MANAGED LOCATION</span> <span class="str">'abfss://finance@mystorageaccount.dfs.core.windows.net/schema-data'</span>;</pre>
+  </div>
+
+  <p>Tři osvědčené vzory organizace schémat:</p>
+
+  <table>
+    <tr><th>Vzor</th><th>Příklad</th><th>Kdy použít</th></tr>
+    <tr><td>Podle oddělení</td><td><code class="inline">marketing_analytics</code>, <code class="inline">financial_data</code></td><td>business units vlastní svá data</td></tr>
+    <tr><td>Podle projektu</td><td><code class="inline">customer_churn_model</code>, <code class="inline">pricing_optimization</code></td><td>dočasné iniciativy, snadný úklid po konci projektu</td></tr>
+    <tr><td>Podle fáze zpracování</td><td><code class="inline">bronze</code>, <code class="inline">silver</code>, <code class="inline">gold</code></td><td>medallion pipeline, nejčastější u data engineeringu</td></tr>
+  </table>
+
+  <p>Managed storage na úrovni schématu je volitelná — pokud ji nezadáte, managed tabulky používají úložiště katalogu (případně metastore). Hierarchie fallbacku je tedy: <strong>schema → catalog → metastore</strong>.</p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> aby uživatel schema vůbec viděl a mohl dotazovat jeho obsah, potřebuje minimálně <code class="inline">USE SCHEMA</code> (plus <code class="inline">USE CATALOG</code> na katalogu). Detailně se privilegiím věnuje kapitola o zabezpečení Unity Catalogu.</div></div>
+</div>
+
+<div class="section" id="sec-tabulky-a-views">
+  <div class="section-header">
+    <div class="section-num">3.4</div>
+    <h2>Tabulky a views</h2>
+  </div>
+
+  <h3>Managed vs. external tabulky</h3>
+
+  <p><strong>Managed table</strong> je default: Databricks spravuje metadata i datové soubory, formát je <strong>Delta Lake</strong> (ACID transakce, time travel, schema enforcement) a při <code class="inline">DROP TABLE</code> se smažou metadata i data. <strong>External table</strong> jen registruje metadata nad daty v externím úložišti — <code class="inline">DROP</code> odstraní pouze registraci v katalogu, soubory zůstanou.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="Srovnání managed a external tabulky. U managed tabulky vlastní Unity Catalog metadata i datové soubory a DROP TABLE smaže obojí. U external tabulky vlastní Unity Catalog jen metadata, data zůstávají ve vlastním úložišti a DROP TABLE smaže pouze metadata.">
+      <text x="215" y="36" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b" text-anchor="middle">MANAGED TABLE (default)</text>
+      <rect x="40" y="52" width="350" height="150" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="60" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" font-weight="bold">SPRAVUJE DATABRICKS / UNITY CATALOG</text>
+      <rect x="60" y="88" width="310" height="44" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="215" y="108" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Metadata (Unity Catalog)</text>
+      <text x="215" y="124" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">jméno, schéma, privilegia, lineage</text>
+      <rect x="60" y="142" width="310" height="44" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="215" y="162" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Datové soubory (Delta, managed storage)</text>
+      <text x="215" y="178" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">optimalizace a lifecycle řeší platforma</text>
+      <text x="60" y="232" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#ef4444" font-weight="bold">DROP TABLE →</text>
+      <text x="160" y="232" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">smaže metadata i data</text>
+      <text x="60" y="252" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">(soubory se odstraní po retenční lhůtě)</text>
+      <text x="605" y="36" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#e8721c" text-anchor="middle">EXTERNAL TABLE</text>
+      <rect x="430" y="52" width="350" height="68" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="450" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" font-weight="bold">SPRAVUJE UNITY CATALOG</text>
+      <rect x="450" y="84" width="310" height="28" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="605" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle" font-weight="bold">Metadata (Unity Catalog)</text>
+      <rect x="430" y="134" width="350" height="68" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="450" y="158" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" font-weight="bold">SPRAVUJETE VY (LOCATION)</text>
+      <rect x="450" y="166" width="310" height="28" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="605" y="185" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8721c" text-anchor="middle" font-weight="bold">Datové soubory (vaše ADLS Gen2)</text>
+      <text x="450" y="232" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#22c55e" font-weight="bold">DROP TABLE →</text>
+      <text x="552" y="232" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">smaže jen metadata,</text>
+      <text x="450" y="252" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#374151">data v úložišti zůstávají</text>
+      <text x="410" y="294" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">Pravidlo: nové pipeline stavějte na managed tabulkách.</text>
+      <text x="410" y="312" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">External jen při konkrétním důvodu.</text>
+    </svg>
+    <figcaption>Managed tabulka: Unity Catalog vlastní metadata i data. External tabulka: Unity Catalog vlastní jen metadata, datové soubory zůstávají ve vašem úložišti. Nové pipeline stavějte na managed tabulkách; k external sáhněte jen při konkrétním důvodu — sdílení s jinými systémy nebo už existující data v úložišti.</figcaption>
+  </figure>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- managed tabulka (default, format Delta Lake)</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">production.sales.sales_transactions</span> (
+  <span class="col">transaction_id</span> <span class="kw">BIGINT</span>,
+  <span class="col">customer_id</span> <span class="kw">INT</span>,
+  <span class="col">amount</span> <span class="kw">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>),
+  <span class="col">transaction_date</span> <span class="kw">DATE</span>
+);
+
+<span class="cm">-- external tabulka nad existujicimi CSV soubory</span>
+<span class="kw">CREATE EXTERNAL TABLE</span> <span class="tbl">production.sales.archived_sales</span>
+<span class="kw">USING</span> CSV
+<span class="kw">LOCATION</span> <span class="str">'abfss://container@storage.dfs.core.windows.net/sales/archive'</span>
+<span class="kw">OPTIONS</span> (header <span class="str">'true'</span>, inferSchema <span class="str">'true'</span>);</pre>
+  </div>
+
+  <h3>Primary a foreign keys</h3>
+
+  <p>Unity Catalog umí definovat <strong>PRIMARY KEY</strong> a <strong>FOREIGN KEY</strong> constraints — ale pozor na očekávání z klasických databází:</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Častý omyl: PK/FK constraints vynucují integritu<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Kdo čeká, že <code class="inline">PRIMARY KEY</code> v Databricks zablokuje duplicitní řádky, bude překvapen. PK/FK constraints jsou <strong>informational only</strong> — nevynucují se při zápisu. Dokumentace: <em>„these constraints are informational only and are not enforced."</em> Slouží jako metadata pro dokumentaci datového modelu, pro query optimizer (lepší join strategie) a pro nástroje jako AI/BI Genie, které z nich odvozují join relationships. Datovou kvalitu vynucují jen <code class="inline">NOT NULL</code> a <code class="inline">CHECK</code> constraints.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">CREATE TABLE</span> <span class="tbl">customers</span> (
+  <span class="col">customer_id</span> <span class="kw">BIGINT NOT NULL</span>,
+  <span class="col">customer_name</span> <span class="kw">STRING</span>,
+  <span class="kw">CONSTRAINT</span> customers_pk <span class="kw">PRIMARY KEY</span> (<span class="col">customer_id</span>)
+);
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">orders</span> (
+  <span class="col">order_id</span> <span class="kw">BIGINT NOT NULL PRIMARY KEY</span>,
+  <span class="col">customer_id</span> <span class="kw">BIGINT</span>,
+  <span class="col">total_amount</span> <span class="kw">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>),
+  <span class="kw">CONSTRAINT</span> orders_customers_fk <span class="kw">FOREIGN KEY</span> (<span class="col">customer_id</span>)
+    <span class="kw">REFERENCES</span> <span class="tbl">customers</span>(<span class="col">customer_id</span>)
+);</pre>
+  </div>
+
+  <h3>Views: standardní, dynamické, materializované</h3>
+
+  <table>
+    <tr><th>Typ</th><th>Data</th><th>Kdy použít</th></tr>
+    <tr><td><strong>View</strong></td><td>nic neukládá, dotaz běží při každém přístupu</td><td>zapouzdření logiky, vždy aktuální data</td></tr>
+    <tr><td><strong>Dynamic view</strong></td><td>jako view + row filtering / column masking</td><td>řízení přístupu podle uživatele (<code class="inline">is_account_group_member()</code>)</td></tr>
+    <tr><td><strong>Materialized view</strong></td><td>předpočítané výsledky v Delta tabulce</td><td>drahé agregace, dashboardy, akceptovatelná mírná neaktuálnost</td></tr>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- dynamic view: maskovani sloupce podle skupiny</span>
+<span class="kw">CREATE VIEW</span> <span class="tbl">sales_redacted</span> <span class="kw">AS</span>
+<span class="kw">SELECT</span> <span class="col">user_id</span>,
+  <span class="kw">CASE WHEN</span> <span class="fn">is_account_group_member</span>(<span class="str">'auditors'</span>) <span class="kw">THEN</span> <span class="col">email</span>
+       <span class="kw">ELSE</span> <span class="str">'REDACTED'</span> <span class="kw">END AS</span> <span class="col">email</span>,
+  <span class="col">product</span>, <span class="col">total</span>
+<span class="kw">FROM</span> <span class="tbl">sales_raw</span>;
+
+<span class="cm">-- materialized view s planovanym refreshem</span>
+<span class="kw">CREATE MATERIALIZED VIEW</span> <span class="tbl">daily_sales_summary</span>
+<span class="kw">SCHEDULE EVERY</span> <span class="num">1</span> <span class="kw">DAY</span>
+<span class="kw">AS SELECT</span> <span class="col">transaction_date</span>,
+  <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> <span class="col">transaction_count</span>,
+  <span class="fn">SUM</span>(<span class="col">amount</span>) <span class="kw">AS</span> <span class="col">total_sales</span>
+<span class="kw">FROM</span> <span class="tbl">sales_transactions</span>
+<span class="kw">GROUP BY</span> <span class="col">transaction_date</span>;</pre>
+  </div>
+
+  <p>Materialized views podporují <strong>inkrementální refresh</strong> — zpracují jen změněná data. Podmínkou je, aby zdrojové Delta tabulky měly zapnutý <strong>row tracking</strong> (<code class="inline">delta.enableRowTracking = true</code>). Zapnutí na velké existující tabulce chvíli trvá, povyšuje protokol tabulky a je nevratné.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Materialized view vs. streaming table — kdy co?<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p><strong>Streaming table</strong> (<code class="inline">CREATE OR REFRESH STREAMING TABLE</code>) zpracovává pouze nové řádky od posledního refreshe — streaming sémantika, exactly-once. Hodí se pro inkrementální ingestion (Auto Loader nad cloud storage, Kafka) a bronze/silver vrstvy, kde data jen přibývají. Materialized view naopak počítá agregace nad kompletním datasetem batch sémantikou. Pravidlo: zdroj jen appenduje a historii nedrží (Kafka) → streaming table; agregace nad celkem s periodickým přepočtem → materialized view. Streaming tables rozebírá detailně kapitola o ingestion.</p>
+    </div>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> dynamic views vyžadují SQL warehouse nebo compute se standard/dedicated access mode (u dedicated na Databricks Runtime 15.4 LTS+). Na starším runtime se dotaz přes dynamic view nespustí.</div></div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> místo klasického partitioningu použijte u tabulek i materialized views <strong>liquid clustering</strong> (<code class="inline">CLUSTER BY</code>) — layout dat se optimalizuje automaticky podle dotazů a nehrozí skewed partitions.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/5-create-tables-views-materialized#create-materialized-views" target="_blank" rel="noopener">Create materialized views</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/5-create-tables-views-materialized#best-practices-for-tables-and-views" target="_blank" rel="noopener">Best practices for tables and views</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-volumes">
+  <div class="section-header">
+    <div class="section-num">3.5</div>
+    <h2>Volumes: governance pro soubory</h2>
+  </div>
+
+  <p><strong>Volume</strong> je objekt Unity Catalogu pro <strong>netabulková data</strong> — CSV k ingestion, obrázky, audio, ML modely. Sedí na třetí úrovni namespace (<code class="inline">catalog.schema.volume</code>) a přenáší stejný governance model, jaký znáte z tabulek, na soubory.</p>
+
+  <p>Stejně jako u tabulek volíte <strong>managed</strong> (úložiště i lifecycle řeší Unity Catalog; po dropu jsou soubory označeny ke smazání po retenční lhůtě) nebo <strong>external</strong> (soubory leží na vámi zadané cestě a drop odstraní jen registraci). External volume použijte, když k souborům přistupují i systémy mimo Databricks nebo když governance přidáváte nad existující úložiště.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- managed volume</span>
+<span class="kw">CREATE VOLUME IF NOT EXISTS</span> <span class="tbl">dev_catalog.bronze_schema.landing_files</span>
+<span class="kw">COMMENT</span> <span class="str">'Landing area for CSV files from external systems'</span>;
+
+<span class="cm">-- external volume nad existujicim ulozistem</span>
+<span class="kw">CREATE EXTERNAL VOLUME</span> <span class="tbl">prod_catalog.silver_schema.ml_models</span>
+<span class="kw">LOCATION</span> <span class="str">'abfss://models@mystorageaccount.dfs.core.windows.net/production/'</span>;
+
+<span class="cm">-- prava: cteni a zapis pro skupinu</span>
+<span class="kw">GRANT READ VOLUME, WRITE VOLUME ON VOLUME</span> <span class="tbl">dev_catalog.bronze_schema.landing_files</span>
+<span class="kw">TO</span> <span class="str">`data-engineers`</span>;</pre>
+  </div>
+
+  <p>K souborům přistupujete jednotnou POSIX-style cestou <code class="inline">/Volumes/&lt;catalog&gt;/&lt;schema&gt;/&lt;volume&gt;/&lt;cesta&gt;</code> — funguje ve Sparku, pandas, SQL i <code class="inline">dbutils.fs</code>, bez credentials a connection stringů:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># stejna cesta pro Spark i pandas</span>
+df <span class="op">=</span> spark.read.format(<span class="str">"csv"</span>).<span class="fn">load</span>(<span class="str">"/Volumes/dev_catalog/bronze_schema/landing_files/data.csv"</span>)
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+pdf <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="str">"/Volumes/dev_catalog/bronze_schema/landing_files/data.csv"</span>)
+
+<span class="cm"># sprava souboru</span>
+dbutils.fs.<span class="fn">ls</span>(<span class="str">"/Volumes/dev_catalog/bronze_schema/landing_files"</span>)</pre>
+  </div>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> volumes nepodporují ACL na úrovni podadresářů — privilegia platí vždy pro <em>celý</em> volume. Potřebujete-li různá práva pro různé sady souborů, vytvořte pro každou bezpečnostní hranici samostatný volume.</div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> ke čtení souboru nestačí <code class="inline">READ VOLUME</code> — uživatel potřebuje i <code class="inline">USE CATALOG</code> a <code class="inline">USE SCHEMA</code> na nadřazených objektech. Privilegia se v hierarchii vyhodnocují vždy shora dolů.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/6-create-volumes#choose-between-managed-and-external-volumes" target="_blank" rel="noopener">Choose between managed and external volumes</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/6-create-volumes#manage-volume-permissions" target="_blank" rel="noopener">Manage volume permissions</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-ddl-operace">
+  <div class="section-header">
+    <div class="section-num">3.6</div>
+    <h2>DDL operace: funkce, procedury, ALTER a tagy</h2>
+  </div>
+
+  <h3>Funkce jako governed objekty</h3>
+
+  <p>Funkce v Unity Catalogu nejsou jen syntaktický cukr — jsou to <strong>governed objekty</strong> s vlastníkem, privilegii a sledováním použití. Definujete je jednou a voláte odkudkoliv, takže výpočet slevy nebo klasifikace známky je v celé organizaci konzistentní. Podporovány jsou <strong>scalar</strong> i <strong>table-valued</strong> funkce v SQL nebo Pythonu:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- SQL scalar funkce</span>
+<span class="kw">CREATE FUNCTION</span> <span class="tbl">dev_catalog.finance_schema.calculate_discount</span>(price <span class="kw">DOUBLE</span>, discount_rate <span class="kw">DOUBLE</span>)
+<span class="kw">RETURNS DOUBLE</span>
+<span class="kw">RETURN</span> price <span class="op">*</span> (<span class="num">1</span> <span class="op">-</span> discount_rate);
+
+<span class="cm">-- Python funkce (bezi na serverless / pro SQL warehouse)</span>
+<span class="kw">CREATE FUNCTION</span> <span class="tbl">dev_catalog.analytics_schema.normalize_text</span>(input_text <span class="kw">STRING</span>)
+<span class="kw">RETURNS STRING</span>
+<span class="kw">LANGUAGE PYTHON</span>
+<span class="kw">AS</span> $$
+  <span class="kw">return</span> input_text.lower().strip() <span class="kw">if</span> input_text <span class="kw">else</span> <span class="kw">None</span>
+$$;
+
+<span class="cm">-- table-valued funkce</span>
+<span class="kw">CREATE FUNCTION</span> <span class="tbl">dev_catalog.utils_schema.split_to_rows</span>(input_array <span class="kw">ARRAY&lt;STRING&gt;</span>)
+<span class="kw">RETURNS TABLE</span>(value <span class="kw">STRING</span>)
+<span class="kw">RETURN SELECT</span> <span class="fn">explode</span>(input_array) <span class="kw">AS</span> <span class="col">value</span>;</pre>
+  </div>
+
+  <p>Pro vícekrokové workflow (validace → transformace → load) existují <strong>SQL stored procedures</strong> — <code class="inline">CREATE PROCEDURE</code> s IN/OUT/INOUT parametry, proměnnými a řízením toku, volané přes <code class="inline">CALL</code>. Vyžadují Databricks Runtime 17.0+; přesný stav podpory ověřte v dokumentaci.</p>
+
+  <h3>ALTER: vlastnictví, tagy, struktura</h3>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- prevod vlastnictvi katalogu na skupinu</span>
+<span class="kw">ALTER CATALOG</span> <span class="tbl">dev_catalog</span> <span class="kw">SET OWNER TO</span> <span class="str">`data_engineering_team`</span>;
+
+<span class="cm">-- governance tagy pro klasifikaci a dohledatelnost</span>
+<span class="cm">-- nazev tagu i hodnota musi byt retezcove literaly</span>
+<span class="kw">ALTER CATALOG</span> <span class="tbl">dev_catalog</span> <span class="kw">SET TAGS</span> (
+  <span class="str">'environment'</span> <span class="op">=</span> <span class="str">'development'</span>,
+  <span class="str">'cost_center'</span> <span class="op">=</span> <span class="str">'engineering'</span>,
+  <span class="str">'data_classification'</span> <span class="op">=</span> <span class="str">'internal'</span>
+);
+
+<span class="cm">-- upravy struktury tabulky bez rebuildu</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">dev_catalog.sales_schema.orders</span>
+<span class="kw">ADD COLUMN</span> <span class="col">shipping_carrier</span> <span class="kw">STRING</span> <span class="kw">COMMENT</span> <span class="str">'Name of the shipping carrier'</span>;
+
+<span class="kw">ALTER TABLE</span> <span class="tbl">dev_catalog.sales_schema.orders</span>
+<span class="kw">ALTER COLUMN</span> <span class="col">quantity</span> <span class="kw">TYPE BIGINT</span>;</pre>
+  </div>
+
+  <p><code class="inline">ALTER TABLE</code> zvládne přidání, přejmenování i odstranění sloupců a rozšíření typů (<code class="inline">INT</code> → <code class="inline">BIGINT</code>) při zachování dat — vyžaduje privilegium <code class="inline">MODIFY</code>. Rozšiřování typů (<strong>type widening</strong>) funguje na Delta tabulkách od Databricks Runtime 15.2 a výš; má-li se typ rozšířit automaticky už při ingesci, zapněte na tabulce <code class="inline">delta.enableTypeWidening</code>. Podporované dvojice typů a přesný stav funkce ověřte v dokumentaci. Přejmenování sloupce potřebuje zapnutý Delta column mapping. Tagy jsou prohledávatelná metadata: základ pro klasifikaci dat, cost management i pozdější automatizovanou governance.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> <code class="inline">ALTER CATALOG prod_catalog ENABLE PREDICTIVE OPTIMIZATION</code> zapne automatickou údržbu (compaction, vacuum) pro všechny tabulky v katalogu — tabulky nastavení dědí, pokud ho na své úrovni nepřepíšete.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/7-implement-data-definition-language-operations#create-procedures-for-multi-step-operations" target="_blank" rel="noopener">Create procedures for multi-step operations</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/7-implement-data-definition-language-operations#modify-table-structure-and-constraints" target="_blank" rel="noopener">Modify table structure and constraints</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-foreign-catalog">
+  <div class="section-header">
+    <div class="section-num">3.7</div>
+    <h2>Foreign catalog a Lakehouse Federation</h2>
+  </div>
+
+  <p>Ne všechna data máte v lakehousu — a ne všechna tam potřebujete stěhovat. <strong>Lakehouse Federation</strong> umožňuje dotazovat externí databáze (PostgreSQL, MySQL, Azure SQL, Snowflake, BigQuery…) přímo z Databricks, přičemž přístup řídí, audituje a lineage sleduje Unity Catalog. Ideální pro ad-hoc analýzy nad živými provozními daty, proof-of-concept bez ETL a postupnou migraci.</p>
+
+  <p>Architektura stojí na dvou objektech: <strong>connection</strong> uchovává technické detaily připojení (JDBC host, port, credentials — ideálně přes Databricks secrets) a <strong>foreign catalog</strong> zrcadlí konkrétní externí databázi do namespace Unity Catalogu. Jedna connection může obsloužit více foreign catalogů (více databází na stejném serveru).</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 320" role="img" aria-label="Tok dotazu při Lakehouse Federation: uživatelský dotaz jde přes Unity Catalog, kde se vyhodnotí privilegia a zapíše audit. Foreign catalog zrcadlí metadata externí databáze a connection drží přihlašovací údaje. Dotaz se přeloží do dialektu externí databáze a pushdown vykoná na jejím compute, výsledky se vrací zpět.">
+      <defs>
+        <marker id="arr37" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#e8721c"/>
+        </marker>
+        <marker id="arr37b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#22c55e"/>
+        </marker>
+      </defs>
+      <rect x="20" y="100" width="180" height="90" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="110" y="130" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b" text-anchor="middle">Uživatel / BI nástroj</text>
+      <text x="110" y="152" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">SELECT ... FROM</text>
+      <text x="110" y="168" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">fed_pg.public.transactions</text>
+      <rect x="250" y="40" width="300" height="230" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="400" y="66" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b" text-anchor="middle">Azure Databricks — Unity Catalog</text>
+      <rect x="270" y="82" width="260" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="400" y="103" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b" text-anchor="middle">Foreign catalog</text>
+      <text x="400" y="121" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">zrcadlo metadat externí DB</text>
+      <rect x="270" y="146" width="260" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="400" y="167" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b" text-anchor="middle">Connection</text>
+      <text x="400" y="185" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">JDBC URL + credentials (secrets)</text>
+      <rect x="270" y="210" width="260" height="44" rx="8" fill="#ffffff" stroke="#22c55e"/>
+      <text x="400" y="228" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e" text-anchor="middle">privilegia + audit log + lineage</text>
+      <text x="400" y="246" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">jednotná governance pro všechna data</text>
+      <rect x="610" y="52" width="190" height="46" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="705" y="80" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c" text-anchor="middle">PostgreSQL</text>
+      <rect x="610" y="110" width="190" height="46" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="705" y="138" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c" text-anchor="middle">Azure SQL Database</text>
+      <rect x="610" y="168" width="190" height="46" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="705" y="196" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c" text-anchor="middle">Snowflake, BigQuery…</text>
+      <line x1="200" y1="145" x2="245" y2="145" stroke="#e8721c" stroke-width="2" marker-end="url(#arr37)"/>
+      <line x1="550" y1="120" x2="605" y2="100" stroke="#e8721c" stroke-width="2" marker-end="url(#arr37)"/>
+      <text x="577" y="94" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" font-weight="bold" text-anchor="middle">pushdown</text>
+      <line x1="605" y1="150" x2="550" y2="165" stroke="#22c55e" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr37b)"/>
+      <text x="585" y="180" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e" text-anchor="middle">výsledky</text>
+      <text x="410" y="300" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">Dotaz se přeloží do dialektu cílové databáze a vykoná na jejím compute; filtry a agregace se posílají dolů (pushdown).</text>
+    </svg>
+    <figcaption>Lakehouse Federation: connection drží credentials, foreign catalog zrcadlí externí databázi a Unity Catalog vynucuje jednotnou governance nad dotazy do externích systémů.</figcaption>
+  </figure>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- 1) connection: credentials pres Databricks secrets, ne v plaintextu</span>
+<span class="kw">CREATE CONNECTION</span> <span class="tbl">postgresql_prod</span> <span class="kw">TYPE</span> postgresql
+<span class="kw">OPTIONS</span> (
+  host <span class="str">'prod-db.example.com'</span>,
+  port <span class="str">'5432'</span>,
+  user <span class="fn">secret</span> (<span class="str">'prod-secrets'</span>,<span class="str">'postgres-user'</span>),
+  password <span class="fn">secret</span> (<span class="str">'prod-secrets'</span>,<span class="str">'postgres-password'</span>)
+);
+
+<span class="cm">-- 2) foreign catalog zrcadlici databazi customers</span>
+<span class="kw">CREATE FOREIGN CATALOG IF NOT EXISTS</span> <span class="tbl">prod_customer_data</span>
+<span class="kw">USING CONNECTION</span> <span class="tbl">postgresql_prod</span>
+<span class="kw">OPTIONS</span> (database <span class="str">'customers'</span>);
+
+<span class="cm">-- 3) dotaz jako na beznou tabulku Unity Catalogu</span>
+<span class="kw">SELECT</span> <span class="col">customer_id</span>, <span class="fn">SUM</span>(<span class="col">transaction_amount</span>) <span class="kw">AS</span> <span class="col">total_spent</span>
+<span class="kw">FROM</span> <span class="tbl">prod_customer_data.public.transactions</span>
+<span class="kw">GROUP BY</span> <span class="col">customer_id</span>;</pre>
+  </div>
+
+  <p>Metadata se synchronizují automaticky při každém dotazu. U vysokofrekvenčních dotazů to může být pomalé — pak metadata občerstvujte plánovaně přes <code class="inline">REFRESH FOREIGN CATALOG / SCHEMA / TABLE</code> (např. z Lakeflow Jobs) a dotazy poběží nad cache.</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> dotaz se vykonává na compute <em>externí</em> databáze. Federovaný dashboard, který každých pár minut agreguje produkční PostgreSQL, je skvělý způsob, jak si znepřátelit DBA týmu provozu. Často dotazovaná externí data raději cacheujte lokálně přes materialized view.</div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> potřebná privilegia: <code class="inline">CREATE CONNECTION</code> na metastore pro connection; <code class="inline">CREATE CATALOG</code> na metastore plus vlastnictví connection (nebo <code class="inline">CREATE FOREIGN CATALOG</code> na ní) pro foreign catalog. Přístup pro federaci je primárně read-only — možnosti zápisu ověřte v aktuální dokumentaci pro konkrétní systém.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/8-implement-foreign-catalog#configure-a-connection-to-the-external-database" target="_blank" rel="noopener">Configure a connection to the external database</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/8-implement-foreign-catalog#grant-access-and-query-foreign-data" target="_blank" rel="noopener">Grant access and query foreign data</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-genie-instructions">
+  <div class="section-header">
+    <div class="section-num">3.8</div>
+    <h2>AI/BI Genie instructions</h2>
+  </div>
+
+  <p><strong>AI/BI Genie</strong> umožňuje business uživatelům ptát se na data přirozeným jazykem — Genie z otázky vygeneruje SQL nad tabulkami Unity Catalogu. Aby generovalo <em>správné</em> SQL, potřebuje kontext: k tomu slouží <strong>knowledge store</strong> objektu <strong>Genie Agent</strong> (dříve Genie space), kde metadata upravujete na jeho úrovni, aniž byste měnili podkladové objekty v katalogu.</p>
+
+  <p>Genie Agent stavíte nad výběrem tabulek (max. 25, doporučeno začít s pěti a méně). Pak vrstvíte kontext:</p>
+
+  <table>
+    <tr><th>Nástroj</th><th>K čemu slouží</th></tr>
+    <tr><td>Popisy tabulek a sloupců</td><td>business jazyk místo technického („obsahuje všechny nákupy zákazníků…"), synonyma pro sloupce</td></tr>
+    <tr><td>Skrytí sloupců</td><td>surrogate keys a audit sloupce ven — matou uživatele i model</td></tr>
+    <tr><td>Joins</td><td>vztahy mezi tabulkami vč. kardinality; PK/FK z Unity Catalogu si Genie načte samo</td></tr>
+    <tr><td>Prompt matching</td><td>vzorky reálných hodnot — „California" se namapuje na kód „CA"</td></tr>
+    <tr><td>SQL expressions</td><td>znovupoužitelné measures/filtry/dimenze (gross margin, fiskální kvartál)</td></tr>
+    <tr><td>Example SQL queries</td><td>vzorové otázky s hotovým SQL; parametrizované se označují jako <strong>Trusted</strong></td></tr>
+    <tr><td>Text instructions</td><td>globální pravidla („fiskální rok začíná v únoru") — používat střídmě</td></tr>
+  </table>
+
+  <p>Tady se vyplácí poctivá práce z předchozích sekcí: PK/FK constraints ze sekce 3.4, popisné komentáře a konzistentní jména Genie automaticky vytěží při zakládání Genie Agenta (knowledge mining) a uloží jako join relationships. Dobře anotovaný katalog znamená méně ruční konfigurace.</p>
+
+  <p>Konfigurace Genie je <strong>iterativní proces</strong>: otestujte Genie Agenta vlastními otázkami, přes <em>Show generated code</em> zkontrolujte vygenerované SQL, chybné odpovědi opravte a uložte jako novou instrukci (<em>Add as instruction</em>). Průběžně sledujte zpětnou vazbu uživatelů v tabu Monitoring a měřte přesnost benchmark otázkami.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Limity Genie Agenta (stav dle Learn modulu, ověřte v dokumentaci)<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Genie Agent má dva oddělené limity: <strong>instructions limit 100</strong> (example SQL queries, SQL funkce a celý blok textových instrukcí dohromady) a <strong>knowledge store snippets limit 200</strong> (popisy tabulek, join relationships a SQL expressions dohromady). Entity matching zvládne až 1 024 distinct hodnot na sloupec napříč 120 sloupci jednoho agenta. Popisy sloupců a prompt matching se do limitů nepočítají. Limity se mohou měnit — aktuální hodnoty ověřte v dokumentaci.</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> začněte minimálně — málo tabulek, málo instrukcí — a rozšiřujte podle skutečných otázek uživatelů. Přehlcený Genie Agent s desítkami obecných textových instrukcí odpovídá hůř než malý a přesně mířený.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/9-configure-ai-bi-genie-instructions#configure-the-knowledge-store" target="_blank" rel="noopener">Configure the knowledge store</a> · <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/9-configure-ai-bi-genie-instructions#add-sql-instructions-and-examples" target="_blank" rel="noopener">Add SQL instructions and examples</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">3.9</div>
+    <h2>Lab 3: Create and Organize Objects in Unity Catalog (45 minut)</h2>
+  </div>
+
+  <p>Lakeside University buduje datovou platformu pro studijní agendu: v labu vytvoříte katalog <code class="inline">edu_dev</code> s medallion schématy (bronze/silver/gold), managed tabulky studentů, kurzů a zápisů s PK/FK constraints, view a materialized view pro analytické dotazy, managed volume pro CSV soubory, SQL funkci pro klasifikaci známek a přes <code class="inline">ALTER</code> aplikujete governance tagy. Volitelně nad datasetem postavíte Genie Agenta.</p>
+
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/03-create-and-organize-objects-in-unity-catalog.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/create-and-organize-objects-in-unity-catalog/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Co se stane s datovými soubory při <code class="inline">DROP TABLE</code> u managed vs. external tabulky? <strong>2)</strong> Vynucují PK/FK constraints v Unity Catalogu referenční integritu při zápisu — a k čemu tedy slouží? <strong>3)</strong> Jaký je rozdíl mezi connection a foreign catalogem v Lakehouse Federation a která privilegia potřebujete k jejich vytvoření?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_02_compute.html">← Výběr a konfigurace compute</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 3 z 16</span>
+      <a href="dp750_04_zabezpeceni.html" style="margin-left:auto">Zabezpečení Unity Catalogu →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

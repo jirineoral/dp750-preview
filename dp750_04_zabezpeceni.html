@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Zabezpečení objektů Unity Catalogu — DP-750</title>
+<title>Secure Unity Catalog objects — DP-750</title>
 <style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
    Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
 :root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
@@ -122,34 +122,34 @@ html.mode-custom [data-view="orig"]{display:none}
 <div id="chapOverlay" class="chapter-menu-overlay"></div>
 <div id="chapMenu" class="chapter-menu">
   <div class="chapter-group">
-    <div class="chapter-group-title">MOC — dny 1 a 2</div>
-    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
-    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
-    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
-    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
-    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
-    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
-    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+    <div class="chapter-group-title">MOC — days 1 and 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
   </div>
   <div class="chapter-group">
-    <div class="chapter-group-title">MOC — pokračování</div>
-    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
-    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
-    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <div class="chapter-group-title">MOC — continued</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
     <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
-    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
-    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
     <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
-      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
     </div>
   </div>
   <div class="chapter-group" data-view="custom">
-    <div class="chapter-group-title">Pod čarou — den 3</div>
-    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <div class="chapter-group-title">Bonus — day 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
     <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
-    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
-      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
     </div>
   </div>
 </div>
@@ -157,11 +157,11 @@ html.mode-custom [data-view="orig"]{display:none}
 <nav class="top-nav">
   <div style="display:flex;align-items:center;gap:16px;min-width:0">
     <span class="course-code">DP-750</span>
-    <span class="chapter-title-nav">Zabezpečení objektů Unity Catalogu</span>
+    <span class="chapter-title-nav">Secure Unity Catalog objects</span>
   </div>
   <div class="nav-links">
-    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="en/dp750_04_zabezpeceni.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div><button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
-    <a href="dp750_05_governance.html" class="next">Governance Unity Catalogu →</a>
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="cs/dp750_04_zabezpeceni.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
+    <a href="dp750_05_governance.html" class="next">Governing Unity Catalog →</a>
   </div>
 </nav>
 
@@ -169,46 +169,46 @@ html.mode-custom [data-view="orig"]{display:none}
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="sidebar-title">Obsah kapitoly</div>
-    <a href="#sec-zivotni-cyklus-dotazu" class="toc-item active" data-section="sec-zivotni-cyklus-dotazu">Query lifecycle: jak Unity Catalog vyhodnocuje dotaz</a>
-    <a href="#sec-strategie-access-control" class="toc-item" data-section="sec-strategie-access-control">Strategie access control: privilege model a dědičnost</a>
-    <a href="#sec-fine-grained-access-control" class="toc-item" data-section="sec-fine-grained-access-control">Fine-grained access control: pod úroveň tabulky</a>
-    <a href="#sec-row-filtering-column-masking" class="toc-item" data-section="sec-row-filtering-column-masking">Row filtering a column masking v praxi</a>
-    <a href="#sec-secrets-key-vault" class="toc-item" data-section="sec-secrets-key-vault">Secrets přes Azure Key Vault: secret scopes</a>
-    <a href="#sec-service-principals" class="toc-item" data-section="sec-service-principals">Autentizace přes service principals</a>
-    <a href="#sec-managed-identities" class="toc-item" data-section="sec-managed-identities">Managed identities a access connector</a>
-    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 4: Secure Unity Catalog Objects (45 minut)</a>
+    <div class="sidebar-title">In this chapter</div>
+    <a href="#sec-zivotni-cyklus-dotazu" class="toc-item active" data-section="sec-zivotni-cyklus-dotazu">Query lifecycle: how Unity Catalog evaluates a query</a>
+    <a href="#sec-strategie-access-control" class="toc-item" data-section="sec-strategie-access-control">Access control strategy: the privilege model and inheritance</a>
+    <a href="#sec-fine-grained-access-control" class="toc-item" data-section="sec-fine-grained-access-control">Fine-grained access control: below the table level</a>
+    <a href="#sec-row-filtering-column-masking" class="toc-item" data-section="sec-row-filtering-column-masking">Row filtering and column masking in practice</a>
+    <a href="#sec-secrets-key-vault" class="toc-item" data-section="sec-secrets-key-vault">Secrets through Azure Key Vault: secret scopes</a>
+    <a href="#sec-service-principals" class="toc-item" data-section="sec-service-principals">Authentication through service principals</a>
+    <a href="#sec-managed-identities" class="toc-item" data-section="sec-managed-identities">Managed identities and the access connector</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 4: Secure Unity Catalog Objects (45 minutes)</a>
   </aside>
 
   <main class="main">
     <div class="chapter-hero">
-      <div class="hero-tag">DP-750 · Kapitola 4</div>
-      <h1>Zabezpečení objektů Unity Catalogu</h1>
-      <div class="hero-subtitle">Privilege model, row filtering a column masking, secrets, service principals a managed identity</div>
-      <div class="hero-meta"><span>🗂 Zabezpečení a governance</span></div>
+      <div class="hero-tag">DP-750 · Chapter 4</div>
+      <h1>Secure Unity Catalog objects</h1>
+      <div class="hero-subtitle">Privilege model, row filtering and column masking, secrets, service principals, and managed identity</div>
+      <div class="hero-meta"><span>🗂 Security and governance</span></div>
     </div>
 
 <div class="objectives">
-  <h3>Cíle kapitoly</h3>
+  <h3>Chapter objectives</h3>
   <ul>
-    <li>Popsat, jak Unity Catalog vyhodnocuje dotaz — od odeslání přes kontrolu oprávnění až po scoped tokeny a filtrování výsledků.</li>
-    <li>Navrhnout strategii access control s využitím privilege modelu, dědičnosti oprávnění a skupin z Microsoft Entra ID.</li>
-    <li>Implementovat row filtering a column masking pomocí SQL UDF funkcí přímo na tabulce.</li>
-    <li>Bezpečně přistupovat k secrets přes Azure Key Vault-backed secret scope.</li>
-    <li>Rozhodnout, kdy použít service principal a kdy managed identity s access connectorem.</li>
+    <li>Describe how Unity Catalog evaluates a query — from submission through permission checks to scoped tokens and result filtering.</li>
+    <li>Design an access control strategy using the privilege model, permission inheritance, and groups from Microsoft Entra ID.</li>
+    <li>Implement row filtering and column masking with SQL UDFs directly on the table.</li>
+    <li>Access secrets securely through an Azure Key Vault-backed secret scope.</li>
+    <li>Decide when to use a service principal and when to use a managed identity with an access connector.</li>
   </ul>
 </div>
 
 <div class="section" id="sec-zivotni-cyklus-dotazu">
   <div class="section-header">
     <div class="section-num">4.1</div>
-    <h2>Query lifecycle: jak Unity Catalog vyhodnocuje dotaz</h2>
+    <h2>Query lifecycle: how Unity Catalog evaluates a query</h2>
   </div>
-  <p>Než začneme rozdávat oprávnění, potřebujeme pochopit, <strong>co se vlastně děje, když uživatel spustí dotaz</strong> nad tabulkou spravovanou Unity Catalogem. Unity Catalog funguje jako <strong>control plane</strong> pro bezpečnost a governance: každý dotaz projde kontrolou oprávnění, zapíše se do audit logu a teprve pak dostane compute krátkodobý přístup k datům.</p>
-  <p>Kdo čeká, že cluster „prostě čte soubory ze storage", bude překvapen — compute nikdy nedostane trvalé přihlašovací údaje ke storage. Dostane jen <strong>scoped temporary access token</strong> platný pro konkrétní objekty v konkrétním dotazu.</p>
+  <p>Before we start handing out permissions, we need to understand <strong>what actually happens when a user runs a query</strong> against a table governed by Unity Catalog. Unity Catalog acts as the <strong>control plane</strong> for security and governance: every query goes through a permission check, is written to the audit log, and only then does the compute get short-lived access to the data.</p>
+  <p>Anyone expecting the cluster to "just read files from storage" will be surprised — the compute never receives permanent storage credentials. It only gets a <strong>scoped temporary access token</strong> valid for specific objects in a specific query.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 350" role="img" aria-label="Diagram životního cyklu dotazu v Unity Catalogu. Principal odešle dotaz na compute, ten jej předá Unity Catalogu, který zapíše audit log, ověří oprávnění, převezme cloud credential a vydá scoped token. Compute pak čte data přímo z ADLS Gen2 a před vrácením výsledku aplikuje row a column filtry.">
+    <svg viewBox="0 0 820 350" role="img" aria-label="A diagram of the query lifecycle in Unity Catalog. The principal submits a query to the compute, which passes it to Unity Catalog, which writes an audit log record, verifies permissions, takes over the cloud credential, and issues a scoped token. The compute then reads data directly from ADLS Gen2 and applies row and column filters before returning the result.">
       <defs>
         <marker id="arr4a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1a3a6b"/></marker>
         <marker id="arr4b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
@@ -227,67 +227,67 @@ html.mode-custom [data-view="orig"]{display:none}
       <text x="560" y="55" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#e8721c">Unity Catalog</text>
       <text x="560" y="75" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">control plane</text>
       <rect x="475" y="88" width="170" height="26" rx="6" fill="#fff7ed" stroke="#e8721c" stroke-width="1"/>
-      <text x="560" y="105" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">2. audit log + kontrola oprávnění</text>
+      <text x="560" y="105" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">2. audit log + permission check</text>
       <rect x="475" y="122" width="170" height="26" rx="6" fill="#fff7ed" stroke="#e8721c" stroke-width="1"/>
       <text x="560" y="139" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">3. cloud credential → 4. token</text>
       <!-- ADLS -->
       <rect x="460" y="230" width="200" height="70" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
       <text x="560" y="258" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">ADLS Gen2</text>
-      <text x="560" y="276" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">abfss:// — managed i external data</text>
+      <text x="560" y="276" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">abfss:// — managed and external data</text>
       <!-- Filters -->
       <rect x="230" y="230" width="160" height="70" rx="8" fill="#e8f0fb" stroke="#22c55e" stroke-width="2"/>
-      <text x="310" y="258" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">7. Row + column filtry</text>
-      <text x="310" y="276" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">vyhodnoceno na compute</text>
+      <text x="310" y="258" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">7. Row + column filters</text>
+      <text x="310" y="276" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">evaluated on the compute</text>
       <!-- Arrows -->
       <line x1="160" y1="85" x2="225" y2="85" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr4a)"/>
-      <text x="192" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">1. dotaz</text>
+      <text x="192" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">1. query</text>
       <line x1="390" y1="80" x2="455" y2="80" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr4a)"/>
       <text x="422" y="71" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">request</text>
       <line x1="455" y1="110" x2="390" y2="110" stroke="#e8721c" stroke-width="2" marker-end="url(#arr4b)"/>
       <text x="422" y="127" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">4. scoped token + URL</text>
       <line x1="345" y1="130" x2="530" y2="228" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr4a)"/>
-      <text x="415" y="185" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">5. čtení s tokenem</text>
+      <text x="415" y="185" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">5. read with the token</text>
       <line x1="460" y1="265" x2="395" y2="265" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr4a)"/>
       <text x="427" y="256" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">6. data</text>
       <line x1="255" y1="230" x2="105" y2="135" stroke="#22c55e" stroke-width="2" marker-end="url(#arr4a)"/>
-      <text x="160" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">8. výsledek</text>
+      <text x="160" y="195" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">8. result</text>
     </svg>
-    <figcaption>Životní cyklus dotazu v Unity Catalogu: control plane ověří oprávnění, vydá scoped token a compute čte data přímo ze storage — fine-grained filtry se aplikují až na compute před vrácením výsledku.</figcaption>
+    <figcaption>The query lifecycle in Unity Catalog: the control plane verifies permissions, issues a scoped token, and the compute reads data straight from storage — fine-grained filters are applied on the compute before the result is returned.</figcaption>
   </figure>
 
-  <p>Celý cyklus má osm kroků:</p>
-  <p><strong>1) Odeslání dotazu</strong> — principal (uživatel, skupina nebo service principal) spustí dotaz z notebooku na all-purpose clusteru, z jobu na job clusteru, přes Databricks SQL warehouse, nebo z připojeného BI nástroje. <strong>2) Validace v Unity Catalogu</strong> — compute předá request Unity Catalogu, ten jej zapíše do <strong>audit logu</strong> a ověří oprávnění ke všem objektům v dotazu. Zamítnutí se také loguje. <strong>3) Převzetí cloud credential</strong> — pro každý objekt Unity Catalog převezme příslušný cloud credential (u managed tabulek storage metastoru, u external objektů storage credential dané external location). <strong>4) Vydání scoped tokenů</strong> — Unity Catalog vygeneruje krátkodobý token a zabezpečenou URL pro každý objekt. <strong>5–6) Přístup k datům</strong> — compute čte přímo z ADLS Gen2 endpointů (<code class="inline">abfss://</code>). <strong>7) Fine-grained filtrování</strong> — row filtry a column masky se vyhodnocují na compute, takže každý principal vidí jen svou podmnožinu dat. <strong>8) Vrácení výsledku</strong> volajícímu.</p>
+  <p>The whole cycle has eight steps:</p>
+  <p><strong>1) Query submission</strong> — a principal (user, group, or service principal) runs a query from a notebook on an all-purpose cluster, from a job on a job cluster, through a Databricks SQL warehouse, or from a connected BI tool. <strong>2) Validation in Unity Catalog</strong> — the compute passes the request to Unity Catalog, which writes it to the <strong>audit log</strong> and verifies permissions on every object in the query. Denials are logged too. <strong>3) Taking over the cloud credential</strong> — for each object Unity Catalog takes over the relevant cloud credential (the metastore storage for managed tables, the storage credential of the given external location for external objects). <strong>4) Issuing scoped tokens</strong> — Unity Catalog generates a short-lived token and a secured URL for each object. <strong>5–6) Data access</strong> — the compute reads directly from the ADLS Gen2 endpoints (<code class="inline">abfss://</code>). <strong>7) Fine-grained filtering</strong> — row filters and column masks are evaluated on the compute, so every principal sees only their own subset of the data. <strong>8) Returning the result</strong> to the caller.</p>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> pokud má storage account zapnutý firewall nebo VNet pravidla, musíte explicitně povolit přístup pro access connector / managed identity. I platný token bude odmítnut, když identitu nepustí síťová pravidla storage účtu.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> if the storage account has a firewall or VNet rules enabled, you must explicitly allow access for the access connector / managed identity. Even a valid token will be rejected when the storage account's network rules do not let the identity through.</div></div>
 
   <div class="collapsible">
-    <div class="collapsible-header">Jak se liší dotaz přes legacy Hive metastore<span class="chevron">▼</span></div>
+    <div class="collapsible-header">How a query through the legacy Hive metastore differs<span class="chevron">▼</span></div>
     <div class="collapsible-body">
-      <p>Workspace připojený k Unity Catalogu vidí starý Hive metastore jako speciální katalog <code class="inline">hive_metastore</code>. Dotaz nad Hive tabulkou ale probíhá jinak: cluster ověří přístup přes <strong>table ACLs</strong>, z metastoru dostane jen cestu ke storage a autentizovat se musí sám — přes service principal, credential passthrough nebo instance profile, které musí administrátor předem nakonfigurovat (často včetně mount pointů a secrets).</p>
-      <p>Chybí centrální vydávání scoped tokenů i integrovaný audit. Dokumentace: <em>„Hive metastore table access control is a legacy data governance model."</em> — pro nové projekty jej nepoužívejte.</p>
+      <p>A workspace attached to Unity Catalog sees the old Hive metastore as a special catalog named <code class="inline">hive_metastore</code>. A query over a Hive table works differently, though: the cluster checks access through <strong>table ACLs</strong>, gets only the storage path from the metastore, and has to authenticate on its own — through a service principal, credential passthrough, or an instance profile that an administrator must configure in advance (often including mount points and secrets).</p>
+      <p>There is no central issuing of scoped tokens and no integrated auditing. From the documentation: <em>"Hive metastore table access control is a legacy data governance model."</em> — do not use it for new projects.</p>
     </div>
   </div>
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/2-understand-query-lifecycle#the-query-lifecycle-in-unity-catalog" target="_blank" rel="noopener">The query lifecycle in Unity Catalog</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/2-understand-query-lifecycle#how-queries-work-with-apache-hive" target="_blank" rel="noopener">How queries work with Apache Hive</a> (EN)</span></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/2-understand-query-lifecycle#the-query-lifecycle-in-unity-catalog" target="_blank" rel="noopener">The query lifecycle in Unity Catalog</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/2-understand-query-lifecycle#how-queries-work-with-apache-hive" target="_blank" rel="noopener">How queries work with Apache Hive</a></span></div>
 </div>
 
 <div class="section" id="sec-strategie-access-control">
   <div class="section-header">
     <div class="section-num">4.2</div>
-    <h2>Strategie access control: privilege model a dědičnost</h2>
+    <h2>Access control strategy: the privilege model and inheritance</h2>
   </div>
-  <p>Access control v Unity Catalogu stojí na čtyřech doplňujících se mechanismech:</p>
+  <p>Access control in Unity Catalog rests on four complementary mechanisms:</p>
   <table>
-    <tr><th>Mechanismus</th><th>Působí na</th><th>Použití</th></tr>
-    <tr><td><strong>Privileges a ownership</strong></td><td>catalog, schema, tabulky</td><td>základní přístup — kdo smí co</td></tr>
-    <tr><td><strong>ABAC</strong> (tagy + policies)</td><td>otagované objekty napříč katalogy</td><td>centrální politiky (viz kapitola 5)</td></tr>
-    <tr><td><strong>Row filtry / column masky</strong></td><td>jednotlivé tabulky</td><td>filtrování a maskování přes UDF</td></tr>
-    <tr><td><strong>Workspace bindings</strong></td><td>catalog, external location, storage credential</td><td>omezení na konkrétní workspace</td></tr>
+    <tr><th>Mechanism</th><th>Applies to</th><th>Use</th></tr>
+    <tr><td><strong>Privileges and ownership</strong></td><td>catalogs, schemas, tables</td><td>basic access — who may do what</td></tr>
+    <tr><td><strong>ABAC</strong> (tags + policies)</td><td>tagged objects across catalogs</td><td>central policies (see chapter 5)</td></tr>
+    <tr><td><strong>Row filters / column masks</strong></td><td>individual tables</td><td>filtering and masking through UDFs</td></tr>
+    <tr><td><strong>Workspace bindings</strong></td><td>catalogs, external locations, storage credentials</td><td>restriction to specific workspaces</td></tr>
   </table>
-  <p>Základem je <strong>privilege model</strong>: grant říká, <em>kdo</em> (principal) smí provést <em>jakou akci</em> (privilege — SELECT, MODIFY, CREATE TABLE…) na <em>jakém objektu</em> (securable). Securables tvoří hierarchii metastore → catalog → schema → tabulka/view a oprávnění se z vyšších úrovní <strong>dědí</strong> dolů.</p>
-  <p>Klíčové pravidlo, na kterém padá většina začátečníků: <strong>SELECT na tabulce sám o sobě nestačí</strong>. Principal potřebuje projít celou cestou — <code class="inline">USE CATALOG</code> na katalogu, <code class="inline">USE SCHEMA</code> na schématu a teprve pak <code class="inline">SELECT</code> na tabulce. Chybí-li kterýkoli článek, dotaz selže.</p>
+  <p>The foundation is the <strong>privilege model</strong>: a grant says <em>who</em> (principal) may perform <em>which action</em> (privilege — SELECT, MODIFY, CREATE TABLE…) on <em>which object</em> (securable). Securables form a hierarchy metastore → catalog → schema → table/view, and permissions are <strong>inherited</strong> downwards from the higher levels.</p>
+  <p>The key rule that trips up most beginners: <strong>SELECT on a table is not enough on its own</strong>. The principal has to make it along the whole path — <code class="inline">USE CATALOG</code> on the catalog, <code class="inline">USE SCHEMA</code> on the schema, and only then <code class="inline">SELECT</code> on the table. If any link is missing, the query fails.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 330" role="img" aria-label="Diagram privilege modelu Unity Catalogu. Vlevo hierarchie metastore, catalog, schema, tabulka. Uprostřed explicitní model, kde skupina analysts dostává USE CATALOG, USE SCHEMA a SELECT zvlášť na každé úrovni. Vpravo dědičný model, kde SELECT udělený na schématu pokrývá všechny současné i budoucí tabulky.">
+    <svg viewBox="0 0 820 330" role="img" aria-label="A diagram of the Unity Catalog privilege model. On the left the hierarchy metastore, catalog, schema, table. In the middle the explicit model, where the analysts group receives USE CATALOG, USE SCHEMA, and SELECT separately at each level. On the right the inheritance model, where SELECT granted on the schema covers all current and future tables.">
       <defs>
         <marker id="arr4c" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
         <marker id="arr4d" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker>
@@ -296,100 +296,100 @@ html.mode-custom [data-view="orig"]{display:none}
       <rect x="30" y="30" width="180" height="44" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
       <text x="120" y="57" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#6b7280">Metastore</text>
       <rect x="30" y="100" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
-      <text x="120" y="127" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Catalog: prodej</text>
+      <text x="120" y="127" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Catalog: sales</text>
       <rect x="30" y="170" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="2"/>
       <text x="120" y="197" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Schema: finance</text>
       <rect x="30" y="240" width="180" height="44" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
-      <text x="120" y="267" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Tabulky: objednavky, …</text>
+      <text x="120" y="267" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Tables: orders, …</text>
       <line x1="120" y1="74" x2="120" y2="96" stroke="#6b7280" stroke-width="2" marker-end="url(#arr4d)"/>
       <line x1="120" y1="144" x2="120" y2="166" stroke="#6b7280" stroke-width="2" marker-end="url(#arr4d)"/>
       <line x1="120" y1="214" x2="120" y2="236" stroke="#6b7280" stroke-width="2" marker-end="url(#arr4d)"/>
       <!-- explicit model -->
       <rect x="300" y="30" width="230" height="254" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
-      <text x="415" y="56" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Explicitní model</text>
-      <text x="415" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">USE CATALOG na katalogu</text>
-      <text x="415" y="134" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">+ USE SCHEMA na schématu</text>
-      <text x="415" y="174" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">+ SELECT na každé tabulce</text>
-      <text x="415" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">✓ nejbezpečnější, nic navíc</text>
-      <text x="415" y="244" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">✗ pracné u tisíců tabulek</text>
+      <text x="415" y="56" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Explicit model</text>
+      <text x="415" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">USE CATALOG on the catalog</text>
+      <text x="415" y="134" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">+ USE SCHEMA on the schema</text>
+      <text x="415" y="174" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">+ SELECT on every table</text>
+      <text x="415" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">✓ safest, nothing extra</text>
+      <text x="415" y="244" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#ef4444">✗ laborious with thousands of tables</text>
       <!-- inherited model -->
       <rect x="560" y="30" width="230" height="254" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
-      <text x="675" y="56" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Dědičnost ze schématu</text>
+      <text x="675" y="56" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Inheritance from the schema</text>
       <text x="675" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">USE CATALOG + USE SCHEMA</text>
-      <text x="675" y="134" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SELECT na celém schématu</text>
+      <text x="675" y="134" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">SELECT on the whole schema</text>
       <line x1="675" y1="148" x2="675" y2="182" stroke="#e8721c" stroke-width="2" marker-end="url(#arr4c)"/>
-      <text x="675" y="202" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">všechny tabulky + views</text>
-      <text x="675" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">včetně budoucích objektů</text>
-      <text x="675" y="250" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">✓ méně správy, širší přístup</text>
+      <text x="675" y="202" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b">all tables + views</text>
+      <text x="675" y="222" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">including future objects</text>
+      <text x="675" y="250" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">✓ less admin, broader access</text>
     </svg>
-    <figcaption>Dva způsoby, jak dát skupině přístup k tabulkám: explicitní granty na každé úrovni, nebo dědičnost — grant na schématu (či katalogu) pokrývá všechny současné i budoucí objekty uvnitř.</figcaption>
+    <figcaption>Two ways to give a group access to tables: explicit grants at each level, or inheritance — a grant on the schema (or catalog) covers all current and future objects inside it.</figcaption>
   </figure>
 
-  <p>Granty se zadávají standardním ANSI SQL (DCL), z notebooku, SQL editoru nebo přes Permissions tab v <strong>Catalog Exploreru</strong>:</p>
+  <p>Grants are issued with standard ANSI SQL (DCL), from a notebook, the SQL editor, or through the Permissions tab in <strong>Catalog Explorer</strong>:</p>
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm">-- cesta k tabulce: catalog -&gt; schema -&gt; tabulka</span>
-<span class="kw">GRANT USE CATALOG ON CATALOG</span> <span class="tbl">prodej</span> <span class="kw">TO</span> `analysts`;
-<span class="kw">GRANT USE SCHEMA ON SCHEMA</span> <span class="tbl">prodej.finance</span> <span class="kw">TO</span> `analysts`;
-<span class="kw">GRANT SELECT ON TABLE</span> <span class="tbl">prodej.finance.objednavky</span> <span class="kw">TO</span> `analysts`;
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- the path to a table: catalog -&gt; schema -&gt; table</span>
+<span class="kw">GRANT USE CATALOG ON CATALOG</span> <span class="tbl">sales</span> <span class="kw">TO</span> `analysts`;
+<span class="kw">GRANT USE SCHEMA ON SCHEMA</span> <span class="tbl">sales.finance</span> <span class="kw">TO</span> `analysts`;
+<span class="kw">GRANT SELECT ON TABLE</span> <span class="tbl">sales.finance.orders</span> <span class="kw">TO</span> `analysts`;
 
-<span class="cm">-- varianta s dedicnosti: SELECT na urovni schematu</span>
-<span class="kw">GRANT SELECT ON SCHEMA</span> <span class="tbl">prodej.finance</span> <span class="kw">TO</span> `analysts`;
+<span class="cm">-- the inheritance variant: SELECT at the schema level</span>
+<span class="kw">GRANT SELECT ON SCHEMA</span> <span class="tbl">sales.finance</span> <span class="kw">TO</span> `analysts`;
 
-<span class="cm">-- pravo vytvaret tabulky ve schematu</span>
-<span class="kw">GRANT CREATE TABLE ON SCHEMA</span> <span class="tbl">prodej.finance</span> <span class="kw">TO</span> `analysts`;
+<span class="cm">-- the right to create tables in the schema</span>
+<span class="kw">GRANT CREATE TABLE ON SCHEMA</span> <span class="tbl">sales.finance</span> <span class="kw">TO</span> `analysts`;
 
-<span class="cm">-- odebrani opravneni</span>
-<span class="kw">REVOKE SELECT ON TABLE</span> <span class="tbl">prodej.finance.objednavky</span> <span class="kw">FROM</span> `analysts`;</pre>
+<span class="cm">-- revoking a permission</span>
+<span class="kw">REVOKE SELECT ON TABLE</span> <span class="tbl">sales.finance.orders</span> <span class="kw">FROM</span> `analysts`;</pre>
   </div>
-  <p>Kontrolu proveďte příkazem <code class="inline">SHOW GRANTS</code>:</p>
+  <p>Check the result with <code class="inline">SHOW GRANTS</code>:</p>
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="kw">SHOW GRANTS ON TABLE</span> <span class="tbl">prodej.finance.objednavky</span>;
-<span class="kw">SHOW GRANTS</span> `analysts` <span class="kw">ON SCHEMA</span> <span class="tbl">prodej.finance</span>;</pre>
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="kw">SHOW GRANTS ON TABLE</span> <span class="tbl">sales.finance.orders</span>;
+<span class="kw">SHOW GRANTS</span> `analysts` <span class="kw">ON SCHEMA</span> <span class="tbl">sales.finance</span>;</pre>
   </div>
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> <code class="inline">SHOW GRANTS</code> na tabulce nemusí zobrazit oprávnění zděděná ze schématu nebo katalogu. Pro úplný obraz zkontrolujte granty na všech úrovních hierarchie.</div></div>
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> grantujte <strong>skupinám, ne jednotlivcům</strong>. Identity (users, groups, service principals) se spravují v <strong>Microsoft Entra ID</strong> a synchronizují do Databricks accountu — Unity Catalog nepodporuje workspace-local skupiny. Vestavěný principal <code class="inline">account users</code> reprezentuje všechny uživatele accountu.</div></div>
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> <code class="inline">ALL PRIVILEGES</code> uděluje všechna aplikovatelná oprávnění na objektu — včetně privilegií, která Databricks přidá v budoucnu. Metastore je vázaný na region: workspace lze připojit jen k metastoru ve stejném Azure regionu a vždy maximálně k jednomu.</div></div>
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/3-implement-access-control-strategies#querying-a-table-with-inherited-permissions-from-schema" target="_blank" rel="noopener">Querying a table with inherited permissions from schema</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/3-implement-access-control-strategies#understand-access-control-lists-acls" target="_blank" rel="noopener">Understand Access Control Lists (ACLs)</a> (EN)</span></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> <code class="inline">SHOW GRANTS</code> on a table may not show permissions inherited from the schema or the catalog. For the full picture, check grants at every level of the hierarchy.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> grant to <strong>groups, not individuals</strong>. Identities (users, groups, service principals) are managed in <strong>Microsoft Entra ID</strong> and synchronized into the Databricks account — Unity Catalog does not support workspace-local groups. The built-in principal <code class="inline">account users</code> represents every user in the account.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> <code class="inline">ALL PRIVILEGES</code> grants every applicable privilege on the object — including privileges Databricks adds in the future. A metastore is bound to a region: a workspace can only be attached to a metastore in the same Azure region, and always to at most one.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/3-implement-access-control-strategies#querying-a-table-with-inherited-permissions-from-schema" target="_blank" rel="noopener">Querying a table with inherited permissions from schema</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/3-implement-access-control-strategies#understand-access-control-lists-acls" target="_blank" rel="noopener">Understand Access Control Lists (ACLs)</a></span></div>
 </div>
 
 <div class="section" id="sec-fine-grained-access-control">
   <div class="section-header">
     <div class="section-num">4.3</div>
-    <h2>Fine-grained access control: pod úroveň tabulky</h2>
+    <h2>Fine-grained access control: below the table level</h2>
   </div>
-  <p>Granty z předchozí sekce fungují na principu „celá tabulka, nebo nic". V praxi ale často potřebujete z jedné kanonické tabulky ukázat různým skupinám <strong>jen část řádků nebo maskované hodnoty sloupců</strong> — regionální data jen regionálním týmům, PII jen compliance týmu. Duplikovat tabulky pro každé publikum je cesta do pekla: kopie zastarávají, synchronizace stojí orchestraci a bezpečnostní pravidla se rozjíždějí.</p>
-  <p>Unity Catalog nabízí dva manuální přístupy k fine-grained access control:</p>
+  <p>The grants from the previous section work on an "all of the table or nothing" basis. In practice, though, you often need to show different groups <strong>only some of the rows or masked column values</strong> from one canonical table — regional data only to regional teams, PII only to the compliance team. Duplicating tables for each audience is the road to hell: copies go stale, synchronization costs orchestration, and security rules drift apart.</p>
+  <p>Unity Catalog offers two manual approaches to fine-grained access control:</p>
   <table>
-    <tr><th>Dimenze</th><th>Row a column security</th><th>Dynamic views</th></tr>
-    <tr><td>Kde žije logika</td><td>přímo na tabulce (UDF)</td><td>v definici view</td></tr>
-    <tr><td>Počet objektů</td><td>tabulka + pár funkcí</td><td>view pro každé publikum</td></tr>
-    <tr><td>Skládání více tabulek</td><td>ne — jen jedna tabulka</td><td>ano, joiny přes více tabulek</td></tr>
-    <tr><td>Zápis do dat</td><td>čtení i zápis s aplikovanými pravidly (na dedicated compute zápisy až od DBR 16.3+)</td><td>view je read-only</td></tr>
-    <tr><td>Abstrakce od zdroje</td><td>struktura tabulky viditelná</td><td>konzument zdrojové tabulky nevidí</td></tr>
+    <tr><th>Dimension</th><th>Row and column security</th><th>Dynamic views</th></tr>
+    <tr><td>Where the logic lives</td><td>directly on the table (UDF)</td><td>in the view definition</td></tr>
+    <tr><td>Number of objects</td><td>the table + a couple of functions</td><td>a view for each audience</td></tr>
+    <tr><td>Combining several tables</td><td>no — a single table only</td><td>yes, joins across several tables</td></tr>
+    <tr><td>Writing data</td><td>reads and writes with the rules applied (on dedicated compute, writes only from DBR 16.3+)</td><td>the view is read-only</td></tr>
+    <tr><td>Abstraction from the source</td><td>the table structure is visible</td><td>the consumer does not see the source table</td></tr>
   </table>
-  <p><strong>Row a column security</strong> (row filtry + column masky) je preferovaný moderní přístup: pravidla jsou připojená k metadatům tabulky, platí všude, kde se tabulka použije, a nevzniká „zvěřinec" odvozených views. <strong>Dynamic views</strong> jsou starší vzor, který má stále smysl, když potřebujete složit data z více tabulek, vytvořit explicitní kontrakt mezi producentem a konzumentem, nebo konzumenty úplně odstínit od existence zdrojových tabulek.</p>
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> zápisy do tabulky s row filtrem či column maskou mají na <strong>dedicated compute</strong> vlastní požadavky — od Databricks Runtime 16.3 výš jsou podporované, na DBR 15.4–16.2 jde jen o čtení. <code class="inline">MERGE</code> navíc nepodporuje tabulky, jejichž filtry nebo masky obsahují vnořené (nested) konstrukce, agregace, okenní funkce, <code class="inline">LIMIT</code> nebo nedeterministické funkce. A ještě jedna praktická past: nad tabulkou s row filtrem nebo column maskou <strong>nefunguje time travel</strong> — <code class="inline">TIMESTAMP AS OF</code> / <code class="inline">VERSION AS OF</code> dotaz selže, i když kapitola 6 time travel jinak doporučuje. Přesný stav podpory ověřte v dokumentaci.</div></div>
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> oba přístupy jsou <em>manuální, per-table</em>. Třetí možností je <strong>ABAC</strong> — centrální policies navázané na governed tagy, které se aplikují automaticky na všechny otagované tabulky ve schématu či katalogu. Databricks jej dnes doporučuje pro většinu scénářů; věnujeme se mu v kapitole 5 (sekce 5.2).</div></div>
+  <p><strong>Row and column security</strong> (row filters + column masks) is the preferred modern approach: the rules are attached to the table metadata, apply everywhere the table is used, and no "zoo" of derived views appears. <strong>Dynamic views</strong> are the older pattern, which still makes sense when you need to combine data from several tables, create an explicit contract between producer and consumer, or shield consumers from the existence of the source tables entirely.</p>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> writes into a table with a row filter or a column mask have their own requirements on <strong>dedicated compute</strong> — they are supported from Databricks Runtime 16.3 up, while on DBR 15.4–16.2 only reads work. On top of that, <code class="inline">MERGE</code> does not support tables whose filters or masks contain nested constructs, aggregations, window functions, <code class="inline">LIMIT</code>, or non-deterministic functions. And one more practical trap: <strong>time travel does not work</strong> over a table with a row filter or a column mask — a <code class="inline">TIMESTAMP AS OF</code> / <code class="inline">VERSION AS OF</code> query fails, even though chapter 6 otherwise recommends time travel. Verify the exact support status in the documentation.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> both approaches are <em>manual and per-table</em>. A third option is <strong>ABAC</strong> — central policies bound to governed tags, applied automatically to every tagged table in a schema or catalog. Databricks recommends it for most scenarios today; we cover it in chapter 5 (section 5.2).</div></div>
   <div class="collapsible">
-    <div class="collapsible-header">Časté omyly při návrhu fine-grained zabezpečení<span class="chevron">▼</span></div>
+    <div class="collapsible-header">Common mistakes when designing fine-grained security<span class="chevron">▼</span></div>
     <div class="collapsible-body">
-      <p><strong>Duplikace tabulek pro každé publikum</strong> — vede k nesynchronizovaným kopiím a governance chaosu. <strong>Desítky téměř identických views</strong> místo jedné zobecněné maskovací logiky — těžko se auditují. <strong>Byznys transformace uvnitř maskovacích funkcí</strong> — transformace patří do pipeline, ne do security vrstvy. <strong>Nezabezpečené UDF funkce</strong> — funkce jsou securables jako každé jiné; kdo je smí měnit, může obejít celý model. A konečně <strong>over-masking</strong>: když zamaskujete víc, než je nutné, zablokujete legitimní analytiku.</p>
+      <p><strong>Duplicating tables for each audience</strong> — leads to out-of-sync copies and governance chaos. <strong>Dozens of nearly identical views</strong> instead of one generalized masking function — hard to audit. <strong>Business transformations inside masking functions</strong> — transformations belong in the pipeline, not in the security layer. <strong>Unsecured UDFs</strong> — functions are securables like any other; whoever may change them can bypass the entire model. And finally <strong>over-masking</strong>: mask more than necessary and you block legitimate analytics.</p>
     </div>
   </div>
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/4-understand-fine-grained-access-control#comparing-row-and-column-security-with-dynamic-views" target="_blank" rel="noopener">Comparing row and column security with dynamic views</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/4-understand-fine-grained-access-control#common-pitfalls" target="_blank" rel="noopener">Common pitfalls</a> (EN)</span></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/4-understand-fine-grained-access-control#comparing-row-and-column-security-with-dynamic-views" target="_blank" rel="noopener">Comparing row and column security with dynamic views</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/4-understand-fine-grained-access-control#common-pitfalls" target="_blank" rel="noopener">Common pitfalls</a></span></div>
 </div>
 
 <div class="section" id="sec-row-filtering-column-masking">
   <div class="section-header">
     <div class="section-num">4.4</div>
-    <h2>Row filtering a column masking v praxi</h2>
+    <h2>Row filtering and column masking in practice</h2>
   </div>
-  <p>Implementace je překvapivě jednoduchá: napíšete <strong>SQL UDF</strong> s rozhodovací logikou a připojíte ji k tabulce. Pro kontrolu členství ve skupině slouží funkce <code class="inline">is_account_group_member()</code>.</p>
+  <p>The implementation is surprisingly simple: you write a <strong>SQL UDF</strong> with the decision logic and attach it to the table. To check group membership there is the <code class="inline">is_account_group_member()</code> function.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 380" role="img" aria-label="Diagram mechanismu row filtru a column masky. Uprostřed je tabulka customers, k níž jsou přes ALTER TABLE připojené dvě UDF funkce: row filter podle regionu a maska e-mailu. Vlevo admin vidí všechny řádky s plnými e-maily, vpravo analytik vidí jen řádky svého regionu a maskované e-maily.">
+    <svg viewBox="0 0 820 380" role="img" aria-label="A diagram of the row filter and column mask mechanism. In the middle is the customers table, to which two UDFs are attached through ALTER TABLE: a row filter by region and an email mask. On the left an admin sees all rows with full email addresses, on the right an analyst sees only the rows of their own region and masked email addresses.">
       <defs>
         <marker id="arr4e" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#e8721c"/></marker>
         <marker id="arr4f" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#1a3a6b"/></marker>
@@ -403,29 +403,29 @@ html.mode-custom [data-view="orig"]{display:none}
       <text x="540" y="60" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">ALTER COLUMN email SET MASK</text>
       <!-- table -->
       <rect x="270" y="120" width="280" height="120" rx="8" fill="#ffffff" stroke="#1a3a6b" stroke-width="2"/>
-      <text x="410" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Tabulka customers</text>
+      <text x="410" y="145" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">customers table</text>
       <line x1="285" y1="158" x2="535" y2="158" stroke="#e2e8f0" stroke-width="1"/>
-      <text x="300" y="178" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | anna@firma.cz</text>
-      <text x="300" y="198" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">South | petr@firma.cz</text>
-      <text x="300" y="218" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | eva@firma.cz</text>
+      <text x="300" y="178" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | anna@company.com</text>
+      <text x="300" y="198" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">South | peter@company.com</text>
+      <text x="300" y="218" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | eva@company.com</text>
       <line x1="290" y1="72" x2="360" y2="116" stroke="#e8721c" stroke-width="2" marker-end="url(#arr4e)"/>
       <line x1="540" y1="72" x2="470" y2="116" stroke="#e8721c" stroke-width="2" marker-end="url(#arr4e)"/>
       <!-- admin result -->
       <rect x="30" y="270" width="330" height="90" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
-      <text x="195" y="292" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">Člen skupiny admins — vidí vše</text>
-      <text x="60" y="315" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | anna@firma.cz</text>
-      <text x="60" y="333" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">South | petr@firma.cz</text>
-      <text x="60" y="351" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | eva@firma.cz</text>
+      <text x="195" y="292" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">Member of admins — sees everything</text>
+      <text x="60" y="315" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | anna@company.com</text>
+      <text x="60" y="333" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">South | peter@company.com</text>
+      <text x="60" y="351" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | eva@company.com</text>
       <!-- analyst result -->
       <rect x="460" y="270" width="330" height="90" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
-      <text x="625" y="292" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">Analytik North — filtr + maska</text>
+      <text x="625" y="292" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ef4444">North analyst — filter + mask</text>
       <text x="490" y="318" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | REDACTED</text>
       <text x="490" y="338" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">North | REDACTED</text>
       <line x1="330" y1="240" x2="220" y2="266" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr4f)"/>
       <line x1="490" y1="240" x2="600" y2="266" stroke="#1a3a6b" stroke-width="2" marker-end="url(#arr4f)"/>
-      <text x="410" y="262" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">stejný dotaz, různé výsledky</text>
+      <text x="410" y="262" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b">same query, different results</text>
     </svg>
-    <figcaption>Row filter a column mask jsou UDF funkce připojené k tabulce — každý principal dostane ze stejného dotazu jen svou povolenou podmnožinu řádků a maskované hodnoty citlivých sloupců.</figcaption>
+    <figcaption>A row filter and a column mask are UDFs attached to the table — from the same query, every principal gets only their permitted subset of rows and masked values of sensitive columns.</figcaption>
   </figure>
 
   <div class="tabs">
@@ -434,10 +434,10 @@ html.mode-custom [data-view="orig"]{display:none}
       <button class="tab-btn" data-tab="tab-04-dv"><span class="tab-icon">👁️</span>Dynamic view</button>
     </div>
     <div class="tab-panel" id="tab-04-rcs">
-      <p><strong>Column mask</strong> — funkce vrací buď skutečnou hodnotu, nebo náhradu, podle členství ve skupině:</p>
+      <p><strong>Column mask</strong> — the function returns either the real value or a substitute, depending on group membership:</p>
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
-        <pre><span class="cm">-- maskovaci funkce pro telefonni cislo</span>
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="cm">-- masking function for a phone number</span>
 <span class="kw">CREATE OR REPLACE FUNCTION</span> <span class="fn">phone_mask</span>(<span class="col">c_phone</span> STRING)
   <span class="kw">RETURN CASE WHEN</span> <span class="fn">is_account_group_member</span>(<span class="str">'metastore_admins'</span>)
     <span class="kw">THEN</span> <span class="col">c_phone</span>
@@ -448,10 +448,10 @@ html.mode-custom [data-view="orig"]{display:none}
   <span class="kw">ALTER COLUMN</span> <span class="col">c_phone</span>
   <span class="kw">SET MASK</span> <span class="fn">phone_mask</span>;</pre>
       </div>
-      <p><strong>Row filter</strong> — funkce vrací <code class="inline">true</code> jen pro řádky, které mají být vidět:</p>
+      <p><strong>Row filter</strong> — the function returns <code class="inline">true</code> only for the rows that should be visible:</p>
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
-        <pre><span class="cm">-- admin vidi vse, ostatni jen nationkey = 21</span>
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+        <pre><span class="cm">-- the admin sees everything, everyone else only nationkey = 21</span>
 <span class="kw">CREATE OR REPLACE FUNCTION</span> <span class="fn">nation_filter</span>(<span class="col">c_nationkey</span> INT)
   <span class="kw">RETURN</span> <span class="fn">IF</span>(<span class="fn">is_account_group_member</span>(<span class="str">'admin'</span>), <span class="kw">true</span>, <span class="col">c_nationkey</span> <span class="op">=</span> <span class="num">21</span>);
 
@@ -460,9 +460,9 @@ html.mode-custom [data-view="orig"]{display:none}
       </div>
     </div>
     <div class="tab-panel" id="tab-04-dv">
-      <p>Stejná pravidla vyjádřená v jednom view — zdrojová tabulka zůstává nedotčená a konzumenti dostanou grant jen na view:</p>
+      <p>The same rules expressed in a single view — the source table stays untouched and consumers are granted access only to the view:</p>
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
         <pre><span class="kw">CREATE OR REPLACE VIEW</span> <span class="tbl">vw_customers</span> <span class="kw">AS</span>
 <span class="kw">SELECT</span>
   <span class="col">c_custkey</span>, <span class="col">c_name</span>, <span class="col">c_nationkey</span>,
@@ -476,30 +476,30 @@ html.mode-custom [data-view="orig"]{display:none}
       </div>
     </div>
   </div>
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> na jednu tabulku lze připojit jen jeden row filter a na jeden sloupec jednu masku. Rozhodovací logiku „kdo vidí co" proto navrhujte uvnitř jedné funkce, ne skládáním více filtrů.</div></div>
-  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> table-level controls (filtr + maska) volte pro striktní vynucení všude, kde se tabulka používá; dynamic views pro flexibilní, sdílené abstrakce nad více tabulkami.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> only one row filter can be attached to a table and only one mask to a column. So design the "who sees what" decision logic inside a single function rather than by stacking several filters.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> choose table-level controls (filter + mask) for strict enforcement everywhere the table is used; choose dynamic views for flexible, shared abstractions over several tables.</div></div>
 </div>
 
 <div class="section" id="sec-secrets-key-vault">
   <div class="section-header">
     <div class="section-num">4.5</div>
-    <h2>Secrets přes Azure Key Vault: secret scopes</h2>
+    <h2>Secrets through Azure Key Vault: secret scopes</h2>
   </div>
-  <p>Hesla, API klíče ani connection stringy <strong>nikdy nepatří do kódu notebooku</strong>. Azure Databricks je organizuje do <strong>secret scopes</strong> — pojmenovaných kolekcí secrets, na jejichž úrovni se řídí přístup. Existují dva typy:</p>
+  <p>Passwords, API keys, and connection strings <strong>never belong in notebook code</strong>. Azure Databricks organizes them into <strong>secret scopes</strong> — named collections of secrets at whose level access is controlled. There are two types:</p>
   <table>
     <tr><th></th><th>Databricks-backed scope</th><th>Azure Key Vault-backed scope</th></tr>
-    <tr><td>Uložení secrets</td><td>šifrovaná DB spravovaná Databricks</td><td>Azure Key Vault (read-only rozhraní)</td></tr>
-    <tr><td>Správa secrets</td><td>Databricks CLI / API</td><td>Azure portal / CLI — v Key Vaultu</td></tr>
-    <tr><td>WRITE přes Databricks</td><td>ano</td><td>ne — jen čtení</td></tr>
-    <tr><td>Enterprise integrace</td><td>omezená</td><td>síťová omezení, centrální rotace</td></tr>
+    <tr><td>Secret storage</td><td>an encrypted DB managed by Databricks</td><td>Azure Key Vault (read-only interface)</td></tr>
+    <tr><td>Secret management</td><td>Databricks CLI / API</td><td>Azure portal / CLI — in the Key Vault</td></tr>
+    <tr><td>WRITE through Databricks</td><td>yes</td><td>no — read only</td></tr>
+    <tr><td>Enterprise integration</td><td>limited</td><td>network restrictions, central rotation</td></tr>
   </table>
-  <p>Pro produkci v Azure je standardem <strong>Key Vault-backed scope</strong>: secrets žijí v Key Vaultu, zapadají do firemní security infrastruktury a po aktualizaci secretu jej všechny workspaces převezmou automaticky. <code class="inline">dbutils.secrets.get()</code> čte aktuální hodnotu při každém volání — po rotaci secretu tedy stačí kód spustit znovu. Restart clusteru potřebujete jen u secrets referencovaných ve <strong>Spark konfiguraci</strong> nebo v <strong>environment proměnných</strong> clusteru: ty se rozvinou při startu, a dokud cluster běží, drží starou hodnotu.</p>
-  <p>Scope se vytváří přes speciální URL <code class="inline">https://&lt;databricks-instance&gt;#secrets/createScope</code> (velké „S" je povinné — URL je case-sensitive). Budete potřebovat <strong>DNS Name</strong> a <strong>Resource ID</strong> Key Vaultu (najdete v Properties). Databricks si při vytvoření sám nastaví Get/List oprávnění na vault.</p>
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Key Vault musí používat permission model <strong>Vault access policy</strong> — RBAC model Databricks pro secret scopes nepodporuje. Novější verze Key Vault API přitom zakládají vaulty s RBAC jako výchozím modelem, takže vytvoření scope skončí chybou 403. Před vytvořením scope zkontrolujte Access configuration vaultu; přesný stav podpory ověřte v dokumentaci.</div></div>
-  <p>V notebooku pak secret čtete přes <code class="inline">dbutils.secrets.get()</code>, v SQL přes funkci <code class="inline">secret()</code>:</p>
+  <p>For production on Azure the standard is a <strong>Key Vault-backed scope</strong>: secrets live in the Key Vault, fit into the corporate security infrastructure, and once a secret is updated every workspace picks it up automatically. <code class="inline">dbutils.secrets.get()</code> reads the current value on every call — so after a secret rotation it is enough to run the code again. You only need a cluster restart for secrets referenced in the cluster's <strong>Spark configuration</strong> or <strong>environment variables</strong>: those are expanded at start-up and keep the old value for as long as the cluster runs.</p>
+  <p>A scope is created through the special URL <code class="inline">https://&lt;databricks-instance&gt;#secrets/createScope</code> (the capital "S" is mandatory — the URL is case-sensitive). You will need the <strong>DNS Name</strong> and the <strong>Resource ID</strong> of the Key Vault (both in Properties). Databricks sets Get/List permissions on the vault for itself during creation.</p>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> the Key Vault must use the <strong>Vault access policy</strong> permission model — Databricks does not support the RBAC model for secret scopes. Newer Key Vault API versions, however, create vaults with RBAC as the default model, so creating the scope ends with a 403 error. Check the vault's Access configuration before creating the scope; verify the exact support status in the documentation.</div></div>
+  <p>In a notebook you then read the secret through <code class="inline">dbutils.secrets.get()</code>, and in SQL through the <code class="inline">secret()</code> function:</p>
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm"># nacteni prihlasovacich udaju ze scope "jdbc"</span>
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># read the credentials from the "jdbc" scope</span>
 username <span class="op">=</span> dbutils.secrets.<span class="fn">get</span>(scope<span class="op">=</span><span class="str">"jdbc"</span>, key<span class="op">=</span><span class="str">"username"</span>)
 password <span class="op">=</span> dbutils.secrets.<span class="fn">get</span>(scope<span class="op">=</span><span class="str">"jdbc"</span>, key<span class="op">=</span><span class="str">"password"</span>)
 
@@ -512,37 +512,37 @@ df <span class="op">=</span> (spark.read
   .<span class="fn">load</span>()
 )
 
-<span class="cm"># seznam klicu ve scope (bez hodnot)</span>
+<span class="cm"># list the keys in the scope (without values)</span>
 dbutils.secrets.<span class="fn">list</span>(<span class="str">"jdbc"</span>)</pre>
   </div>
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm">-- secret() v SQL; try_secret() vraci NULL misto chyby</span>
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- secret() in SQL; try_secret() returns NULL instead of an error</span>
 <span class="kw">SELECT</span> <span class="fn">secret</span>(<span class="str">'jdbc'</span>, <span class="str">'username'</span>) <span class="kw">AS</span> <span class="col">db_username</span>;</pre>
   </div>
-  <p>Výstupy notebooku hodnoty secrets automaticky nahrazují textem <code class="inline">[REDACTED]</code>. To ale chrání jen proti <em>náhodnému</em> úniku — kdokoli s právem spouštět kód na clusteru se k hodnotě programově dostane. Přístup proto řiďte ACL na scope (úrovně READ / WRITE / MANAGE) přes Databricks CLI:</p>
+  <p>Notebook output automatically replaces secret values with the text <code class="inline">[REDACTED]</code>. That only protects against an <em>accidental</em> leak, though — anyone with the right to run code on the cluster can get to the value programmatically. So control access with ACLs on the scope (levels READ / WRITE / MANAGE) through the Databricks CLI:</p>
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm"># READ pro skupinu data-engineers na scope jdbc</span>
+    <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># READ for the data-engineers group on the jdbc scope</span>
 databricks secrets put-acl jdbc data-engineers READ
 databricks secrets list-acls jdbc</pre>
   </div>
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> ACL na Key Vault-backed scope platí pro <strong>všechny secrets v celém vaultu</strong>. Potřebujete-li oddělit přístup k jednotlivým secrets, založte více Key Vaultů a k nim samostatné scopes. Omezení MANAGE jen na tvůrce scope vyžaduje Premium plán.</div></div>
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> secrets lze referencovat i ve Spark konfiguraci clusteru syntaxí <code class="inline">{{secrets/storage/account-key}}</code> nebo v environment proměnných. Pozor ale — každý s CAN ATTACH TO na clusteru si je přečte, i bez práv na scope.</div></div>
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/6-access-azure-key-vault#creating-an-azure-key-vault-backed-secret-scope" target="_blank" rel="noopener">Creating an Azure Key Vault-backed secret scope</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/6-access-azure-key-vault#managing-secret-scope-permissions" target="_blank" rel="noopener">Managing secret scope permissions</a> (EN)</span></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> an ACL on a Key Vault-backed scope applies to <strong>all secrets in the whole vault</strong>. If you need to separate access to individual secrets, create several Key Vaults and a separate scope for each. Restricting MANAGE to the scope creator only requires the Premium plan.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> secrets can also be referenced in the cluster's Spark configuration with the syntax <code class="inline">{{secrets/storage/account-key}}</code> or in environment variables. Watch out, though — anyone with CAN ATTACH TO on the cluster can read them, even without rights on the scope.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/6-access-azure-key-vault#creating-an-azure-key-vault-backed-secret-scope" target="_blank" rel="noopener">Creating an Azure Key Vault-backed secret scope</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/6-access-azure-key-vault#managing-secret-scope-permissions" target="_blank" rel="noopener">Managing secret scope permissions</a></span></div>
 </div>
 
 <div class="section" id="sec-service-principals">
   <div class="section-header">
     <div class="section-num">4.6</div>
-    <h2>Autentizace přes service principals</h2>
+    <h2>Authentication through service principals</h2>
   </div>
-  <p><strong>Service principal</strong> je identita pro aplikace a automatizaci — „uživatelský účet pro roboty". Joby a pipelines se s ním autentizují bez osobních přihlašovacích údajů, konzistentně napříč prostředími. Skládá se ze tří komponent: <strong>Application (client) ID</strong>, <strong>Directory (tenant) ID</strong> a <strong>client secret</strong> (heslo s expirací).</p>
-  <p>V Unity Catalogu se service principal typicky schová za <strong>storage credential</strong>: administrátor jej jednou zaregistruje a vy pak jen dotazujete tabulky — Unity Catalog za scénou převezme identitu, vyžádá si od Microsoft Entra ID dočasný token a předá jej compute. Do kódu se žádné credentials nedostanou a audit log zaznamená, kdo k čemu přistoupil.</p>
-  <p>Přímou konfiguraci v notebooku potkáte u storage, které v Unity Catalogu registrované není, nebo u legacy řešení — OAuth 2.0 client credentials flow přes Spark konfiguraci:</p>
+  <p>A <strong>service principal</strong> is an identity for applications and automation — "a user account for robots". Jobs and pipelines authenticate with it without personal credentials, consistently across environments. It consists of three components: an <strong>Application (client) ID</strong>, a <strong>Directory (tenant) ID</strong>, and a <strong>client secret</strong> (a password with an expiry date).</p>
+  <p>In Unity Catalog a service principal is typically hidden behind a <strong>storage credential</strong>: an administrator registers it once and you simply query tables — Unity Catalog takes over the identity behind the scenes, requests a temporary token from Microsoft Entra ID, and hands it to the compute. No credentials end up in the code and the audit log records who accessed what.</p>
+  <p>You will meet direct configuration in a notebook with storage that is not registered in Unity Catalog, or with legacy solutions — the OAuth 2.0 client credentials flow through Spark configuration:</p>
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm"># client secret vzdy ze secret scope, nikdy natvrdo v kodu</span>
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm"># the client secret always from a secret scope, never hardcoded</span>
 service_credential <span class="op">=</span> dbutils.secrets.<span class="fn">get</span>(scope<span class="op">=</span><span class="str">"storage-secrets"</span>, key<span class="op">=</span><span class="str">"sp-client-secret"</span>)
 
 spark.conf.<span class="fn">set</span>(<span class="str">"fs.azure.account.auth.type.&lt;storage-account&gt;.dfs.core.windows.net"</span>, <span class="str">"OAuth"</span>)
@@ -557,55 +557,55 @@ spark.conf.<span class="fn">set</span>(<span class="str">"fs.azure.account.oauth
 
 df <span class="op">=</span> spark.read.<span class="fn">parquet</span>(<span class="str">"abfss://&lt;container&gt;@&lt;storage-account&gt;.dfs.core.windows.net/path/to/data"</span>)</pre>
   </div>
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> client secrets <strong>expirují a musí se rotovat</strong>. Když pipeline v pondělí ráno přestane číst data, expirovaný secret je jeden z prvních podezřelých. Domluvte si s administrátory rotační plán a vězte, na koho se obrátit.</div></div>
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> uplatňujte least privilege — každý service principal jen na ta úložiště, která skutečně potřebuje. Microsoft nicméně pro storage credentials doporučuje <strong>managed identities</strong>, kdykoli je to možné — bez secrets a s podporou síťově chráněných storage účtů. Detaily v následující sekci.</div></div>
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/7-authenticate-data-access-service-principals#using-service-principals-with-unity-catalog" target="_blank" rel="noopener">Using service principals with Unity Catalog</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/7-authenticate-data-access-service-principals#security-considerations-and-best-practices" target="_blank" rel="noopener">Security considerations and best practices</a> (EN)</span></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> client secrets <strong>expire and have to be rotated</strong>. When a pipeline stops reading data on a Monday morning, an expired secret is one of the first suspects. Agree on a rotation plan with your administrators and know who to turn to.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> apply least privilege — give each service principal access only to the storage it genuinely needs. Microsoft nevertheless recommends <strong>managed identities</strong> for storage credentials whenever possible — no secrets and support for network-protected storage accounts. Details in the next section.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/7-authenticate-data-access-service-principals#using-service-principals-with-unity-catalog" target="_blank" rel="noopener">Using service principals with Unity Catalog</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/7-authenticate-data-access-service-principals#security-considerations-and-best-practices" target="_blank" rel="noopener">Security considerations and best practices</a></span></div>
 </div>
 
 <div class="section" id="sec-managed-identities">
   <div class="section-header">
     <div class="section-num">4.7</div>
-    <h2>Managed identities a access connector</h2>
+    <h2>Managed identities and the access connector</h2>
   </div>
-  <p><strong>Managed identity</strong> je identita, jejíž životní cyklus spravuje Azure — žádný client secret, žádná expirace, žádná rotace. Unity Catalog ji používá prostřednictvím <strong>Azure Databricks access connectoru</strong>: first-party Azure resource, který funguje jako most mezi managed identitou a vaším Databricks accountem. Connector může nést buď <strong>system-assigned</strong> identitu (vzniká a zaniká s connectorem), nebo jednu či více <strong>user-assigned</strong> identit (existují nezávisle a lze je připojit k více connectorům).</p>
-  <p>Postup nasazení:</p>
-  <p><strong>1)</strong> V Azure portálu vytvořte access connector (ideálně ve stejném regionu jako storage). <strong>2)</strong> Managed identitě přidělte na ADLS Gen2 účtu roli <strong>Storage Blob Data Contributor</strong>; pro file event notifikace se hodí i <strong>Storage Queue Data Contributor</strong>. <strong>3)</strong> V Catalog Exploreru vytvořte <strong>storage credential</strong> typu Azure Managed Identity s resource ID connectoru. <strong>4)</strong> Nad credentialem definujte <strong>external locations</strong> — kombinace credentialu a konkrétní cesty <code class="inline">abfss://</code>, na kterou pak grantujete oprávnění.</p>
+  <p>A <strong>managed identity</strong> is an identity whose lifecycle is managed by Azure — no client secret, no expiry, no rotation. Unity Catalog uses it through the <strong>Azure Databricks access connector</strong>: a first-party Azure resource acting as a bridge between the managed identity and your Databricks account. The connector can carry either a <strong>system-assigned</strong> identity (created and destroyed with the connector) or one or more <strong>user-assigned</strong> identities (which exist independently and can be attached to several connectors).</p>
+  <p>The deployment steps:</p>
+  <p><strong>1)</strong> In the Azure portal, create an access connector (ideally in the same region as the storage). <strong>2)</strong> Assign the managed identity the <strong>Storage Blob Data Contributor</strong> role on the ADLS Gen2 account; for file event notifications, <strong>Storage Queue Data Contributor</strong> is useful too. <strong>3)</strong> In Catalog Explorer, create a <strong>storage credential</strong> of type Azure Managed Identity with the connector's resource ID. <strong>4)</strong> On top of the credential, define <strong>external locations</strong> — a combination of the credential and a specific <code class="inline">abfss://</code> path, on which you then grant permissions.</p>
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
-    <pre><span class="cm">-- external tabulka nad external location krytou managed identitou</span>
-<span class="kw">CREATE TABLE</span> <span class="tbl">prodej.bronze.sales_data</span>
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <pre><span class="cm">-- external table over an external location backed by a managed identity</span>
+<span class="kw">CREATE TABLE</span> <span class="tbl">sales.bronze.sales_data</span>
 <span class="kw">USING DELTA</span>
 <span class="kw">LOCATION</span> <span class="str">'abfss://data@mystorageaccount.dfs.core.windows.net/sales/'</span>;
 
-<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">prodej.bronze.sales_data</span> <span class="kw">WHERE</span> <span class="col">sale_date</span> <span class="op">&gt;=</span> <span class="str">'2026-01-01'</span>;</pre>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> <span class="tbl">sales.bronze.sales_data</span> <span class="kw">WHERE</span> <span class="col">sale_date</span> <span class="op">&gt;=</span> <span class="str">'2026-01-01'</span>;</pre>
   </div>
-  <p>Proč je to preferovaná cesta? Dokumentace shrnuje výhody proti service principalům: <em>„They have the benefit of allowing Unity Catalog to access storage accounts protected by network rules, which isn't possible using service principals, and they remove the need to manage and rotate secrets."</em> Jinými slovy — funguje i za firewallem storage účtu a nemá co expirovat.</p>
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> k vytvoření storage credentialu potřebujete privilege <code class="inline">CREATE STORAGE CREDENTIAL</code> na metastoru (mají ji account a metastore admini). Jako data engineer typicky credentials nevytváříte — používáte existující přes external locations.</div></div>
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> external locations i storage credentials podporují <strong>workspace binding</strong> — produkční location připoutejte jen k produkčnímu workspace a dev prostředí se k produkčním datům nedostane ani omylem.</div></div>
-  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/8-authenticate-resource-access-managed-identities#creating-storage-credentials-with-managed-identities" target="_blank" rel="noopener">Creating storage credentials with managed identities</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/8-authenticate-resource-access-managed-identities#accessing-external-storage-through-storage-credentials" target="_blank" rel="noopener">Accessing external storage through storage credentials</a> (EN)</span></div>
+  <p>Why is this the preferred route? The documentation sums up the advantages over service principals: <em>"They have the benefit of allowing Unity Catalog to access storage accounts protected by network rules, which isn't possible using service principals, and they remove the need to manage and rotate secrets."</em> In other words — it works behind a storage account firewall and has nothing that can expire.</p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> to create a storage credential you need the <code class="inline">CREATE STORAGE CREDENTIAL</code> privilege on the metastore (account and metastore admins have it). As a data engineer you typically do not create credentials — you use existing ones through external locations.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> external locations and storage credentials support <strong>workspace binding</strong> — tie a production location to the production workspace only and the dev environment will not reach production data even by accident.</div></div>
+  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/8-authenticate-resource-access-managed-identities#creating-storage-credentials-with-managed-identities" target="_blank" rel="noopener">Creating storage credentials with managed identities</a> · <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/8-authenticate-resource-access-managed-identities#accessing-external-storage-through-storage-credentials" target="_blank" rel="noopener">Accessing external storage through storage credentials</a></span></div>
 </div>
 
 <div class="section" id="sec-lab">
   <div class="section-header">
     <div class="section-num">4.8</div>
-    <h2>Lab 4: Secure Unity Catalog Objects (45 minut)</h2>
+    <h2>Lab 4: Secure Unity Catalog Objects (45 minutes)</h2>
   </div>
-  <p>Fiktivní řetězec supermarketů <strong>NorthMart Retail</strong> se čtyřmi regiony (North, South, East, West) potřebuje zabezpečit zákaznická a věrnostní data: v labu vytvoříte skupinu <code class="inline">retail-analysts</code> a schema-level granty, row filter omezující záznamy podle regionu, column masku pro PII e-maily a Key Vault-backed secret scope <code class="inline">retail-kv-scope</code> pro bezpečné čtení API klíče v notebooku.</p>
-  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/04-secure-unity-catalog-objects.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
-     <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
-  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Jaká tři oprávnění potřebuje skupina, aby mohla dotazovat jednu tabulku explicitním modelem? <strong>2)</strong> Jakým příkazem připojíte row filter funkci k tabulce a kolik filtrů může tabulka mít? <strong>3)</strong> Proč musí Key Vault pro Databricks secret scope používat model Vault access policy a co se stane, když je nastavený RBAC?</div></div>
+  <p>The fictional supermarket chain <strong>NorthMart Retail</strong>, with four regions (North, South, East, West), needs to secure its customer and loyalty data: in the lab you will create the group <code class="inline">retail-analysts</code> and schema-level grants, a row filter restricting records by region, a column mask for PII email addresses, and the Key Vault-backed secret scope <code class="inline">retail-kv-scope</code> for reading an API key securely in a notebook.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/04-secure-unity-catalog-objects.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/secure-unity-catalog-objects/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> Which three permissions does a group need in order to query a single table under the explicit model? <strong>2)</strong> Which command attaches a row filter function to a table, and how many filters can a table have? <strong>3)</strong> Why must a Key Vault for a Databricks secret scope use the Vault access policy model, and what happens when RBAC is set?</div></div>
 </div>
 
     <div class="footer-nav">
-      <a href="dp750_03_objekty_unity_catalog.html">← Objekty v Unity Catalogu</a>
-      <span style="color:var(--text-muted);font-size:13px">Kapitola 4 z 16</span>
-      <a href="dp750_05_governance.html" style="margin-left:auto">Governance Unity Catalogu →</a>
+      <a href="dp750_03_objekty_unity_catalog.html">← Objects in Unity Catalog</a>
+      <span style="color:var(--text-muted);font-size:13px">Chapter 4 of 16</span>
+      <a href="dp750_05_governance.html" style="margin-left:auto">Governing Unity Catalog →</a>
     </div>
   </main>
 </div>
 
-<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
+<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
 /* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
    tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
 function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}

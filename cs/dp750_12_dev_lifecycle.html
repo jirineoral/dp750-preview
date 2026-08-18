@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Vývojový lifecycle v Azure Databricks — DP-750</title>
+<style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
+   Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
+:root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
+:root{--gopas-blue:#1a3a6b;--gopas-orange:#e8721c;--accent:#1a3a6b;--accent-light:#e8f0fb;--bg:#f5f7fa;--bg-card:#fff;--text:#1a1f2e;--text-muted:#6b7280;--border:#e2e8f0;--code-bg:#1e2533;--code-text:#e2e8f0;--tip-bg:#fff8e7;--tip-border:#e8721c;--warning-bg:#fef2f2;--warning-border:#ef4444;--info-bg:#eff6ff;--info-border:#3b82f6;--success-bg:#f0fdf4;--success-border:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--gopas-blue);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.course-code{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65}
+.chapter-title-nav{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px}
+.nav-links{display:flex;gap:8px;flex-shrink:0}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);transition:all .15s;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-links a.home{border-color:transparent;font-size:16px}
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--border)}
+.progress-bar-fill{height:100%;background:var(--gopas-orange);transition:width .3s}
+.layout{display:flex;margin-top:55px;min-height:calc(100vh - 55px)}
+.sidebar{width:240px;flex-shrink:0;position:fixed;top:55px;bottom:0;left:0;overflow-y:auto;background:#fff;border-right:1px solid var(--border);padding:16px 0}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:0 16px 10px}
+.toc-item{display:block;padding:7px 16px;font-size:13px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.toc-item:hover{color:var(--text);background:var(--bg)}
+.toc-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:500}
+.main{margin-left:240px;padding:40px 48px;max-width:920px}
+.section{margin-bottom:48px;scroll-margin-top:80px}
+.section-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gopas-orange);background:#fff5ee;border-radius:4px;padding:3px 8px;margin-top:4px;white-space:nowrap;flex-shrink:0}
+.section h2{font-size:21px;font-weight:700;color:var(--gopas-blue);line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text);margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:var(--text-muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.section p{margin-bottom:12px}
+.section ul,.section ol{padding-left:22px;margin-bottom:12px}
+.section li{margin-bottom:6px}
+.tabs{margin:20px 0}
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{margin-right:6px}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+.collapsible{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#fff;font-weight:500;font-size:14px;transition:background .15s;user-select:none}
+.collapsible-header:hover{background:var(--bg)}
+.chevron{font-size:12px;color:var(--text-muted);transition:transform .2s;margin-left:8px}
+.collapsible.open .chevron{transform:rotate(180deg)}
+.collapsible-body{display:none;padding:14px 16px;background:#fff;border-top:1px solid var(--border);font-size:14px}
+.collapsible.open .collapsible-body{display:block}
+.code-block{background:var(--code-bg);border-radius:8px;margin:14px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-lang{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);font-family:var(--font-mono)}
+.copy-btn{font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;font-family:var(--font-ui)}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+pre{padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--code-text)}
+.kw{color:#569cd6}.fn{color:#dcdcaa}.str{color:#ce9178}.num{color:#b5cea8}.cm{color:#6a9955;font-style:italic}.tbl{color:#4ec9b0}.col{color:#9cdcfe}.msr{color:#c8a8e9}.var-kw{color:#e0afff}.op{color:#d4d4d4}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55}
+.callout-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:var(--tip-bg);border-left:3px solid var(--tip-border)}
+.callout.warning{background:var(--warning-bg);border-left:3px solid var(--warning-border)}
+.callout.info{background:var(--info-bg);border-left:3px solid var(--info-border)}
+.callout.success{background:var(--success-bg);border-left:3px solid var(--success-border)}
+.chapter-hero{background:linear-gradient(135deg,var(--gopas-blue) 0%,#2d5a9e 100%);color:#fff;padding:44px 48px;margin:-40px -48px 36px;border-radius:0}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+.chapter-hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero-subtitle{font-size:15px;opacity:.8;margin-bottom:18px}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.objectives{background:var(--accent-light);border-radius:8px;padding:18px 22px;margin-bottom:28px;border:1px solid rgba(26,58,107,.15)}
+.objectives h3{color:var(--gopas-blue);font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.objectives ul{padding-left:18px}
+.objectives li{font-size:14px;margin-bottom:5px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gopas-orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:14px;margin-bottom:5px}
+.hint-box{border:1px dashed var(--gopas-orange);border-radius:6px;margin-top:8px}
+.hint-toggle{padding:7px 13px;font-size:13px;color:var(--gopas-orange);cursor:pointer;font-weight:500;user-select:none;display:block}
+.hint-toggle:hover{background:#fff5ee;border-radius:6px}
+.hint-content{display:none;padding:10px 13px;font-size:13px;border-top:1px dashed var(--gopas-orange);line-height:1.6}
+.hint-content.open{display:block}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th{background:var(--gopas-blue);color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:13px}
+td{padding:8px 13px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;margin:56px 0 36px;padding:18px 0;border-top:1px solid var(--border)}
+.footer-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gopas-blue);font-weight:500;font-size:14px;padding:9px 16px;border:1px solid var(--border);border-radius:6px;transition:all .15s}
+.footer-nav a:hover{background:var(--accent-light);border-color:var(--accent)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;margin-right:6px}
+.badge.new{background:#dcfce7;color:#15803d}
+.badge.important{background:#fef3c7;color:#92400e}
+.badge.advanced{background:#ede9fe;color:#5b21b6}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.chapter-hero{margin:-20px -20px 28px;padding:32px 20px}.top-nav .chapter-title-nav{display:none}}.chapter-menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-ui);transition:all .15s;letter-spacing:.3px}.chapter-menu-btn:hover{background:rgba(255,255,255,.15);color:#fff}.chapter-menu{position:fixed;top:52px;left:0;right:0;z-index:98;background:#1e3560;border-bottom:3px solid var(--gopas-orange);box-shadow:0 8px 32px rgba(0,0,0,.35);display:none;padding:18px 32px 22px;gap:28px;flex-wrap:wrap;max-height:calc(100vh - 52px);overflow-y:auto}.chapter-menu.open{display:flex}.chapter-group{flex:1;min-width:0}.chapter-group-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap}.chapter-link{display:block;padding:5px 0;font-size:13px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s;line-height:1.4;border-radius:3px}.chapter-link:hover{color:#fff}.chapter-link.current{color:var(--gopas-orange);font-weight:600}.chapter-menu-overlay{display:none;position:fixed;inset:0;z-index:97;background:rgba(0,0,0,.25)}.chapter-menu-overlay.open{display:block}.figure{margin:18px 0;padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.figure svg{display:block;width:100%;height:auto;max-width:820px;margin:0 auto}
+.figure figcaption{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5}
+code.inline{font-family:var(--font-mono);font-size:.9em;background:var(--accent-light);color:var(--gopas-blue);padding:1px 5px;border-radius:3px}
+/* Vychozi pohled = originalni osnova MOC. Vlastni tridenni osnovu zapina trida
+   mode-custom na <html> (MODE_BOOT v build.py + initViewSwitch). Bez JS => originalni osnova. */
+[data-view="custom"]{display:none}
+html.mode-custom [data-view="custom"]{display:revert}
+html.mode-custom [data-view="orig"]{display:none}
+/* prepinac jazyka v top-nav (kapitoly); vlajky jsou inline SVG - zadny externi request */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;flex-shrink:0}
+.nav-links .lang-switch>*{display:flex;align-items:center;gap:5px;padding:3px 9px;border:none;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.6);text-decoration:none}
+.nav-links .lang-switch a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-links .lang-switch>.current{background:#fff;color:var(--gopas-blue)}
+.lang-switch svg{display:block;width:18px;height:12px;border-radius:2px;flex-shrink:0}
+@media(max-width:700px){.lang-switch .lang-lbl{display:none}.nav-links .lang-switch>*{padding:4px 7px}}
+.learn-more{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;padding:9px 13px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid var(--gopas-blue);border-radius:6px;font-size:13px;color:var(--text-muted)}
+.learn-more .lm-label{flex-shrink:0;font-weight:600;color:var(--gopas-blue)}
+.learn-more a{color:var(--gopas-blue);text-decoration:none;border-bottom:1px solid rgba(26,58,107,.3)}
+.learn-more a:hover{border-bottom-color:var(--gopas-blue)}</style>
+<script>try{if(localStorage.getItem("dp750-view")==="custom")document.documentElement.className="mode-custom"}catch(e){}</script>
+</head>
+<body>
+<div id="chapOverlay" class="chapter-menu-overlay"></div>
+<div id="chapMenu" class="chapter-menu">
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
+  </div>
+  <div class="chapter-group">
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
+    <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
+    <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+  <div class="chapter-group" data-view="custom">
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
+    <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
+    </div>
+  </div>
+</div>
+
+<nav class="top-nav">
+  <div style="display:flex;align-items:center;gap:16px;min-width:0">
+    <span class="course-code">DP-750</span>
+    <span class="chapter-title-nav">Vývojový lifecycle v Azure Databricks</span>
+  </div>
+  <div class="nav-links">
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="../dp750_12_dev_lifecycle.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div><button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_13_monitoring.html" class="next">Monitoring a optimalizace →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-bar-fill" id="pfill"></div></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-git-folders" class="toc-item active" data-section="sec-git-folders">Git folders: verzování přímo ve workspace</a>
+    <a href="#sec-branching-pr" class="toc-item" data-section="sec-branching-pr">Branching, pull requesty a konflikty</a>
+    <a href="#sec-testovani" class="toc-item" data-section="sec-testovani">Testovací strategie: pyramida, pytest, integrace</a>
+    <a href="#sec-bundles" class="toc-item" data-section="sec-bundles">Declarative Automation Bundles: konfigurace a balení</a>
+    <a href="#sec-deploy-cli" class="toc-item" data-section="sec-deploy-cli">Deploy bundlu přes Databricks CLI</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 12: Implement Development Lifecycle Processes (45 minut)</a>
+  </aside>
+
+  <main class="main">
+    <div class="chapter-hero">
+      <div class="hero-tag">DP-750 · Kapitola 12</div>
+      <h1>Vývojový lifecycle v Azure Databricks</h1>
+      <div class="hero-subtitle">Git folders, branching a pull requesty, testování, Asset Bundles a nasazení přes CLI</div>
+      <div class="hero-meta"><span>🗂 Automatizace</span><span data-view="custom">⚠️ Mimo osnovu zkráceného kurzu</span></div>
+    </div>
+<div class="callout info" data-view="custom"><div class="callout-icon">ℹ️</div><div><strong>Mimo osnovu zkráceného kurzu:</strong> tento modul je součástí oficiálního čtyřdenního kurzu DP-750. Ve zkrácené třídenní verzi ho na kurzu neprobíráme — kapitola slouží k samostudiu a odkazovaný lab k ní zůstává plně k dispozici.</div></div>
+
+<div class="objectives">
+  <h3>Cíle kapitoly</h3>
+  <ul>
+    <li>Aplikovat best practices verzování kódu pomocí Git folders v Azure Databricks</li>
+    <li>Pracovat s feature branchemi, pull requesty a řešením merge konfliktů</li>
+    <li>Navrhnout testovací strategii — unit testy s pytest, integrační, end-to-end a UAT</li>
+    <li>Nakonfigurovat Declarative Automation Bundle (databricks.yml, variables, targets)</li>
+    <li>Nasadit bundle do dev a prod prostředí přes Databricks CLI</li>
+  </ul>
+</div>
+
+<div class="section" id="sec-git-folders">
+  <div class="section-header">
+    <div class="section-num">12.1</div>
+    <h2>Git folders: verzování přímo ve workspace</h2>
+  </div>
+
+  <p><strong>Git folders</strong> (dříve známé jako Repos) přinášejí do Azure Databricks workspace vizuálního Git klienta a API. Přímo z workspace klonujete repozitáře, vytváříte branche, commitujete a pushujete — bez přepínání do externích nástrojů. Podporovaní provideři: <strong>Azure DevOps</strong>, <strong>GitHub</strong>, <strong>GitLab</strong> a <strong>Bitbucket</strong>.</p>
+
+  <p>Git folder vytvoříte přes <code class="inline">Workspace</code> → <code class="inline">Create</code> → <code class="inline">Git folder</code>: zadáte URL repozitáře, providera a název složky. Po naklonování se obsah repozitáře objeví ve workspace a můžete rovnou pracovat s notebooky, Python soubory i SQL skripty.</p>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Každý člen týmu má mít <strong>vlastní Git folder</strong> napojený na sdílený repozitář. Když víc lidí sdílí jednu složku, přepnutí branche jedním uživatelem změní obsah všem — zdroj velmi obtížně laditelných „záhad".</div></div>
+
+  <p>Před začátkem práce vždy <strong>pull</strong> — pravidelné stahování změn minimalizuje integrační konflikty. Počítejte s tím, že pull, který změní zdrojový kód notebooku, resetuje jeho stav: outputy buněk, komentáře a verze notebooku se vyčistí podle nového obsahu.</p>
+
+  <p>K pořádku v repozitáři patří: <code class="inline">.gitignore</code> pro dočasné výstupy, credentials a environment-specifické konfigurace (na už trackované soubory se aplikuje až po jejich explicitním odebrání z Gitu), logická struktura složek a mazání staré branche u providera po merge — lokální branche přežívají až 30 dní po smazání remote branche.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Limity Git folders a sparse checkout<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Pracovní branch je limitována na 1 GB a Databricks doporučuje držet počet assetů pod 20 000 (přesné aktuální limity ověřte v dokumentaci). Pro velké monorepo použijte <strong>sparse checkout</strong> — naklonujete jen adresáře, které skutečně potřebujete.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/2-apply-version-control-git#understand-git-folders-in-azure-databricks" target="_blank" rel="noopener">Understand Git folders in Azure Databricks</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/2-apply-version-control-git#keep-your-repository-organized" target="_blank" rel="noopener">Keep your repository organized</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-branching-pr">
+  <div class="section-header">
+    <div class="section-num">12.2</div>
+    <h2>Branching, pull requesty a konflikty</h2>
+  </div>
+
+  <p><strong>Feature branch</strong> izoluje rozpracovanou práci od hlavní větve. V Git dialogu (tlačítko s názvem branche u notebooku) zvolíte <code class="inline">Create branch</code>, pojmenujete ji a založíte typicky z <code class="inline">main</code>. Konzistentní pojmenování se vyplatí:</p>
+
+  <table>
+    <tr><th>Vzor</th><th>Použití</th></tr>
+    <tr><td><code class="inline">feature/nazev-funkce</code></td><td>nová funkcionalita</td></tr>
+    <tr><td><code class="inline">bugfix/popis-problemu</code></td><td>opravy chyb</td></tr>
+    <tr><td><code class="inline">users/jmeno/popis</code></td><td>osobní experimenty</td></tr>
+  </table>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Přepnutí branche může <strong>smazat workspace assety</strong>, které cílová branch neobsahuje — nasdílené či záložkované notebooky náhle zmizí. Necommitnuté změny se při přepnutí přenášejí na novou branch, pokud nekonfliktují; co přenést nechcete, zahoďte předem.</div></div>
+
+  <p>Commit děláte z Git dialogu: UI zvýrazní změněné soubory, ukáže vizuální diff, napíšete popisnou commit message a dáte <code class="inline">Commit &amp; Push</code>. <strong>Pull request</strong> pak vytváříte a reviewujete v rozhraní Git providera — Databricks poskytuje Git operace, code review žije u providera. Do chráněné <code class="inline">main</code> se typicky přímo commitovat nedá; jde se přes feature branch a PR.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 260" role="img" aria-label="Git workflow v Azure Databricks: z main branche se vytvoří feature branch, v Git folderu vzniknou commity, push odešle změny k Git providerovi, kde proběhne pull request s code review a CI testy, po merge do main následuje deploy.">
+      <defs><marker id="arr12a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker></defs>
+      <rect x="0" y="0" width="820" height="260" fill="#ffffff"/>
+      <text x="410" y="24" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Git workflow: branch → PR → merge → deploy</text>
+      <!-- main line -->
+      <line x1="40" y1="80" x2="780" y2="80" stroke="#1a3a6b" stroke-width="3"/>
+      <text x="52" y="66" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">main (chráněná)</text>
+      <circle cx="90" cy="80" r="7" fill="#1a3a6b"/>
+      <circle cx="620" cy="80" r="8" fill="#22c55e" stroke="#1a3a6b" stroke-width="2"/>
+      <text x="620" y="62" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">merge</text>
+      <!-- feature line -->
+      <path d="M 90 80 C 130 80 130 160 180 160" fill="none" stroke="#e8721c" stroke-width="2.5"/>
+      <line x1="180" y1="160" x2="440" y2="160" stroke="#e8721c" stroke-width="2.5"/>
+      <text x="200" y="184" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">feature/cdr-cleanup</text>
+      <circle cx="240" cy="160" r="6" fill="#e8721c"/>
+      <circle cx="330" cy="160" r="6" fill="#e8721c"/>
+      <circle cx="420" cy="160" r="6" fill="#e8721c"/>
+      <text x="330" y="204" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">commity v Git folderu (Databricks workspace)</text>
+      <!-- PR box -->
+      <rect x="470" y="130" width="130" height="60" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="535" y="152" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Pull request</text>
+      <text x="535" y="168" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">review + CI testy</text>
+      <text x="535" y="182" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">(Git provider)</text>
+      <line x1="440" y1="160" x2="466" y2="160" stroke="#e8721c" stroke-width="2.5" marker-end="url(#arr12a)"/>
+      <path d="M 600 155 C 615 140 612 100 618 90" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#arr12a)"/>
+      <!-- deploy -->
+      <rect x="670" y="120" width="130" height="56" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="735" y="144" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#22c55e">Deploy</text>
+      <text x="735" y="161" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">bundle → prod (12.5)</text>
+      <line x1="660" y1="84" x2="722" y2="118" stroke="#22c55e" stroke-width="2" marker-end="url(#arr12a)"/>
+      <text x="410" y="240" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">každý vývojář pracuje na vlastní branchi ve vlastním Git folderu — konflikty se řeší malé a brzy</text>
+    </svg>
+    <figcaption>Doporučený týmový workflow: feature branch v Git folderu, pull request u Git providera, po merge automatizovaný deploy.</figcaption>
+  </figure>
+
+  <p><strong>Merge konflikty</strong> vznikají, když víc lidí změní stejné řádky. Git folders UI nabízí seznam konfliktních souborů a tři cesty: <code class="inline">Keep all current changes</code>, <code class="inline">Take all incoming changes</code>, nebo ruční editaci souboru s konfliktními markery (<code class="inline">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> … <code class="inline">=======</code> … <code class="inline">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>) a <code class="inline">Mark As Resolved</code>. Pak <code class="inline">Continue Merge</code>/<code class="inline">Continue Rebase</code> — nebo <code class="inline">Abort</code>, pokud jste sáhli vedle.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Notebook outputy a formáty souborů<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>U notebooků ve zdrojových formátech (<code class="inline">.py</code>, <code class="inline">.sql</code>, <code class="inline">.scala</code>, <code class="inline">.r</code>) se outputy buněk do commitů nezahrnují — v repozitáři je čistý kód, diffy jsou čitelné. Pokud outputy verzovat potřebujete, použijte formát <code class="inline">IPYNB</code>. Pro data engineering pipeline je zdrojový formát téměř vždy lepší volba.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/3-manage-branching-pull-requests-conflicts#work-with-pull-requests" target="_blank" rel="noopener">Work with pull requests</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/3-manage-branching-pull-requests-conflicts#resolve-merge-conflicts" target="_blank" rel="noopener">Resolve merge conflicts</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-testovani">
+  <div class="section-header">
+    <div class="section-num">12.3</div>
+    <h2>Testovací strategie: pyramida, pytest, integrace</h2>
+  </div>
+
+  <p>Dobrá testovací strategie kopíruje <strong>testovací pyramidu</strong>: hodně rychlých unit testů dole, méně integračních uprostřed, hrstka end-to-end testů a UAT scénářů nahoře.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 280" role="img" aria-label="Testovací pyramida: základnu tvoří mnoho rychlých unit testů (milisekundy), nad nimi integrační testy (sekundy), výše end-to-end testy celých pipeline (minuty) a na vrcholu UAT — validace byznys požadavků stakeholdery.">
+      <rect x="0" y="0" width="820" height="280" fill="#ffffff"/>
+      <text x="300" y="24" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Testovací pyramida</text>
+      <!-- pyramid layers -->
+      <polygon points="270,40 330,40 355,85 245,85" fill="#e8721c" stroke="#e2e8f0"/>
+      <polygon points="245,90 355,90 385,135 215,135" fill="#f0a35e" stroke="#e2e8f0"/>
+      <polygon points="215,140 385,140 420,185 180,185" fill="#e8f0fb" stroke="#1a3a6b"/>
+      <polygon points="180,190 420,190 455,235 145,235" fill="#1a3a6b" stroke="#e2e8f0"/>
+      <text x="300" y="68" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">UAT</text>
+      <text x="300" y="118" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">End-to-end</text>
+      <text x="300" y="168" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1a3a6b">Integrační testy</text>
+      <text x="300" y="218" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">Unit testy (pytest)</text>
+      <!-- annotations -->
+      <text x="500" y="66" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">byznys validace · staging · stakeholdeři</text>
+      <text x="500" y="116" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">celá pipeline · minuty · deployment pipeline</text>
+      <text x="500" y="166" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">spolupráce komponent · sekundy · test katalog</text>
+      <text x="500" y="216" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#6b7280">izolované funkce · milisekundy · syntetická data</text>
+      <line x1="480" y1="52" x2="480" y2="230" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="80" y="120" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" transform="rotate(-90 80 120)">← méně testů, širší záběr</text>
+      <text x="300" y="262" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">více testů, rychlejší zpětná vazba →</text>
+    </svg>
+    <figcaption>Testovací pyramida: čím výše, tím méně testů, delší běh a širší záběr — od funkcí po byznys scénáře.</figcaption>
+  </figure>
+
+  <p><strong>Unit testy</strong> testují jednotlivé funkce v izolaci. Klíčové doporučení Databricks: transformační logiku držte v <code class="inline">.py</code> modulech <em>mimo notebooky</em> a do notebooků ji importujte — testuje se pak snadno standardním <strong>pytest</strong>. Testovací soubory pojmenujte <code class="inline">test_*.py</code> nebo <code class="inline">*_test.py</code>:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">import</span> pytest
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> transforms <span class="kw">import</span> filter_country_region
+
+<span class="fn">@pytest.fixture</span>
+<span class="kw">def</span> <span class="fn">sample_data</span>():
+    <span class="cm"># synteticka data se strukturou produkce - zadna citliva data</span>
+    <span class="kw">return</span> pd.<span class="fn">DataFrame</span>({
+        <span class="str">"iso_code"</span>: [<span class="str">"USA"</span>, <span class="str">"USA"</span>, <span class="str">"CAN"</span>, <span class="str">"GBR"</span>],
+        <span class="str">"value"</span>: [<span class="num">100</span>, <span class="num">200</span>, <span class="num">150</span>, <span class="num">175</span>],
+    })
+
+<span class="kw">def</span> <span class="fn">test_filter_default</span>(sample_data):
+    result = <span class="fn">filter_country_region</span>(sample_data)
+    <span class="kw">assert</span> <span class="fn">len</span>(result) == <span class="num">2</span>
+    <span class="kw">assert</span> <span class="fn">all</span>(result.iso_code == <span class="str">"USA"</span>)</pre>
+  </div>
+
+  <p>Fixture <code class="inline">@pytest.fixture</code> dodává znovupoužitelná syntetická data — testujete strukturu a logiku, ne produkční obsah. Testy spustíte i přímo v notebooku:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre>%pip install pytest
+
+<span class="kw">import</span> pytest, sys
+sys.dont_write_bytecode = <span class="kw">True</span>   <span class="cm"># zadna cache na readonly filesystem</span>
+
+retcode = pytest.<span class="fn">main</span>([<span class="str">"tests/"</span>, <span class="str">"-v"</span>, <span class="str">"-p"</span>, <span class="str">"no:cacheprovider"</span>])
+<span class="kw">assert</span> retcode == <span class="num">0</span>, <span class="str">"Testy selhaly - zkontrolujte vystup vyse"</span></pre>
+  </div>
+
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> Navrhujte funkce s předvídatelným návratovým typem. Funkce vracející „DataFrame nebo <code class="inline">False</code>" se testuje mizerně — ať vrací vždy DataFrame, klidně prázdný.</div></div>
+
+  <table>
+    <tr><th>Typ testu</th><th>Ověřuje</th><th>Rozsah</th><th>Rychlost</th></tr>
+    <tr><td><strong>Unit</strong></td><td>jednotlivé funkce</td><td>funkce/třída, syntetická data</td><td>milisekundy</td></tr>
+    <tr><td><strong>Integrační</strong></td><td>spolupráci komponent</td><td>více komponent, testovací katalog</td><td>sekundy</td></tr>
+    <tr><td><strong>End-to-end</strong></td><td>celý workflow</td><td>kompletní pipeline</td><td>minuty</td></tr>
+    <tr><td><strong>UAT</strong></td><td>byznys požadavky</td><td>byznys scénáře, staging</td><td>dle scénáře</td></tr>
+  </table>
+
+  <p><strong>Integrační testy</strong> běží proti skutečným Databricks zdrojům — čtou testovací tabulku, spustí transformaci a ověří schéma a typy výstupu. Vytvořte pro ně <strong>dedikovaný testovací katalog/schéma</strong> s reprezentativním vzorkem dat. <strong>End-to-end testy</strong> simulují celý denní běh (setup vstupů → spuštění pipeline → asserty nad výstupní tabulkou → cleanup); pouštějte je v deployment pipeline nebo mimo špičku, ne na každý commit. <strong>UAT</strong> pak znamená: akceptační kritéria dohodnutá se stakeholdery předem, staging prostředí zrcadlící produkci a připravené scénáře (třeba notebook s rekonciliací měsíčních tržeb proti finančnímu systému).</p>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Integrační ani e2e testy nikdy nepouštějte proti produkčním tabulkám. Izolované testovací prostředí se strukturou produkce, ale bez citlivých dat, je nutná podmínka — ne nice-to-have.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/4-implement-testing-strategy#implement-unit-tests-with-pytest" target="_blank" rel="noopener">Implement unit tests with pytest</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/4-implement-testing-strategy#organize-your-test-structure" target="_blank" rel="noopener">Organize your test structure</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-bundles">
+  <div class="section-header">
+    <div class="section-num">12.4</div>
+    <h2>Declarative Automation Bundles: konfigurace a balení</h2>
+  </div>
+
+  <p><strong>Declarative Automation Bundles</strong> — dříve známé jako <strong>Databricks Asset Bundles</strong> (DAB); starší materiály a slidy používají původní název — jsou <strong>infrastructure-as-code</strong> přístup k nasazování Databricks zdrojů. Joby, pipeline a další resources popíšete v YAML souborech a stejnou definici pak deklarativně nasazujete do dev, stagingu i produkce. Dokumentace: <em>„Declarative Automation Bundles (formerly known as Databricks Asset Bundles)"</em>.</p>
+
+  <p>Základem je soubor <code class="inline">databricks.yml</code> v kořeni projektu:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">YAML</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">bundle</span>:
+  <span class="kw">name</span>: <span class="str">order-processing</span>
+
+<span class="kw">include</span>:
+  - <span class="str">resources/*.yml</span>      <span class="cm"># rozdeleni konfigurace do vice souboru</span>
+
+<span class="kw">variables</span>:
+  <span class="kw">environment</span>:
+    <span class="kw">description</span>: <span class="str">Nazev prostredi</span>
+    <span class="kw">default</span>: <span class="str">development</span>
+
+<span class="kw">resources</span>:
+  <span class="kw">jobs</span>:
+    <span class="kw">etl_pipeline</span>:
+      <span class="kw">name</span>: <span class="str">${var.environment}-order-pipeline</span>
+      <span class="kw">tasks</span>:
+        - <span class="kw">task_key</span>: <span class="str">extract</span>
+          <span class="kw">notebook_task</span>:
+            <span class="kw">notebook_path</span>: <span class="str">./notebooks/extract.py</span>
+        - <span class="kw">task_key</span>: <span class="str">transform</span>
+          <span class="kw">depends_on</span>:
+            - <span class="kw">task_key</span>: <span class="str">extract</span>
+          <span class="kw">notebook_task</span>:
+            <span class="kw">notebook_path</span>: <span class="str">./notebooks/transform.py</span></pre>
+  </div>
+
+  <p>Mapování <code class="inline">bundle</code> definuje identitu projektu, <code class="inline">resources</code> nasazované objekty (nejčastěji joby s tasky, závislostmi přes <code class="inline">depends_on</code> a parametry přes <code class="inline">base_parameters</code>), <code class="inline">include</code> přibalí další YAML soubory. Cesty uvádějte relativně ke kořeni bundlu. <strong>Variables</strong> s substitucí <code class="inline">${var.nazev}</code> nahrazují hardcodované hodnoty — plnit je lze defaultem, per-target overridem, CLI volbou <code class="inline">--var="klic=hodnota"</code> nebo proměnnou prostředí s prefixem <code class="inline">BUNDLE_VAR_</code>.</p>
+
+  <p><strong>Targets</strong> reprezentují nasazovací prostředí. Zásadní jsou režimy: <code class="inline">mode: development</code> prefixuje názvy resources <code class="inline">[dev uživatel]</code>, pozastaví všechny scheduly a povolí souběžné běhy — dev nasazení si nešlape po produkci. <code class="inline">mode: production</code> naopak validuje shodu Git branche a doporučuje deploy přes <strong>service principal</strong>:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">YAML</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="kw">targets</span>:
+  <span class="kw">dev</span>:
+    <span class="kw">default</span>: <span class="kw">true</span>
+    <span class="kw">mode</span>: <span class="str">development</span>
+    <span class="kw">variables</span>:
+      <span class="kw">environment</span>: <span class="str">development</span>
+  <span class="kw">staging</span>:
+    <span class="kw">presets</span>:                       <span class="cm"># jemne ladeni bez plneho rezimu</span>
+      <span class="kw">name_prefix</span>: <span class="str">staging_</span>
+      <span class="kw">trigger_pause_status</span>: <span class="str">PAUSED</span>
+  <span class="kw">prod</span>:
+    <span class="kw">mode</span>: <span class="str">production</span>
+    <span class="kw">workspace</span>:
+      <span class="kw">host</span>: <span class="str">https://adb-prod.azuredatabricks.net</span>
+    <span class="kw">variables</span>:
+      <span class="kw">environment</span>: <span class="str">production</span></pre>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">Bundle konfigurace v Pythonu (Public Preview)<span class="chevron">▼</span></div>
+    <div class="collapsible-body">
+      <p>Vedle YAML lze bundle definovat i jako Python kód — joby a resources popíšete programově. V době psaní jde o Public Preview a YAML zůstává nejběžnější cestou; aktuální stav ověřte v dokumentaci.</p>
+    </div>
+  </div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/5-configure-package-databricks-asset-bundles#customize-deployment-parameters-with-variables" target="_blank" rel="noopener">Customize deployment parameters with variables</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/5-configure-package-databricks-asset-bundles#set-up-deployment-targets" target="_blank" rel="noopener">Set up deployment targets</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-deploy-cli">
+  <div class="section-header">
+    <div class="section-num">12.5</div>
+    <h2>Deploy bundlu přes Databricks CLI</h2>
+  </div>
+
+  <p>Nasazení řídí <strong>Databricks CLI</strong> čtyřmi kroky: validace, náhled, deploy, ověření. CLI si při deployi ukládá stav do workspace — ví, co vytvořilo, a při dalším nasazení resources aktualizuje, doplní nové a smaže ty, které z konfigurace zmizely.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">BASH</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># autentizace vuci workspace</span>
+databricks auth login --host https://adb-1234567890123456.7.azuredatabricks.net
+
+databricks bundle validate            <span class="cm"># kontrola syntaxe a konfigurace</span>
+databricks bundle plan                <span class="cm"># nahled: co se vytvori / zmeni / smaze</span>
+databricks bundle deploy -t dev       <span class="cm"># nasazeni do dev targetu</span>
+databricks bundle summary             <span class="cm"># prehled nasazenych resources + URL</span>
+databricks bundle open etl_pipeline   <span class="cm"># otevre resource v prohlizeci</span>
+
+<span class="cm"># produkce v CI/CD: bez interaktivnich potvrzeni</span>
+databricks bundle deploy -t prod --auto-approve</pre>
+  </div>
+
+  <table>
+    <tr><th>Příkaz</th><th>Co dělá</th></tr>
+    <tr><td><code class="inline">bundle validate</code></td><td>ověří syntaxi, vypíše identitu bundlu (name, target, workspace, path)</td></tr>
+    <tr><td><code class="inline">bundle plan</code></td><td>ukáže plánované akce (create/update/delete) bez provedení změn</td></tr>
+    <tr><td><code class="inline">bundle deploy</code></td><td>nahraje artefakty a vytvoří/aktualizuje resources v targetu (<code class="inline">-t</code>)</td></tr>
+    <tr><td><code class="inline">bundle summary</code></td><td>vypíše nasazené resources s přímými odkazy do UI</td></tr>
+    <tr><td><code class="inline">bundle run</code> / <code class="inline">bundle destroy</code></td><td>spustí job z bundlu / odstraní nasazené resources</td></tr>
+  </table>
+
+  <figure class="figure">
+    <svg viewBox="0 0 820 330" role="img" aria-label="Tok nasazení bundlu: lokální projekt s databricks.yml, notebooky a testy prochází přes příkazy validate, plan a deploy. Deploy s targetem dev vede do dev workspace s prefixem dev a pozastavenými scheduly; deploy přes CI/CD pipeline pod service principalem s targetem prod vede do produkčního workspace.">
+      <defs><marker id="arr12b" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/></marker></defs>
+      <rect x="0" y="0" width="820" height="330" fill="#ffffff"/>
+      <text x="410" y="24" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1a3a6b">Bundle: jedna definice, více prostředí</text>
+      <!-- local project -->
+      <rect x="20" y="70" width="190" height="120" rx="8" fill="#e8f0fb" stroke="#1a3a6b" stroke-width="1.5"/>
+      <text x="115" y="94" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#1a3a6b">Bundle projekt (Git)</text>
+      <text x="115" y="116" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">databricks.yml</text>
+      <text x="115" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">resources/*.yml</text>
+      <text x="115" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">notebooks/ · src/ · tests/</text>
+      <text x="115" y="174" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">variables + targets</text>
+      <!-- CLI -->
+      <rect x="280" y="86" width="180" height="88" rx="8" fill="#1a3a6b"/>
+      <text x="370" y="112" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Databricks CLI</text>
+      <text x="370" y="133" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb">validate → plan → deploy</text>
+      <text x="370" y="150" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb">stav uložen ve workspace</text>
+      <line x1="210" y1="130" x2="276" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arr12b)"/>
+      <!-- dev workspace -->
+      <rect x="560" y="52" width="240" height="96" rx="8" fill="#ffffff" stroke="#e8721c" stroke-width="2"/>
+      <text x="680" y="76" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#e8721c">Dev workspace</text>
+      <text x="680" y="97" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">mode: development</text>
+      <text x="680" y="114" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">názvy s prefixem [dev user]</text>
+      <text x="680" y="131" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">scheduly pozastaveny</text>
+      <line x1="460" y1="110" x2="556" y2="92" stroke="#e8721c" stroke-width="2" marker-end="url(#arr12b)"/>
+      <text x="505" y="86" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c">deploy -t dev</text>
+      <!-- prod workspace -->
+      <rect x="560" y="196" width="240" height="96" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+      <text x="680" y="220" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="bold" fill="#22c55e">Prod workspace</text>
+      <text x="680" y="241" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">mode: production</text>
+      <text x="680" y="258" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">validace Git branche</text>
+      <text x="680" y="275" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">deploy pod service principalem</text>
+      <!-- CI/CD -->
+      <rect x="280" y="220" width="180" height="66" rx="8" fill="#fff7ed" stroke="#e8721c" stroke-width="1.5"/>
+      <text x="370" y="244" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e8721c">CI/CD pipeline</text>
+      <text x="370" y="262" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">po merge do main</text>
+      <text x="370" y="277" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">--auto-approve</text>
+      <line x1="370" y1="174" x2="370" y2="216" stroke="#6b7280" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arr12b)"/>
+      <line x1="460" y1="250" x2="556" y2="248" stroke="#22c55e" stroke-width="2" marker-end="url(#arr12b)"/>
+      <text x="505" y="238" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e">deploy -t prod</text>
+      <text x="410" y="316" text-anchor="middle" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">stejná definice resources — jiné hodnoty variables a jiný režim podle targetu</text>
+    </svg>
+    <figcaption>Tok nasazení bundlu: z Git projektu přes Databricks CLI do dev workspace ručně a do produkce přes CI/CD pod service principalem.</figcaption>
+  </figure>
+
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> Identita nasazení = název bundlu + target + identita nasazujícího uživatele. Když do sdíleného prostředí deployuje každý člen týmu sám za sebe, vzniknou konfliktní paralelní nasazení. Domluvte si, kdo (ideálně který service principal) nasazuje do sdílených targetů.</div></div>
+
+  <p>Nejčastější zádrhely: chyby autentizace (řeší <code class="inline">databricks auth login</code>), <strong>lock konflikt</strong> po přerušeném nasazení (<code class="inline">--force-lock</code>), běžící joby z bundlu v okamžiku deploye (chování řídí <code class="inline">--fail-on-active-runs</code>) a varování o neznámých properties — obvykle stará verze CLI proti novějšímu schématu.</p>
+
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> Celý lifecycle do sebe zapadá: kód žije v Git folders (12.1), změny jdou přes feature branch a PR (12.2), CI spouští pytest testy (12.3), a po merge nasadí pipeline tentýž bundle nejdřív do dev a pak do prod (12.4–12.5). Žádné ruční klikání konfigurace jobů v produkci — vše je v repozitáři. Orchestraci samotných jobů popisuje kapitola 11.</div></div>
+
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/6-deploy-bundle-databricks-cli#preview-deployment-changes" target="_blank" rel="noopener">Preview deployment changes</a> · <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/6-deploy-bundle-databricks-cli#troubleshoot-common-deployment-issues" target="_blank" rel="noopener">Troubleshoot common deployment issues</a> (EN)</span></div>
+</div>
+
+<div class="section" id="sec-lab">
+  <div class="section-header">
+    <div class="section-num">12.6</div>
+    <h2>Lab 12: Implement Development Lifecycle Processes (45 minut)</h2>
+  </div>
+  <p>Převezmete order-processing pipeline (čištění objednávek, normalizace status kódů, výpočet totálů s daní) a dotáhnete ji k produkční zralosti: napíšete pytest unit a integrační testy k modulu <code class="inline">transforms.py</code>, zabalíte job do Declarative Automation Bundle s dev/prod targety a nasadíte ho přes Databricks CLI (<code class="inline">validate</code> → <code class="inline">plan</code> → <code class="inline">deploy</code>).</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/12-implement-development-lifecycle-processes-in-azure-databricks.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/implement-development-lifecycle-processes-in-azure-databricks/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Proč Databricks doporučuje držet transformační funkce v .py modulech mimo notebooky a jak to souvisí s pytest? <strong>2)</strong> Co všechno automaticky změní <code class="inline">mode: development</code> na nasazených resources a proč? <strong>3)</strong> Jaký je rozdíl mezi <code class="inline">bundle plan</code> a <code class="inline">bundle deploy</code> a kdy plan zachrání produkci?</div></div>
+</div>
+
+    <div class="footer-nav">
+      <a href="dp750_11_lakeflow_jobs.html">← Lakeflow Jobs</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 12 z 16</span>
+      <a href="dp750_13_monitoring.html" style="margin-left:auto">Monitoring a optimalizace →</a>
+    </div>
+  </main>
+</div>
+
+<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
+/* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
+   tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
+function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
+function initCollapsibles(){document.querySelectorAll('.collapsible-header').forEach(h=>{h.addEventListener('click',()=>h.closest('.collapsible').classList.toggle('open'))})}
+function initHints(){document.querySelectorAll('.hint-toggle').forEach(t=>{t.addEventListener('click',()=>{const c=t.nextElementSibling;c.classList.toggle('open');t.textContent=c.classList.contains('open')?T.hintHide:T.hintShow})})}
+function initCopy(){document.querySelectorAll('.copy-btn').forEach(btn=>{btn.addEventListener('click',()=>{const code=btn.closest('.code-block').querySelector('pre').innerText;function ok(){btn.textContent=T.copied;btn.classList.add('copied');setTimeout(()=>{btn.textContent=T.copy;btn.classList.remove('copied')},2000)}function legacy(){try{const ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){btn.textContent=T.copyFallback;setTimeout(()=>{btn.textContent=T.copy},2000)}}if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(legacy)}else{legacy()}})})}
+function initTOC(){const sections=document.querySelectorAll('.section');const items=document.querySelectorAll('.toc-item[data-section]');if(!items.length)return;const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;items.forEach(i=>i.classList.toggle('active',i.dataset.section===id))}})},{rootMargin:'-15% 0px -70% 0px'});sections.forEach(s=>obs.observe(s));items.forEach(i=>{i.addEventListener('click',()=>{document.getElementById(i.dataset.section)?.scrollIntoView({behavior:'smooth'})})})}
+function initProgress(){const bar=document.getElementById('pfill');if(!bar)return;window.addEventListener('scroll',()=>{const t=window.scrollY;const h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?t/h*100:0)+'%'})}
+function initChapterMenu(){const btn=document.getElementById('chapBtn');const menu=document.getElementById('chapMenu');const overlay=document.getElementById('chapOverlay');if(!btn)return;const cur=window.location.pathname.split('/').pop()||'index.html';menu.querySelectorAll('.chapter-link').forEach(a=>{if(a.getAttribute('href')===cur)a.classList.add('current')});function close(){menu.classList.remove('open');overlay.classList.remove('open');btn.textContent=T.menuOpen}function open(){menu.classList.add('open');overlay.classList.add('open');btn.textContent=T.menuClose}btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.contains('open')?close():open()});overlay.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});menu.querySelectorAll('.chapter-link').forEach(a=>a.addEventListener('click',close))}
+function initViewSwitch(){document.querySelectorAll('[data-view-set]').forEach(b=>b.addEventListener('click',()=>{const m=b.dataset.viewSet;document.documentElement.classList.toggle('mode-custom',m==='custom');try{localStorage.setItem('dp750-view',m)}catch(e){}}))}
+document.addEventListener('DOMContentLoaded',()=>{initChapterMenu();initViewSwitch();initTabs();initCollapsibles();initHints();initCopy();initTOC();initProgress()})</script>
+</body>
+</html>

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Ingest data into Unity Catalog — DP-750</title>
+<title>Ingest dat do Unity Catalogu — DP-750</title>
 <style>/* Zadne externi fonty: stranky nesmi pri otevreni volat cizi server (GDPR + offline provoz).
    Inter/JetBrains Mono se pouziji, pokud je ma uzivatel nainstalovane, jinak systemovy fallback. */
 :root{--font-ui:'Inter','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;--font-mono:'JetBrains Mono','Cascadia Mono',Consolas,'SF Mono',Menlo,monospace}
@@ -122,34 +122,34 @@ html.mode-custom [data-view="orig"]{display:none}
 <div id="chapOverlay" class="chapter-menu-overlay"></div>
 <div id="chapMenu" class="chapter-menu">
   <div class="chapter-group">
-    <div class="chapter-group-title">MOC — days 1 and 2</div>
-    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Explore Azure Databricks</a>
-    <a class="chapter-link" href="dp750_02_compute.html">2. Select and configure compute</a>
-    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objects in Unity Catalog</a>
-    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Securing Unity Catalog</a>
-    <a class="chapter-link" href="dp750_05_governance.html">5. Governing Unity Catalog</a>
-    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Data modeling</a>
-    <a class="chapter-link" href="dp750_07_ingest.html">7. Data ingestion</a>
+    <div class="chapter-group-title">MOC — dny 1 a 2</div>
+    <a class="chapter-link" href="dp750_01_explore_databricks.html">1. Představení Azure Databricks</a>
+    <a class="chapter-link" href="dp750_02_compute.html">2. Výběr a konfigurace compute</a>
+    <a class="chapter-link" href="dp750_03_objekty_unity_catalog.html">3. Objekty v Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_04_zabezpeceni.html">4. Zabezpečení Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_05_governance.html">5. Governance Unity Catalogu</a>
+    <a class="chapter-link" href="dp750_06_datove_modelovani.html">6. Datové modelování</a>
+    <a class="chapter-link" href="dp750_07_ingest.html">7. Ingest dat</a>
   </div>
   <div class="chapter-group">
-    <div class="chapter-group-title">MOC — continued</div>
-    <a class="chapter-link" href="dp750_08_transformace.html">8. Cleansing and transforming data</a>
-    <a class="chapter-link" href="dp750_09_data_quality.html" title="Not in the three-day agenda">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
-    <a class="chapter-link" href="dp750_10_pipelines.html">10. Data pipelines</a>
+    <div class="chapter-group-title">MOC — pokračování</div>
+    <a class="chapter-link" href="dp750_08_transformace.html">8. Čištění a transformace dat</a>
+    <a class="chapter-link" href="dp750_09_data_quality.html" title="Mimo osnovu zkráceného kurzu">9. Data quality constraints<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_10_pipelines.html">10. Datové pipelines</a>
     <a class="chapter-link" href="dp750_11_lakeflow_jobs.html">11. Lakeflow Jobs</a>
-    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Not in the three-day agenda">12. Development lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · not in agenda</span></a>
-    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring and optimization</a>
+    <a class="chapter-link" href="dp750_12_dev_lifecycle.html" title="Mimo osnovu zkráceného kurzu">12. Vývojový lifecycle<span data-view="custom" style="opacity:.55;font-size:11px"> · mimo osnovu</span></a>
+    <a class="chapter-link" href="dp750_13_monitoring.html">13. Monitoring a optimalizace</a>
     <div data-view="orig" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
-      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
     </div>
   </div>
   <div class="chapter-group" data-view="custom">
-    <div class="chapter-group-title">Bonus — day 3</div>
-    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Microsoft Fabric overview</a>
+    <div class="chapter-group-title">Pod čarou — den 3</div>
+    <a class="chapter-link" href="dp750_14_fabric_prehled.html">14. Průřez Microsoft Fabric</a>
     <a class="chapter-link" href="dp750_15_pbi_fabric_databricks.html">15. Power BI + Fabric + Databricks</a>
-    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrating from Oracle</a>
+    <a class="chapter-link" href="dp750_16_migrace_oracle.html">16. Migrace z Oracle</a>
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
-      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Course home</a>
+      <a class="chapter-link" href="index.html" style="color:rgba(255,255,255,.5)">🏠 Rozcestník kurzu</a>
     </div>
   </div>
 </div>
@@ -157,11 +157,11 @@ html.mode-custom [data-view="orig"]{display:none}
 <nav class="top-nav">
   <div style="display:flex;align-items:center;gap:16px;min-width:0">
     <span class="course-code">DP-750</span>
-    <span class="chapter-title-nav">Ingest data into Unity Catalog</span>
+    <span class="chapter-title-nav">Ingest dat do Unity Catalogu</span>
   </div>
   <div class="nav-links">
-    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><a href="../dp750_07_ingest.html" title="Česká verze" hreflang="cs"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></a><span class="current" aria-current="true"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></span></div><button id="chapBtn" class="chapter-menu-btn">☰ Chapters</button><a href="index.html" class="home" title="Course home">🏠</a>
-    <a href="dp750_08_transformace.html" class="next">Cleansing and transforming data →</a>
+    <div class="lang-switch" role="group" aria-label="Jazyk / Language"><span class="current" aria-current="true"><svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#d7141a"/><path d="M0 0 15 10 0 20Z" fill="#11457e"/></svg><span class="lang-lbl">CS</span></span><a href="../dp750_07_ingest.html" title="English version" hreflang="en"><svg viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#c8102e" stroke-width="6"/></svg><span class="lang-lbl">EN</span></a></div><button id="chapBtn" class="chapter-menu-btn">☰ Kapitoly</button><a href="index.html" class="home" title="Rozcestník">🏠</a>
+    <a href="dp750_08_transformace.html" class="next">Čištění a transformace dat →</a>
   </div>
 </nav>
 
@@ -169,62 +169,62 @@ html.mode-custom [data-view="orig"]{display:none}
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="sidebar-title">In this chapter</div>
-    <a href="#sec-lakeflow-connect" class="toc-item active" data-section="sec-lakeflow-connect">Lakeflow Connect: managed connectors</a>
-    <a href="#sec-notebook-ingest" class="toc-item" data-section="sec-notebook-ingest">Ingestion in a notebook: spark.read and the DataFrame API</a>
-    <a href="#sec-sql-metody" class="toc-item" data-section="sec-sql-metody">SQL methods: CTAS, CREATE OR REPLACE, and COPY INTO</a>
-    <a href="#sec-cdc-feed" class="toc-item" data-section="sec-cdc-feed">CDC feeds and the AUTO CDC API</a>
+    <div class="sidebar-title">Obsah kapitoly</div>
+    <a href="#sec-lakeflow-connect" class="toc-item active" data-section="sec-lakeflow-connect">Lakeflow Connect: managed konektory</a>
+    <a href="#sec-notebook-ingest" class="toc-item" data-section="sec-notebook-ingest">Ingest v notebooku: spark.read a DataFrame API</a>
+    <a href="#sec-sql-metody" class="toc-item" data-section="sec-sql-metody">SQL metody: CTAS, CREATE OR REPLACE a COPY INTO</a>
+    <a href="#sec-cdc-feed" class="toc-item" data-section="sec-cdc-feed">CDC feed a AUTO CDC API</a>
     <a href="#sec-structured-streaming" class="toc-item" data-section="sec-structured-streaming">Spark Structured Streaming</a>
-    <a href="#sec-auto-loader" class="toc-item" data-section="sec-auto-loader">Auto Loader: cloudFiles and exactly-once</a>
-    <a href="#sec-deklarativni-pipelines" class="toc-item" data-section="sec-deklarativni-pipelines">Declarative pipelines as a framework over ingestion</a>
-    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 7: Ingest Data into Unity Catalog (45 minutes)</a>
+    <a href="#sec-auto-loader" class="toc-item" data-section="sec-auto-loader">Auto Loader: cloudFiles a exactly-once</a>
+    <a href="#sec-deklarativni-pipelines" class="toc-item" data-section="sec-deklarativni-pipelines">Deklarativní pipelines jako rámec nad ingestem</a>
+    <a href="#sec-lab" class="toc-item" data-section="sec-lab">Lab 7: Ingest Data into Unity Catalog (45 minut)</a>
   </aside>
 
   <main class="main">
     <div class="chapter-hero">
-      <div class="hero-tag">DP-750 · Chapter 7</div>
-      <h1>Ingest data into Unity Catalog</h1>
-      <div class="hero-subtitle">Lakeflow Connect, notebooks, SQL methods, CDC, Structured Streaming, Auto Loader, and declarative pipelines</div>
-      <div class="hero-meta"><span>🗂 Loading data into Unity Catalog, ETL and pipelines</span></div>
+      <div class="hero-tag">DP-750 · Kapitola 7</div>
+      <h1>Ingest dat do Unity Catalogu</h1>
+      <div class="hero-subtitle">Lakeflow Connect, notebooky, SQL metody, CDC, Structured Streaming, Auto Loader a deklarativní pipelines</div>
+      <div class="hero-meta"><span>🗂 Plnění dat do Unity Catalogu, ETL a Pipelines</span></div>
     </div>
 
 <div class="objectives">
-  <h3>Chapter objectives</h3>
+  <h3>Cíle kapitoly</h3>
   <ul>
-    <li>Choose a suitable ingestion route into Unity Catalog based on the source type and the required latency</li>
-    <li>Configure Lakeflow Connect with managed connectors for SaaS applications and databases</li>
-    <li>Load batch and streaming data in a notebook with the DataFrame API and write it into Delta tables</li>
-    <li>Use the SQL statements COPY INTO and CTAS for idempotent file loading</li>
-    <li>Set up Auto Loader with exactly-once semantics and automatic schema inference</li>
+    <li>Vybrat vhodnou ingesční cestu do Unity Catalogu podle typu zdroje a požadované latence</li>
+    <li>Nakonfigurovat Lakeflow Connect s managed konektory pro SaaS aplikace a databáze</li>
+    <li>Načíst batch i streaming data v notebooku pomocí DataFrame API a zapsat je do Delta tabulek</li>
+    <li>Použít SQL příkazy COPY INTO a CTAS pro idempotentní načítání souborů</li>
+    <li>Nastavit Auto Loader s exactly-once sémantikou a automatickou inferencí schématu</li>
   </ul>
 </div>
 
 <div class="section" id="sec-lakeflow-connect">
   <div class="section-header">
     <div class="section-num">7.1</div>
-    <h2>Lakeflow Connect: managed connectors</h2>
+    <h2>Lakeflow Connect: managed konektory</h2>
   </div>
-  <p>Before we get into the individual techniques, let us look at the overall map. Several ingestion routes lead into <strong>Unity Catalog</strong> and each has its sweet spot: managed connectors for SaaS and databases, a notebook with custom code for anything non-standard, SQL statements for one-off and repeated file loading, Auto Loader for files that keep arriving, and Structured Streaming for message buses. All the routes end at the same point — in the Delta tables of the bronze layer governed by Unity Catalog.</p>
+  <p>Než se pustíme do jednotlivých technik, podívejme se na celkovou mapu. Do <strong>Unity Catalogu</strong> vede několik ingesčních cest a každá má svůj sweet spot: managed konektory pro SaaS a databáze, notebook s vlastním kódem pro cokoli nestandardního, SQL příkazy pro jednorázové i opakované načítání souborů, Auto Loader pro průběžně přibývající soubory a Structured Streaming pro message busy. Všechny cesty končí ve stejném bodě — v Delta tabulkách bronze vrstvy spravovaných Unity Catalogem.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 340" role="img" aria-label="A map of ingestion routes into the lakehouse. On the left four source types: SaaS applications, relational databases, files in cloud storage, and a message bus. In the middle six ingestion methods, on the right the target Delta tables in the bronze layer of Unity Catalog.">
+    <svg viewBox="0 0 820 340" role="img" aria-label="Mapa ingesčních cest do lakehouse. Vlevo čtyři typy zdrojů: SaaS aplikace, relační databáze, soubory v cloud storage a message bus. Uprostřed šest ingesčních metod, vpravo cílové Delta tabulky v bronze vrstvě Unity Catalogu.">
       <defs>
         <marker id="arr7a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
       </defs>
-      <text x="110" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">SOURCES</text>
-      <text x="420" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">INGESTION METHODS</text>
-      <text x="710" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">TARGET</text>
+      <text x="110" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">ZDROJE</text>
+      <text x="420" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">INGESČNÍ METODY</text>
+      <text x="710" y="24" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b" text-anchor="middle">CÍL</text>
 
       <rect x="20" y="40" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
-      <text x="110" y="58" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">SaaS applications</text>
+      <text x="110" y="58" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">SaaS aplikace</text>
       <text x="110" y="74" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">Salesforce, Workday, Jira</text>
 
       <rect x="20" y="104" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
-      <text x="110" y="122" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">Relational databases</text>
+      <text x="110" y="122" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">Relační databáze</text>
       <text x="110" y="138" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">SQL Server, MySQL, Postgres</text>
 
       <rect x="20" y="180" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
-      <text x="110" y="198" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">Files in cloud storage</text>
+      <text x="110" y="198" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1a3a6b" text-anchor="middle">Soubory v cloud storage</text>
       <text x="110" y="214" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">CSV, JSON, Parquet, XML</text>
 
       <rect x="20" y="262" width="180" height="44" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
@@ -242,11 +242,11 @@ html.mode-custom [data-view="orig"]{display:none}
       <rect x="310" y="224" width="220" height="32" rx="8" fill="#fff" stroke="#e2e8f0"/>
       <text x="420" y="244" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Structured Streaming</text>
       <rect x="310" y="266" width="220" height="32" rx="8" fill="#fff" stroke="#e2e8f0"/>
-      <text x="420" y="286" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Declarative pipelines</text>
+      <text x="420" y="286" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#1a3a6b" text-anchor="middle">Deklarativní pipelines</text>
 
       <rect x="620" y="120" width="180" height="100" rx="8" fill="#1a3a6b"/>
       <text x="710" y="158" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Unity Catalog</text>
-      <text x="710" y="178" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8f0fb" text-anchor="middle">bronze Delta tables</text>
+      <text x="710" y="178" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" fill="#e8f0fb" text-anchor="middle">bronze Delta tabulky</text>
       <text x="710" y="196" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">catalog.schema.table</text>
 
       <line x1="200" y1="62" x2="310" y2="56" stroke="#6b7280" marker-end="url(#arr7a)"/>
@@ -264,23 +264,23 @@ html.mode-custom [data-view="orig"]{display:none}
       <line x1="530" y1="240" x2="620" y2="185" stroke="#6b7280" marker-end="url(#arr7a)"/>
       <line x1="530" y1="282" x2="620" y2="200" stroke="#6b7280" marker-end="url(#arr7a)"/>
     </svg>
-    <figcaption>A map of ingestion routes: every source type has one or more suitable methods, and all of them end in Delta tables of the bronze layer governed by Unity Catalog.</figcaption>
+    <figcaption>Mapa ingesčních cest: každý typ zdroje má jednu či více vhodných metod, všechny končí v Delta tabulkách bronze vrstvy pod správou Unity Catalogu.</figcaption>
   </figure>
 
-  <p><strong>Lakeflow Connect</strong> is a set of managed connectors — instead of writing extraction code you just configure a pipeline, through the UI, Asset Bundles (today Declarative Automation Bundles, see section 12.4), a notebook, or the CLI — and Databricks takes care of extraction, staging, and writing into streaming tables. The connectors fall into three categories:</p>
+  <p><strong>Lakeflow Connect</strong> je sada managed konektorů — místo psaní extrakčního kódu jen nakonfigurujete pipeline — přes UI, Asset Bundles (dnes Declarative Automation Bundles, viz sekce 12.4), notebook nebo CLI — a Databricks se stará o extrakci, staging i zápis do streaming tabulek. Konektory se dělí do tří kategorií:</p>
 
   <table>
-    <tr><th>Connector type</th><th>Sources</th><th>Mechanism</th></tr>
-    <tr><td><strong>SaaS connectors</strong></td><td>Salesforce, HubSpot, Jira, Workday</td><td>extraction directly through the source API</td></tr>
-    <tr><td><strong>Database (CDC)</strong></td><td>SQL Server, MySQL, PostgreSQL</td><td>an ingestion gateway reads changes from the transaction log (binlog)</td></tr>
-    <tr><td><strong>Query-based</strong></td><td>databases without CDC</td><td>scheduled queries with a cursor column (increasing timestamp/ID), no gateway</td></tr>
+    <tr><th>Typ konektoru</th><th>Zdroje</th><th>Mechanismus</th></tr>
+    <tr><td><strong>SaaS konektory</strong></td><td>Salesforce, HubSpot, Jira, Workday</td><td>extrakce přímo přes API zdroje</td></tr>
+    <tr><td><strong>Databázové (CDC)</strong></td><td>SQL Server, MySQL, PostgreSQL</td><td>ingestion gateway čte změny z transakčního logu (binlog)</td></tr>
+    <tr><td><strong>Query-based</strong></td><td>databáze bez CDC</td><td>plánované dotazy s cursor sloupcem (rostoucí timestamp/ID), bez gateway</td></tr>
   </table>
 
-  <p>Every ingestion pipeline is made up of three components: a <strong>connection</strong> (stored credentials and endpoint — created once, used repeatedly), an <strong>ingestion definition</strong> (which tables and where in Unity Catalog), and a <strong>schedule</strong>. Database connectors additionally create an <strong>ingestion gateway</strong>, which continuously pulls changes out of the source database.</p>
+  <p>Každá ingesční pipeline se skládá ze tří komponent: <strong>connection</strong> (uložené přihlašovací údaje a endpoint — vytvoříte jednou, použijete opakovaně), <strong>ingestion definition</strong> (které tabulky a kam v Unity Catalogu) a <strong>schedule</strong>. U databázových konektorů vzniká navíc <strong>ingestion gateway</strong>, která průběžně vytahuje změny ze zdrojové databáze.</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">YAML</span><button class="copy-btn">Copy</button></div>
-    <pre><span class="cm"># ingestion definition in Declarative Automation Bundles (formerly Asset Bundles)</span>
+    <div class="code-header"><span class="code-lang">YAML</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># ingestion definition v Declarative Automation Bundles (drive Asset Bundles)</span>
 resources:
   pipelines:
     pipeline_sqlserver:
@@ -288,9 +288,9 @@ resources:
       catalog: <span class="tbl">sales</span>
       schema: <span class="tbl">bronze</span>
       ingestion_definition:
-        <span class="cm"># connection_name points to the UC connection with the source credentials</span>
+        <span class="cm"># connection_name odkazuje na UC connection se zdrojovymi udaji</span>
         connection_name: sqlserver_prod_connection
-        <span class="cm"># database connectors also need a gateway pipeline with the source changes</span>
+        <span class="cm"># u databazovych konektoru navic gateway pipeline se zmenami ze zdroje</span>
         ingestion_gateway_id: <span class="str">${resources.pipelines.gateway_sqlserver.id}</span>
         objects:
           - table:
@@ -300,48 +300,48 @@ resources:
               destination_schema: <span class="tbl">bronze</span></pre>
   </div>
 
-  <p>The key choices during configuration: <strong>SCD type 1</strong> (the target always reflects the current state of the source — an update overwrites the row) vs. <strong>SCD type 2</strong> (history is preserved and the table gets the columns <code class="inline">__START_AT</code> and <code class="inline">__END_AT</code>). Then column selection through <code class="inline">include_columns</code> / <code class="inline">exclude_columns</code> and the option of a <strong>full refresh</strong> when incremental processing cannot recover from a schema change.</p>
+  <p>Klíčové volby při konfiguraci: <strong>SCD type 1</strong> (cíl vždy odráží aktuální stav zdroje — update přepíše řádek) vs. <strong>SCD type 2</strong> (historie se uchovává, tabulka dostane sloupce <code class="inline">__START_AT</code> a <code class="inline">__END_AT</code>). Dále výběr sloupců přes <code class="inline">include_columns</code> / <code class="inline">exclude_columns</code> a možnost <strong>full refresh</strong>, když se inkrementální zpracování nedokáže zotavit ze změny schématu.</p>
 
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> a single pipeline can write the same source table into several target catalogs and schemas — useful when both marketing and sales need their own copy of the data under their own governance. You do not have to build a second pipeline.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> jedna pipeline umí zapisovat stejnou zdrojovou tabulku do více cílových katalogů a schémat — hodí se, když marketing i sales potřebují vlastní kopii dat pod vlastní governance. Nemusíte stavět druhou pipeline.</div></div>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> with <code class="inline">include_columns</code>, newly added columns in the source do not reach the target automatically. With <code class="inline">exclude_columns</code> it is the other way round — new columns are added automatically. Choose according to whether you want to govern the schema or let it evolve. The connector offering is expanding quickly — verify the current list and status (preview/GA) in the documentation.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> s <code class="inline">include_columns</code> se nově přidané sloupce ve zdroji do cíle automaticky nedostanou. S <code class="inline">exclude_columns</code> je to naopak — nové sloupce se přidávají automaticky. Vyberte podle toho, jestli chcete schéma řídit, nebo nechat evolvovat. Nabídka konektorů se rychle rozšiřuje — aktuální seznam a stav (preview/GA) ověřte v dokumentaci.</div></div>
 
-  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/2-ingest-data-lakeflow-connect#control-data-extraction-behavior" target="_blank" rel="noopener">Control data extraction behavior</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/2-ingest-data-lakeflow-connect#optimize-column-selection-and-refresh-strategies" target="_blank" rel="noopener">Optimize column selection and refresh strategies</a></span></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/2-ingest-data-lakeflow-connect#control-data-extraction-behavior" target="_blank" rel="noopener">Control data extraction behavior</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/2-ingest-data-lakeflow-connect#optimize-column-selection-and-refresh-strategies" target="_blank" rel="noopener">Optimize column selection and refresh strategies</a> (EN)</span></div>
 </div>
 
 <div class="section" id="sec-notebook-ingest">
   <div class="section-header">
     <div class="section-num">7.2</div>
-    <h2>Ingestion in a notebook: spark.read and the DataFrame API</h2>
+    <h2>Ingest v notebooku: spark.read a DataFrame API</h2>
   </div>
-  <p>When no managed connector exists or you need custom logic, you reach for a notebook. The basis of batch ingestion is <code class="inline">spark.read</code> — it returns a <strong>DataFrame</strong>, a distributed collection of data organized into named columns.</p>
+  <p>Když managed konektor neexistuje nebo potřebujete vlastní logiku, sáhnete po notebooku. Základem batch ingestu je <code class="inline">spark.read</code> — vrací <strong>DataFrame</strong>, distribuovanou kolekci dat organizovanou do pojmenovaných sloupců.</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
     <pre>df = (spark.read
     .<span class="fn">format</span>(<span class="str">"csv"</span>)
     .<span class="fn">option</span>(<span class="str">"header"</span>, <span class="str">"true"</span>)
     .<span class="fn">option</span>(<span class="str">"inferSchema"</span>, <span class="str">"true"</span>)
     .<span class="fn">load</span>(<span class="str">"/Volumes/catalog/schema/volume/data.csv"</span>))
 
-<span class="cm"># write into a Delta table in Unity Catalog</span>
+<span class="cm"># zapis do Delta tabulky v Unity Catalogu</span>
 df.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>).<span class="fn">saveAsTable</span>(<span class="str">"catalog.schema.table_name"</span>)</pre>
   </div>
 
-  <p>The same pattern loads JSON, Parquet, and XML (there the <code class="inline">rowTag</code> option is mandatory, telling Spark which XML element corresponds to one row). The write always ends in the Delta format — the default in Databricks, giving ACID transactions and time travel. The behavior when the table already exists is controlled by <code class="inline">mode()</code>:</p>
+  <p>Stejným vzorem načtete JSON, Parquet i XML (tam je povinná option <code class="inline">rowTag</code>, která říká, který XML element odpovídá jednomu řádku). Zápis vždy končí v Delta formátu — ten je v Databricks výchozí a dává ACID transakce a time travel. Chování při existující tabulce řídí <code class="inline">mode()</code>:</p>
 
   <table>
-    <tr><th>Mode</th><th>Behavior</th></tr>
-    <tr><td><code class="inline">overwrite</code></td><td>completely replaces the table contents</td></tr>
-    <tr><td><code class="inline">append</code></td><td>adds rows to the existing ones</td></tr>
-    <tr><td><code class="inline">ignore</code></td><td>does nothing if the table exists</td></tr>
-    <tr><td><code class="inline">error</code> (default)</td><td>throws an exception if the table exists</td></tr>
+    <tr><th>Mode</th><th>Chování</th></tr>
+    <tr><td><code class="inline">overwrite</code></td><td>kompletně nahradí obsah tabulky</td></tr>
+    <tr><td><code class="inline">append</code></td><td>přidá řádky k existujícím</td></tr>
+    <tr><td><code class="inline">ignore</code></td><td>pokud tabulka existuje, neudělá nic</td></tr>
+    <tr><td><code class="inline">error</code> (default)</td><td>pokud tabulka existuje, vyhodí výjimku</td></tr>
   </table>
 
-  <p>For relational sources without a Lakeflow connector, <strong>JDBC</strong> does the job. Never write credentials into the notebook — they belong in Databricks secrets:</p>
+  <p>Pro relační zdroje bez Lakeflow konektoru poslouží <strong>JDBC</strong>. Přihlašovací údaje nikdy nepište do notebooku — patří do Databricks secrets:</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
     <pre>df_jdbc = (spark.read
     .<span class="fn">format</span>(<span class="str">"jdbc"</span>)
     .<span class="fn">option</span>(<span class="str">"url"</span>, <span class="str">"jdbc:sqlserver://server.database.windows.net:1433;database=mydb"</span>)
@@ -351,38 +351,38 @@ df.write.<span class="fn">mode</span>(<span class="str">"overwrite"</span>).<spa
     .<span class="fn">load</span>())</pre>
   </div>
 
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> instead of a table name you can put a subquery into the <code class="inline">dbtable</code> option — the filter is then executed on the database side (pushdown) and only the relevant rows travel over the network. On large source tables that is the difference between minutes and hours.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> do option <code class="inline">dbtable</code> lze místo názvu tabulky vložit subquery — filtr se pak vykoná na straně databáze (pushdown) a po síti tečou jen relevantní řádky. U velkých zdrojových tabulek to je rozdíl mezi minutami a hodinami.</div></div>
 
   <div class="collapsible">
-    <div class="collapsible-header">Semi-structured data and the VARIANT type<span class="chevron">▼</span></div>
+    <div class="collapsible-header">Semi-strukturovaná data a typ VARIANT<span class="chevron">▼</span></div>
     <div class="collapsible-body">
-      <p>When the schema of JSON records differs between rows or evolves over time, you do not have to enforce it at ingestion. The <strong>VARIANT</strong> data type stores the whole nested structure and you can query specific fields later:</p>
+      <p>Když se schéma JSON záznamů mezi řádky liší nebo se vyvíjí v čase, nemusíte ho vynucovat při ingestu. Datový typ <strong>VARIANT</strong> uloží celou vnořenou strukturu a dotazovat se na konkrétní pole můžete až později:</p>
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
         <pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> parse_json, variant_get, col
 
 df = spark.read.<span class="fn">text</span>(<span class="str">"/path/to/data.json"</span>)
 df_variant = df.<span class="fn">select</span>(<span class="fn">parse_json</span>(<span class="fn">col</span>(<span class="str">"value"</span>)).<span class="fn">alias</span>(<span class="str">"data"</span>))
 df_variant.<span class="fn">select</span>(<span class="fn">variant_get</span>(<span class="fn">col</span>(<span class="str">"data"</span>), <span class="str">"$.customer.name"</span>, <span class="str">"string"</span>)).<span class="fn">display</span>()</pre>
       </div>
-      <p>That is exactly the "schema-on-read" pattern for the bronze layer: raw data in without loss, structure dealt with in silver.</p>
+      <p>To je přesně vzor „schema-on-read" pro bronze vrstvu: surová data dovnitř beze ztrát, strukturu řešíme až v silver.</p>
     </div>
   </div>
 
-  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/3-ingest-data-notebooks#handle-semi-structured-data" target="_blank" rel="noopener">Handle semi-structured data</a></span></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/3-ingest-data-notebooks#handle-semi-structured-data" target="_blank" rel="noopener">Handle semi-structured data</a> (EN)</span></div>
 </div>
 
 <div class="section" id="sec-sql-metody">
   <div class="section-header">
     <div class="section-num">7.3</div>
-    <h2>SQL methods: CTAS, CREATE OR REPLACE, and COPY INTO</h2>
+    <h2>SQL metody: CTAS, CREATE OR REPLACE a COPY INTO</h2>
   </div>
-  <p>If you prefer declarative SQL to procedural code, three statements are available. They differ mainly in what they do with an existing table — and that is exactly what you have to remember about them.</p>
+  <p>Kdo preferuje deklarativní SQL před procedurálním kódem, má k dispozici tři příkazy. Liší se hlavně tím, co udělají s existující tabulkou — a to je přesně to, co si u nich musíte zapamatovat.</p>
 
-  <p><strong>CTAS</strong> (<code class="inline">CREATE TABLE AS SELECT</code>) combines creating a table and filling it with data in one step. The schema is derived from the query result. For reading from files it is combined with the table-valued function <code class="inline">read_files</code>:</p>
+  <p><strong>CTAS</strong> (<code class="inline">CREATE TABLE AS SELECT</code>) spojí vytvoření tabulky a naplnění daty do jednoho kroku. Schéma se odvodí z výsledku dotazu. Pro čtení ze souborů se kombinuje s table-valued funkcí <code class="inline">read_files</code>:</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
     <pre><span class="kw">CREATE TABLE</span> <span class="tbl">catalog.schema.sales_data</span> <span class="kw">AS</span>
 <span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="fn">read_files</span>(
     <span class="str">'/Volumes/catalog/schema/volume/sales/*.parquet'</span>,
@@ -390,13 +390,13 @@ df_variant.<span class="fn">select</span>(<span class="fn">variant_get</span>(<s
 );</pre>
   </div>
 
-  <p><strong>CREATE OR REPLACE TABLE</strong> replaces the table completely, but unlike DROP + CREATE it preserves the table history, the granted permissions, row filters, and column masks. Downstream consumers notice nothing. It suits periodic full refreshes.</p>
+  <p><strong>CREATE OR REPLACE TABLE</strong> tabulku kompletně nahradí, ale na rozdíl od DROP + CREATE zachová historii tabulky, udělená oprávnění, row filters i column masks. Downstream konzumenti nic nepoznají. Hodí se na periodické full refreshe.</p>
 
-  <p><strong>COPY INTO</strong> is meant for repeatedly appending files: it loads files from cloud storage and <em>appends</em> them to an existing table. Its key property is <strong>idempotence</strong> — files already loaded are skipped automatically, even if you run the statement again:</p>
+  <p><strong>COPY INTO</strong> je určeno pro opakované přiléhání souborů: načte soubory z cloud storage a <em>appenduje</em> je do existující tabulky. Jeho klíčová vlastnost je <strong>idempotence</strong> — už jednou načtené soubory automaticky přeskočí, i když příkaz spustíte znovu:</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
-    <pre><span class="cm">-- the target table must exist beforehand</span>
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm">-- cilova tabulka musi existovat predem</span>
 <span class="kw">CREATE TABLE IF NOT EXISTS</span> <span class="tbl">catalog.schema.events</span> (
     <span class="col">event_id</span> STRING, <span class="col">event_type</span> STRING,
     <span class="col">event_timestamp</span> TIMESTAMP, <span class="col">payload</span> STRING);
@@ -407,26 +407,26 @@ FILEFORMAT = JSON
 FORMAT_OPTIONS (<span class="str">'multiline'</span> = <span class="str">'true'</span>);</pre>
   </div>
 
-  <p>You narrow the file selection with <code class="inline">PATTERN</code> (a glob) or <code class="inline">FILES</code> (specific names). The option <code class="inline">COPY_OPTIONS ('mergeSchema' = 'true')</code> allows the table schema to evolve, and <code class="inline">VALIDATE ALL</code> checks parsability and schema conformance without loading anything.</p>
+  <p>Výběr souborů zúžíte přes <code class="inline">PATTERN</code> (glob) nebo <code class="inline">FILES</code> (konkrétní jména). Volba <code class="inline">COPY_OPTIONS ('mergeSchema' = 'true')</code> dovolí schématu tabulky evolvovat, a <code class="inline">VALIDATE ALL</code> zkontroluje parsovatelnost a shodu se schématem, aniž by cokoliv načetlo.</p>
 
   <table>
-    <tr><th>Method</th><th>Best for</th><th>Behavior</th></tr>
-    <tr><td><strong>CTAS</strong></td><td>the first load, one-off migrations</td><td>creates a new table; fails if it exists</td></tr>
-    <tr><td><strong>CREATE OR REPLACE</strong></td><td>periodic full refresh</td><td>replaces the whole table; preserves permissions</td></tr>
-    <tr><td><strong>COPY INTO</strong></td><td>continuously adding files</td><td>append; skips already loaded files</td></tr>
+    <tr><th>Metoda</th><th>Nejlepší pro</th><th>Chování</th></tr>
+    <tr><td><strong>CTAS</strong></td><td>první load, jednorázové migrace</td><td>vytvoří novou tabulku; selže, pokud existuje</td></tr>
+    <tr><td><strong>CREATE OR REPLACE</strong></td><td>periodický full refresh</td><td>nahradí celou tabulku; zachová oprávnění</td></tr>
+    <tr><td><strong>COPY INTO</strong></td><td>průběžné přidávání souborů</td><td>append; načtené soubory přeskakuje</td></tr>
   </table>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> <code class="inline">COPY INTO</code> scales well into the thousands of files. If the source will grow into millions of files, the documentation recommends Auto Loader (section 7.6) — it discovers files more efficiently and without the overhead of directory listing. Anyone expecting <code class="inline">CTAS ... IF NOT EXISTS</code> to "top up" the table will be surprised: the statement is simply skipped as a whole.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> <code class="inline">COPY INTO</code> škáluje dobře do řádu tisíců souborů. Pokud zdroj poroste do milionů souborů, dokumentace doporučuje Auto Loader (sekce 7.6) — objevuje soubory efektivněji a bez režie výpisu adresáře. Kdo čeká, že <code class="inline">CTAS ... IF NOT EXISTS</code> tabulku „doplní", bude překvapen: příkaz se prostě celý přeskočí.</div></div>
 </div>
 
 <div class="section" id="sec-cdc-feed">
   <div class="section-header">
     <div class="section-num">7.4</div>
-    <h2>CDC feeds and the AUTO CDC API</h2>
+    <h2>CDC feed a AUTO CDC API</h2>
   </div>
-  <p>When the source system generates millions of transactions a day, full reloads stop making sense. <strong>Change data capture (CDC)</strong> transfers only the changes — every feed record carries the data columns, the <strong>operation type</strong> (INSERT/UPDATE/DELETE), and a <strong>sequencing column</strong> (a timestamp or an ordinal number) that determines the order of the changes.</p>
+  <p>Když zdrojový systém generuje miliony transakcí denně, plné reloady přestávají dávat smysl. <strong>Change data capture (CDC)</strong> přenáší jen změny — každý záznam feedu nese datové sloupce, <strong>typ operace</strong> (INSERT/UPDATE/DELETE) a <strong>sekvenční sloupec</strong> (timestamp nebo pořadové číslo), který určuje pořadí změn.</p>
 
-  <p>Applying a CDC feed by hand is full of pitfalls: out-of-order events, deduplication, deletes. The <strong>AUTO CDC API</strong> in Lakeflow Spark Declarative Pipelines handles this for you — you create the target streaming table, define a flow, and choose the SCD type:</p>
+  <p>Ruční aplikace CDC feedu je plná záludností: out-of-order události, deduplikace, mazání. <strong>AUTO CDC API</strong> v Lakeflow Spark Declarative Pipelines tohle řeší za vás — vytvoříte cílovou streaming tabulku, definujete flow a zvolíte SCD typ:</p>
 
   <div class="tabs">
     <div class="tab-list">
@@ -435,7 +435,7 @@ FORMAT_OPTIONS (<span class="str">'multiline'</span> = <span class="str">'true'<
     </div>
     <div class="tab-panel" id="tab-07-cdc-sql">
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
         <pre><span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">employees</span>;
 
 <span class="kw">CREATE FLOW</span> employees_cdc_flow
@@ -450,7 +450,7 @@ STORED AS SCD TYPE <span class="num">1</span>;</pre>
     </div>
     <div class="tab-panel" id="tab-07-cdc-py">
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
         <pre><span class="kw">from</span> pyspark <span class="kw">import</span> pipelines <span class="kw">as</span> dp
 <span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, expr
 
@@ -469,15 +469,15 @@ dp.<span class="fn">create_auto_cdc_flow</span>(
     </div>
   </div>
 
-  <p>The choice of SCD type decides what happens to the previous version of a record:</p>
+  <p>Volba SCD typu rozhoduje, co se stane s předchozí verzí záznamu:</p>
   <ul>
-    <li><strong>SCD Type 1</strong> — an update overwrites the row; an employee moves from Seattle to Portland and Seattle disappears from the table.</li>
-    <li><strong>SCD Type 2</strong> — the history stays: the Seattle record gets an <code class="inline">__END_AT</code> and a new row with Portland is added. With <code class="inline">TRACK HISTORY ON * EXCEPT (...)</code> you can specify which columns trigger a new historical version at all.</li>
+    <li><strong>SCD Type 1</strong> — update přepíše řádek; zaměstnanec se přestěhuje ze Seattlu do Portlandu a Seattle z tabulky zmizí.</li>
+    <li><strong>SCD Type 2</strong> — historie zůstává: záznam se Seattle dostane <code class="inline">__END_AT</code>, přibude nový řádek s Portlandem. Přes <code class="inline">TRACK HISTORY ON * EXCEPT (...)</code> lze určit, které sloupce novou historickou verzi vůbec vyvolají.</li>
   </ul>
 
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> a late-arriving older update (a lower value in <code class="inline">SEQUENCE BY</code>) is ignored automatically by the API if a newer one has already been applied. Without that you would be writing your own merge logic with version comparisons. For sources sending <em>partial updates</em> (only the changed columns) there is <code class="inline">IGNORE NULL UPDATES</code> — NULLs in the incoming record then do not overwrite existing values.</div></div>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> pozdě dorazivší starší update (nižší hodnota v <code class="inline">SEQUENCE BY</code>) API automaticky ignoruje, pokud už je aplikován novější. Bez toho byste psali vlastní merge logiku s porovnáváním verzí. Pro zdroje posílající <em>partial updates</em> (jen změněné sloupce) existuje <code class="inline">IGNORE NULL UPDATES</code> — NULLy v příchozím záznamu pak nepřepíšou existující hodnoty.</div></div>
 
-  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/5-ingest-data-change-data-capture-feed#handle-out-of-order-events" target="_blank" rel="noopener">Handle out-of-order events</a></span></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/5-ingest-data-change-data-capture-feed#handle-out-of-order-events" target="_blank" rel="noopener">Handle out-of-order events</a> (EN)</span></div>
 </div>
 
 <div class="section" id="sec-structured-streaming">
@@ -485,36 +485,36 @@ dp.<span class="fn">create_auto_cdc_flow</span>(
     <div class="section-num">7.5</div>
     <h2>Spark Structured Streaming</h2>
   </div>
-  <p><strong>Structured Streaming</strong> treats incoming data as an unbounded table that keeps growing. The API is the same as for batch — you just write <code class="inline">spark.readStream</code> instead of <code class="inline">spark.read</code> and <code class="inline">writeStream</code> instead of <code class="inline">write</code>. What has already been processed is tracked by a <strong>checkpoint</strong>.</p>
+  <p><strong>Structured Streaming</strong> pracuje s příchozími daty jako s neohraničenou tabulkou, která neustále roste. API je stejné jako u batchů — jen místo <code class="inline">spark.read</code> píšete <code class="inline">spark.readStream</code> a místo <code class="inline">write</code> pak <code class="inline">writeStream</code>. O to, co už bylo zpracováno, se stará <strong>checkpoint</strong>.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 300" role="img" aria-label="A comparison of three processing modes. Batch reloads all the data on every run. Incremental batch with the availableNow trigger processes only the new data on each scheduled run and finishes. Streaming processes events continuously in micro-batches.">
+    <svg viewBox="0 0 820 300" role="img" aria-label="Srovnání tří režimů zpracování. Batch načítá při každém běhu všechna data znovu. Inkrementální batch s triggerem availableNow zpracuje při každém plánovaném běhu jen nová data a skončí. Streaming zpracovává události průběžně v mikrodávkách.">
       <defs>
         <marker id="arr7b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
       </defs>
       <line x1="150" y1="40" x2="790" y2="40" stroke="#e2e8f0"/>
       <text x="20" y="70" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b">Batch</text>
-      <text x="20" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">full reload</text>
+      <text x="20" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">plny reload</text>
       <rect x="180" y="55" width="120" height="34" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
-      <text x="240" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">all the data</text>
+      <text x="240" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">vsechna data</text>
       <rect x="400" y="55" width="120" height="34" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
-      <text x="460" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">all the data</text>
+      <text x="460" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">vsechna data</text>
       <rect x="620" y="55" width="120" height="34" rx="8" fill="#e8f0fb" stroke="#1a3a6b"/>
-      <text x="680" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">all the data</text>
+      <text x="680" y="76" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#1a3a6b" text-anchor="middle">vsechna data</text>
 
-      <text x="20" y="140" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b">Incremental</text>
+      <text x="20" y="140" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b">Inkrementální</text>
       <text x="20" y="156" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">trigger availableNow</text>
       <rect x="180" y="125" width="90" height="34" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
-      <text x="225" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">new data only</text>
+      <text x="225" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">jen nová data</text>
       <rect x="400" y="125" width="70" height="34" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
-      <text x="435" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">new</text>
+      <text x="435" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">nová</text>
       <rect x="620" y="125" width="80" height="34" rx="8" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
-      <text x="660" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">new</text>
+      <text x="660" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8721c" text-anchor="middle">nová</text>
       <text x="330" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">checkpoint →</text>
       <text x="530" y="146" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">checkpoint →</text>
 
       <text x="20" y="215" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1a3a6b">Streaming</text>
-      <text x="20" y="231" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">continuously</text>
+      <text x="20" y="231" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280">kontinuálně</text>
       <g fill="#22c55e">
         <rect x="185" y="205" width="18" height="26" rx="4"/><rect x="245" y="205" width="18" height="26" rx="4"/>
         <rect x="290" y="205" width="18" height="26" rx="4"/><rect x="360" y="205" width="18" height="26" rx="4"/>
@@ -523,16 +523,16 @@ dp.<span class="fn">create_auto_cdc_flow</span>(
         <rect x="655" y="205" width="18" height="26" rx="4"/><rect x="720" y="205" width="18" height="26" rx="4"/>
       </g>
       <line x1="180" y1="250" x2="790" y2="250" stroke="#6b7280" marker-end="url(#arr7b)"/>
-      <text x="480" y="272" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">time → micro-batches processed continuously, latency in seconds</text>
+      <text x="480" y="272" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">čas → mikrodávky zpracovávané průběžně, latence sekundy</text>
     </svg>
-    <figcaption>Batch vs. incremental batch vs. streaming: the incremental mode with the availableNow trigger combines the efficiency of streaming (only the new data) with the predictability of scheduled jobs.</figcaption>
+    <figcaption>Batch vs. inkrementální batch vs. streaming: inkrementální režim s triggerem availableNow kombinuje efektivitu streamingu (zpracuje jen nové) s předvídatelností plánovaných jobů.</figcaption>
   </figure>
 
-  <p>For <strong>Azure Event Hubs</strong> the simplest route is through its Kafka-compatible endpoint — the same connector as for Kafka, only with SASL authentication through a connection string from secrets. There is also a native <code class="inline">eventhubs</code> connector (the payload is then in the <code class="inline">body</code> column instead of <code class="inline">value</code>).</p>
+  <p>Pro <strong>Azure Event Hubs</strong> je nejjednodušší cesta přes jeho Kafka-kompatibilní endpoint — stejný konektor jako pro Kafku, jen s SASL autentizací přes connection string ze secrets. Existuje i nativní konektor <code class="inline">eventhubs</code> (payload pak najdete ve sloupci <code class="inline">body</code> místo <code class="inline">value</code>).</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
-    <pre><span class="cm"># reading from a Kafka topic and writing into a Delta table</span>
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
+    <pre><span class="cm"># cteni z Kafka topicu a zapis do Delta tabulky</span>
 df_stream = (spark.readStream
     .<span class="fn">format</span>(<span class="str">"kafka"</span>)
     .<span class="fn">option</span>(<span class="str">"kafka.bootstrap.servers"</span>, <span class="str">"broker-server:9092"</span>)
@@ -547,29 +547,29 @@ df_stream = (spark.readStream
     .<span class="fn">toTable</span>(<span class="str">"iot.bronze.sensor_readings"</span>))</pre>
   </div>
 
-  <p>The Kafka connector returns a standard schema (<code class="inline">key</code>, <code class="inline">value</code>, <code class="inline">topic</code>, <code class="inline">partition</code>, <code class="inline">offset</code>, <code class="inline">timestamp</code>) — the values are binary, so you typically cast them to string and parse them with <code class="inline">from_json</code>. The processing frequency is governed by the <strong>trigger</strong>: with no trigger the stream runs continuously, <code class="inline">processingTime="10 seconds"</code> processes at intervals, and <code class="inline">availableNow=True</code> processes everything available and finishes — ideal for scheduled jobs.</p>
+  <p>Kafka konektor vrací standardní schéma (<code class="inline">key</code>, <code class="inline">value</code>, <code class="inline">topic</code>, <code class="inline">partition</code>, <code class="inline">offset</code>, <code class="inline">timestamp</code>) — hodnoty jsou binární, takže je typicky castujete na string a parsujete přes <code class="inline">from_json</code>. Frekvenci zpracování řídí <strong>trigger</strong>: bez triggeru běží stream nepřetržitě, <code class="inline">processingTime="10 seconds"</code> zpracovává v intervalech a <code class="inline">availableNow=True</code> zpracuje vše dostupné a skončí — ideální pro plánované joby.</p>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> every streaming query must have <em>its own unique</em> checkpoint location. Sharing a checkpoint between two streams leads to processing errors. And no lifecycle policies on checkpoint directories — deleting a checkpoint means starting from zero.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> každá streaming query musí mít <em>vlastní unikátní</em> checkpoint location. Sdílení checkpointu mezi dvěma streamy vede k chybám zpracování. A žádné lifecycle policy na checkpoint adresáře — smazání checkpointu znamená start od nuly.</div></div>
 
   <div class="collapsible">
     <div class="collapsible-header">Monitoring streaming queries<span class="chevron">▼</span></div>
     <div class="collapsible-body">
-      <p>You can see active streams in the Spark UI on the Structured Streaming tab. Programmatically: <code class="inline">query.isActive</code>, <code class="inline">query.status</code>, <code class="inline">query.recentProgress</code>. In production, wrap <code class="inline">query.awaitTermination()</code> in try/except and set up alerting on stream lag (the lag metrics in the progress report). A common misunderstanding: <code class="inline">startingOffsets</code> applies only to the very first start — once a checkpoint exists, processing continues from it and the option is ignored.</p>
+      <p>Aktivní streamy vidíte ve Spark UI na záložce Structured Streaming. Programově: <code class="inline">query.isActive</code>, <code class="inline">query.status</code>, <code class="inline">query.recentProgress</code>. V produkci obalte <code class="inline">query.awaitTermination()</code> do try/except a nastavte alerting na zaostávání streamu (lag metriky v progress reportu). Časté nedorozumění: <code class="inline">startingOffsets</code> platí jen pro úplně první spuštění — jakmile existuje checkpoint, pokračuje se od něj a option se ignoruje.</p>
     </div>
   </div>
 
-  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/6-ingest-data-spark-structured-streaming#configure-checkpoint-locations" target="_blank" rel="noopener">Configure checkpoint locations</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/6-ingest-data-spark-structured-streaming#monitor-streaming-queries" target="_blank" rel="noopener">Monitor streaming queries</a></span></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/6-ingest-data-spark-structured-streaming#configure-checkpoint-locations" target="_blank" rel="noopener">Configure checkpoint locations</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/6-ingest-data-spark-structured-streaming#monitor-streaming-queries" target="_blank" rel="noopener">Monitor streaming queries</a> (EN)</span></div>
 </div>
 
 <div class="section" id="sec-auto-loader">
   <div class="section-header">
     <div class="section-num">7.6</div>
-    <h2>Auto Loader: cloudFiles and exactly-once</h2>
+    <h2>Auto Loader: cloudFiles a exactly-once</h2>
   </div>
-  <p><strong>Auto Loader</strong> is a Structured Streaming source specialized in files: it watches a location in cloud storage and incrementally processes newly arriving files. It keeps the state of already processed files itself, so every file is ingested <strong>exactly once</strong> — no manual tracking, no duplicates after a restart.</p>
+  <p><strong>Auto Loader</strong> je Structured Streaming source specializovaný na soubory: sleduje lokaci v cloud storage a inkrementálně zpracovává nově příchozí soubory. Stav o už zpracovaných souborech si drží sám, takže každý soubor je ingestován <strong>exactly-once</strong> — bez ručního trackování, bez duplicit při restartu.</p>
 
   <figure class="figure">
-    <svg viewBox="0 0 820 320" role="img" aria-label="The Auto Loader mechanism. New files in cloud storage are detected either by directory listing or by file notifications. Auto Loader compares the files against the state in the checkpoint, processes only the new ones, stores the inferred schema in the schema location, and writes the data into a Delta table with an exactly-once guarantee.">
+    <svg viewBox="0 0 820 320" role="img" aria-label="Mechanismus Auto Loaderu. Nové soubory v cloud storage detekuje buď directory listing, nebo file notifications. Auto Loader porovná soubory se stavem v checkpointu, zpracuje jen nové, uloží inferované schéma do schema location a zapíše data do Delta tabulky s garancí exactly-once.">
       <defs>
         <marker id="arr7c" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6b7280"/></marker>
       </defs>
@@ -580,7 +580,7 @@ df_stream = (spark.readStream
       <rect x="40" y="132" width="150" height="24" rx="4" fill="#fff" stroke="#e2e8f0"/>
       <text x="115" y="148" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">orders_002.json ✓</text>
       <rect x="40" y="164" width="150" height="24" rx="4" fill="#fff" stroke="#e8721c" stroke-width="1.5"/>
-      <text x="115" y="180" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="600" fill="#e8721c" text-anchor="middle">orders_003.json NEW</text>
+      <text x="115" y="180" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="600" fill="#e8721c" text-anchor="middle">orders_003.json NOVÝ</text>
 
       <line x1="210" y1="135" x2="310" y2="135" stroke="#6b7280" marker-end="url(#arr7c)"/>
       <text x="260" y="112" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">directory listing</text>
@@ -589,28 +589,28 @@ df_stream = (spark.readStream
       <rect x="310" y="85" width="220" height="100" rx="8" fill="#1a3a6b"/>
       <text x="420" y="120" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">Auto Loader</text>
       <text x="420" y="140" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">format("cloudFiles")</text>
-      <text x="420" y="158" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">processes only the new files</text>
+      <text x="420" y="158" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#e8f0fb" text-anchor="middle">zpracuje jen nové soubory</text>
 
       <line x1="530" y1="135" x2="620" y2="135" stroke="#6b7280" marker-end="url(#arr7c)"/>
       <text x="575" y="122" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#22c55e" font-weight="600" text-anchor="middle">exactly-once</text>
 
       <rect x="620" y="100" width="180" height="70" rx="8" fill="#fff" stroke="#22c55e" stroke-width="1.5"/>
-      <text x="710" y="130" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1a3a6b" text-anchor="middle">Delta table</text>
+      <text x="710" y="130" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1a3a6b" text-anchor="middle">Delta tabulka</text>
       <text x="710" y="150" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">sales.bronze.orders</text>
 
       <rect x="310" y="230" width="150" height="56" rx="8" fill="#fff" stroke="#e2e8f0"/>
       <text x="385" y="253" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="600" fill="#1a3a6b" text-anchor="middle">checkpoint</text>
-      <text x="385" y="271" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">state of processed files</text>
+      <text x="385" y="271" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">stav zpracovaných souborů</text>
       <rect x="490" y="230" width="150" height="56" rx="8" fill="#fff" stroke="#e2e8f0"/>
       <text x="565" y="253" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" font-weight="600" fill="#1a3a6b" text-anchor="middle">schema location</text>
-      <text x="565" y="271" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">inferred schema + evolution</text>
+      <text x="565" y="271" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">inferované schéma + evoluce</text>
       <line x1="395" y1="185" x2="385" y2="230" stroke="#6b7280" marker-end="url(#arr7c)"/>
       <line x1="470" y1="185" x2="545" y2="230" stroke="#6b7280" marker-end="url(#arr7c)"/>
     </svg>
-    <figcaption>Auto Loader detects new files, keeps its state in the checkpoint and the inferred schema in the schema location — every file goes through exactly once.</figcaption>
+    <figcaption>Auto Loader detekuje nové soubory, stav si vede v checkpointu a inferované schéma ve schema location — každý soubor projde právě jednou.</figcaption>
   </figure>
 
-  <p>Detection of new files runs in two modes: <strong>directory listing</strong> (a periodic listing of the directory, works with no further configuration) and <strong>file notification</strong> (notifications from the cloud when a file arrives — lower latency and API cost for large workloads; recommended with file events on a Unity Catalog external location).</p>
+  <p>Detekce nových souborů běží ve dvou režimech: <strong>directory listing</strong> (periodický výpis adresáře, funguje bez další konfigurace) a <strong>file notification</strong> (notifikace z cloudu při příchodu souboru — nižší latence a náklady na API u velkých workloadů; doporučeno s file events na external location v Unity Catalogu).</p>
 
   <div class="tabs">
     <div class="tab-list">
@@ -619,7 +619,7 @@ df_stream = (spark.readStream
     </div>
     <div class="tab-panel" id="tab-07-al-py">
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+        <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
         <pre>(spark.readStream
   .<span class="fn">format</span>(<span class="str">"cloudFiles"</span>)
   .<span class="fn">option</span>(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
@@ -634,8 +634,8 @@ df_stream = (spark.readStream
     </div>
     <div class="tab-panel" id="tab-07-al-sql">
       <div class="code-block">
-        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
-        <pre><span class="cm">-- a streaming table in a declarative pipeline: STREAM enables Auto Loader</span>
+        <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
+        <pre><span class="cm">-- streaming tabulka v deklarativni pipeline: STREAM zapina Auto Loader</span>
 <span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">bronze_orders</span>
 <span class="kw">AS SELECT</span> * <span class="kw">FROM</span> STREAM <span class="fn">read_files</span>(
   <span class="str">'abfss://container@storage.dfs.core.windows.net/incoming/orders/'</span>,
@@ -646,43 +646,43 @@ df_stream = (spark.readStream
     </div>
   </div>
 
-  <p><strong>Schema inference</strong>: Auto Loader can infer the schema itself and store it in the <code class="inline">schemaLocation</code>. For JSON and CSV it infers everything as string by default — you enable automatic types with <code class="inline">cloudFiles.inferColumnTypes</code> and force specific columns with <code class="inline">cloudFiles.schemaHints</code>. When new columns appear in the source, the outcome is decided by <code class="inline">cloudFiles.schemaEvolutionMode</code>:</p>
+  <p><strong>Schema inference</strong>: Auto Loader umí schéma odvodit sám a uložit do <code class="inline">schemaLocation</code>. U JSON a CSV inferuje defaultně vše jako string — automatické typy zapnete přes <code class="inline">cloudFiles.inferColumnTypes</code>, konkrétní sloupce vynutíte přes <code class="inline">cloudFiles.schemaHints</code>. Když se ve zdroji objeví nové sloupce, rozhoduje <code class="inline">cloudFiles.schemaEvolutionMode</code>:</p>
 
   <table>
-    <tr><th>Mode</th><th>Behavior</th></tr>
-    <tr><td><code class="inline">addNewColumns</code> (default without a schema)</td><td>the stream fails, the schema is extended, and it continues after a restart</td></tr>
-    <tr><td><code class="inline">rescue</code></td><td>the schema does not change, new columns land in <code class="inline">_rescued_data</code>, the stream does not fail</td></tr>
-    <tr><td><code class="inline">failOnNewColumns</code></td><td>the stream fails and will not start until you adjust the schema</td></tr>
-    <tr><td><code class="inline">none</code> (default with a schema)</td><td>new columns are ignored</td></tr>
-    <tr><td><code class="inline">addNewColumnsWithTypeWidening</code></td><td>like <code class="inline">addNewColumns</code> + widening of compatible types (INT → LONG)</td></tr>
+    <tr><th>Mode</th><th>Chování</th></tr>
+    <tr><td><code class="inline">addNewColumns</code> (default bez schématu)</td><td>stream spadne, schéma se rozšíří, po restartu jede dál</td></tr>
+    <tr><td><code class="inline">rescue</code></td><td>schéma se nemění, nové sloupce padají do <code class="inline">_rescued_data</code>, stream nepadá</td></tr>
+    <tr><td><code class="inline">failOnNewColumns</code></td><td>stream spadne a nenaběhne, dokud schéma neupravíte</td></tr>
+    <tr><td><code class="inline">none</code> (default se schématem)</td><td>nové sloupce se ignorují</td></tr>
+    <tr><td><code class="inline">addNewColumnsWithTypeWidening</code></td><td>jako <code class="inline">addNewColumns</code> + rozšíření kompatibilních typů (INT → LONG)</td></tr>
   </table>
 
-  <p>The <strong><code class="inline">_rescued_data</code></strong> column is a safety net: it captures data that does not match the schema (type mismatches, unexpected columns), so nothing is silently lost.</p>
+  <p>Sloupec <strong><code class="inline">_rescued_data</code></strong> je záchranná síť: zachytí data neodpovídající schématu (typové neshody, neočekávané sloupce), takže se nic tiše neztratí.</p>
 
-  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> you can list the state of ingested files at any time: <code class="inline">SELECT * FROM cloud_files_state('/path/to/checkpoint')</code>. And through the hidden <code class="inline">_metadata</code> column you get <code class="inline">file_path</code>, <code class="inline">file_name</code>, and <code class="inline">file_modification_time</code> for every row — very useful in the bronze layer for tracing the origin of the data.</div></div>
+  <div class="callout tip"><div class="callout-icon">💡</div><div><strong>Tip:</strong> stav ingestovaných souborů si můžete kdykoli vypsat: <code class="inline">SELECT * FROM cloud_files_state('/path/to/checkpoint')</code>. A přes skrytý sloupec <code class="inline">_metadata</code> získáte ke každému řádku <code class="inline">file_path</code>, <code class="inline">file_name</code> i <code class="inline">file_modification_time</code> — v bronze vrstvě velmi užitečné pro dohledatelnost původu.</div></div>
 
   <div class="collapsible">
-    <div class="collapsible-header">Controlling throughput at large volumes<span class="chevron">▼</span></div>
+    <div class="collapsible-header">Řízení propustnosti u velkých objemů<span class="chevron">▼</span></div>
     <div class="collapsible-body">
-      <p>To stop a single micro-batch swallowing the whole backlog, limit it: <code class="inline">cloudFiles.maxFilesPerTrigger</code> (e.g. 1000 files) or <code class="inline">cloudFiles.maxBytesPerTrigger</code> (e.g. 1g). Track progress through the <code class="inline">numFilesOutstanding</code> and <code class="inline">numBytesOutstanding</code> metrics in the streaming dashboard. The schema location and the checkpoint can be the same directory, but keeping them apart pays off — you can reset the stream without losing the inferred schema.</p>
+      <p>Aby jedna mikrodávka nespolkla celý backlog, omezte ji: <code class="inline">cloudFiles.maxFilesPerTrigger</code> (např. 1000 souborů) nebo <code class="inline">cloudFiles.maxBytesPerTrigger</code> (např. 1g). Průběh sledujte přes metriky <code class="inline">numFilesOutstanding</code> a <code class="inline">numBytesOutstanding</code> ve streaming dashboardu. Schema location a checkpoint mohou být tentýž adresář, ale oddělení se vyplatí — můžete resetovat stream bez ztráty inferovaného schématu.</p>
     </div>
   </div>
 
-  <div class="learn-more"><span class="lm-label">📚 Go deeper on Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/7-ingest-data-auto-loader#handle-schema-inference-and-evolution" target="_blank" rel="noopener">Handle schema inference and evolution</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/7-ingest-data-auto-loader#monitor-and-optimize-auto-loader-streams" target="_blank" rel="noopener">Monitor and optimize Auto Loader streams</a></span></div>
+  <div class="learn-more"><span class="lm-label">📚 Do hloubky na Learn:</span> <span><a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/7-ingest-data-auto-loader#handle-schema-inference-and-evolution" target="_blank" rel="noopener">Handle schema inference and evolution</a> · <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/7-ingest-data-auto-loader#monitor-and-optimize-auto-loader-streams" target="_blank" rel="noopener">Monitor and optimize Auto Loader streams</a> (EN)</span></div>
 </div>
 
 <div class="section" id="sec-deklarativni-pipelines">
   <div class="section-header">
     <div class="section-num">7.7</div>
-    <h2>Declarative pipelines as a framework over ingestion</h2>
+    <h2>Deklarativní pipelines jako rámec nad ingestem</h2>
   </div>
-  <p>The previous techniques are the building blocks; a <strong>declarative pipeline</strong> is the framework that assembles them into a complete pipeline. You declare <em>what</em> you want (tables and their sources in SQL or Python) and the framework handles <em>how</em>: execution order, parallelism, retries on failure, checkpoints, and incremental processing. The target of ingestion is typically a <strong>streaming table</strong> — a Delta table with built-in streaming support and an exactly-once guarantee.</p>
+  <p>Předchozí techniky jsou stavební kameny; <strong>deklarativní pipeline</strong> je rámec, který z nich složí celou pipeline. Deklarujete <em>co</em> chcete (tabulky a jejich zdroje v SQL nebo Pythonu) a framework řeší <em>jak</em>: pořadí spouštění, paralelismus, retry při selhání, checkpointy i inkrementální zpracování. Cílem ingestu je typicky <strong>streaming table</strong> — Delta tabulka s vestavěnou podporou streamingu a garancí exactly-once.</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Copy</button></div>
+    <div class="code-header"><span class="code-lang">PYTHON</span><button class="copy-btn">Kopírovat</button></div>
     <pre><span class="kw">from</span> pyspark <span class="kw">import</span> pipelines <span class="kw">as</span> dp
 
-<span class="cm"># a streaming table defined by a decorator; the pipeline handles checkpoints</span>
+<span class="cm"># streaming tabulka definovana dekoratorem; checkpointy resi pipeline</span>
 <span class="kw">@dp.table</span>
 <span class="kw">def</span> <span class="fn">orders_bronze</span>():
     <span class="kw">return</span> (
@@ -692,10 +692,10 @@ df_stream = (spark.readStream
     )</pre>
   </div>
 
-  <p>Besides the default flow (created automatically with the table) you can define <strong>explicit flows</strong> — for example two regional sources feeding one table without a UNION. You then add a new source with a new flow, without touching the existing ones or triggering a full refresh:</p>
+  <p>Kromě výchozího flow (vzniká automaticky s tabulkou) můžete definovat <strong>explicitní flows</strong> — třeba dva regionální zdroje tekoucí do jedné tabulky bez UNION. Nový zdroj pak přidáte novým flow, aniž byste sahali na existující nebo vyvolali full refresh:</p>
 
   <div class="code-block">
-    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+    <div class="code-header"><span class="code-lang">SQL</span><button class="copy-btn">Kopírovat</button></div>
     <pre><span class="kw">CREATE OR REFRESH STREAMING TABLE</span> <span class="tbl">orders_us</span>;
 
 <span class="kw">CREATE FLOW</span> orders_west_flow
@@ -707,34 +707,34 @@ df_stream = (spark.readStream
 <span class="kw">SELECT</span> * <span class="kw">FROM</span> STREAM(<span class="tbl">orders_east</span>);</pre>
   </div>
 
-  <p>Pipelines can read from message buses too (<code class="inline">read_kafka</code>, Event Hubs through the Kafka interface) and for semi-structured JSON they offer <code class="inline">from_json</code> with automatic schema inference and evolution (schema <code class="inline">NULL</code> + <code class="inline">schemaLocationKey</code>). Monitoring is provided by the event log and the dependency DAG in the Lakeflow Pipelines Editor.</p>
+  <p>Pipelines umí číst i z message busů (<code class="inline">read_kafka</code>, Event Hubs přes Kafka rozhraní) a pro semi-strukturovaný JSON nabízejí <code class="inline">from_json</code> s automatickou inferencí a evolucí schématu (schéma <code class="inline">NULL</code> + <code class="inline">schemaLocationKey</code>). Monitoring poskytuje event log a DAG závislostí v Lakeflow Pipelines Editoru.</p>
 
-  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Caution:</strong> the name of a flow identifies its streaming checkpoint. Rename a flow and the checkpoint does not follow — the renamed flow starts processing from the beginning as a new one. With large sources that means a complete re-ingest.</div></div>
+  <div class="callout warning"><div class="callout-icon">⚠️</div><div><strong>Pozor:</strong> jméno flow identifikuje streaming checkpoint. Přejmenujete-li flow, checkpoint se nepřenese a přejmenovaný flow začne zpracovávat od začátku jako nový. U velkých zdrojů to znamená kompletní re-ingest.</div></div>
 
-  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Summary:</strong> Lakeflow Connect for managed sources · a notebook for custom logic · COPY INTO/CTAS for SQL work with files · AUTO CDC for change feeds · Structured Streaming for message buses · Auto Loader for growing file directories · a declarative pipeline as the orchestration framework over all of it. Declarative pipelines are covered in detail in section 10.6.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Shrnutí:</strong> Lakeflow Connect pro managed zdroje · notebook pro custom logiku · COPY INTO/CTAS pro SQL práci se soubory · AUTO CDC pro change feedy · Structured Streaming pro message busy · Auto Loader pro rostoucí adresáře souborů · deklarativní pipeline jako orchestrační rámec nad tím vším. Deklarativním pipelines se podrobně věnuje sekce 10.6.</div></div>
 </div>
 
 <div class="section" id="sec-lab">
   <div class="section-header">
     <div class="section-num">7.8</div>
-    <h2>Lab 7: Ingest Data into Unity Catalog (45 minutes)</h2>
+    <h2>Lab 7: Ingest Data into Unity Catalog (45 minut)</h2>
   </div>
-  <p>At the fictional company <strong>Solaris Energy</strong> (solar farms in Spain and Germany, wind turbines in the Netherlands and Denmark) you are building a central platform for energy production measurements. You will create the catalog → schema → volume hierarchy, load a CSV of readings through a PySpark DataFrame, add an incremental load through COPY INTO and a summary table through CTAS, and finally set up Auto Loader with exactly-once semantics for the files that keep arriving.</p>
-  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/07-ingest-data-into-unity-catalog.html" target="_blank" rel="noopener"><strong>▶ Open the lab on GitHub</strong></a> ·
-     <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/" target="_blank" rel="noopener">Learn module for this topic — with short training videos</a></p>
-  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Note:</strong> in class the instructor walks through the lab as a demo. The instructions are step-by-step and self-service — if there is no time for it during the day, you can go through it on your own.</div></div>
-  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Self-check:</strong> <strong>1)</strong> Why does COPY INTO not process the same file twice, and what happens when you run it repeatedly over the same directory? <strong>2)</strong> What is the difference between CTAS and CREATE OR REPLACE TABLE from the point of view of permissions and an existing table? <strong>3)</strong> Which two locations does Auto Loader need for its work, and what is stored in each of them?</div></div>
+  <p>Ve fiktivní firmě <strong>Solaris Energy</strong> (solární farmy ve Španělsku a Německu, větrné turbíny v Nizozemsku a Dánsku) budujete centrální platformu pro měření výroby energie. Vytvoříte hierarchii katalog → schéma → volume, načtete CSV s odečty přes PySpark DataFrame, doplníte inkrementální load přes COPY INTO, souhrnnou tabulku přes CTAS a nakonec nastavíte Auto Loader s exactly-once sémantikou pro průběžně přibývající soubory.</p>
+  <p><a href="https://microsoftlearning.github.io/DP-750T00-Implement-Data-Engineering-Solutions-using-Azure-Databricks/Instructions/Labs/07-ingest-data-into-unity-catalog.html" target="_blank" rel="noopener"><strong>▶ Otevřít lab na GitHubu (EN)</strong></a> ·
+     <a href="https://learn.microsoft.com/en-us/training/modules/ingest-data-into-unity-catalog/" target="_blank" rel="noopener">Learn modul k tématu — s krátkými výukovými videy</a></p>
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div><strong>Poznámka:</strong> na kurzu lab prochází lektor jako demo. Postup je krokový a samoobslužný — pokud se na něj v rámci dne nedostane, projdete si ho samostatně.</div></div>
+  <div class="callout success"><div class="callout-icon">✓</div><div><strong>Sebekontrola:</strong> <strong>1)</strong> Proč COPY INTO nezpracuje stejný soubor dvakrát a co se stane, když ho spustíte opakovaně nad stejným adresářem? <strong>2)</strong> Jaký je rozdíl mezi CTAS a CREATE OR REPLACE TABLE z pohledu oprávnění a existující tabulky? <strong>3)</strong> Které dvě lokace Auto Loader potřebuje ke své práci a co se v každé z nich ukládá?</div></div>
 </div>
 
     <div class="footer-nav">
-      <a href="dp750_06_datove_modelovani.html">← Data modeling</a>
-      <span style="color:var(--text-muted);font-size:13px">Chapter 7 of 16</span>
-      <a href="dp750_08_transformace.html" style="margin-left:auto">Cleansing and transforming data →</a>
+      <a href="dp750_06_datove_modelovani.html">← Datové modelování</a>
+      <span style="color:var(--text-muted);font-size:13px">Kapitola 7 z 16</span>
+      <a href="dp750_08_transformace.html" style="margin-left:auto">Čištění a transformace dat →</a>
     </div>
   </main>
 </div>
 
-<script>var T={copy:"Copy",copied:"✓ Copied",copyFallback:"Ctrl+C",hintShow:"💡 Show hint",hintHide:"🙈 Hide hint",menuOpen:"☰ Chapters",menuClose:"✕ Close"};
+<script>var T={copy:"Kopírovat",copied:"✓ Zkopírováno",copyFallback:"Ctrl+C",hintShow:"💡 Zobrazit nápovědu",hintHide:"🙈 Skrýt nápovědu",menuOpen:"☰ Kapitoly",menuClose:"✕ Zavřít"};
 /* Sdilene chovani pro CS i EN vetev. Objekt T (UI texty) emituje build.py pred telem
    tohoto skriptu — viz LANGS v build.py. Zadny text natvrdo, jinak se rozejdou jazyky. */
 function initTabs(){document.querySelectorAll('.tab-list').forEach(list=>{list.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const panel=btn.dataset.tab;const container=btn.closest('.tabs');container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');container.querySelector('#'+panel).classList.add('active')})})});document.querySelectorAll('.tabs').forEach(t=>{const first=t.querySelector('.tab-btn');if(first)first.classList.add('active');const firstP=t.querySelector('.tab-panel');if(firstP)firstP.classList.add('active')})}
